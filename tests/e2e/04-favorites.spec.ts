@@ -29,9 +29,21 @@ test.describe('04 · favoritos', () => {
     await expect(heart).toHaveAttribute('aria-pressed', 'true')
   })
 
-  test('visitante é levado ao login ao favoritar', async ({ page }) => {
+  test('visitante entra sem sair do detalhe e o favorito é salvo em seguida', async ({ page }) => {
     await openApp(page, '/nft/emerald-ape-042')
-    await page.getByRole('button', { name: /lista de interesse/ }).filter({ visible: true }).first().click()
-    await expect(page).toHaveURL(/\/login\?redirect=/)
+    const heart = page.getByRole('button', { name: /lista de interesse/ }).filter({ visible: true }).first()
+    await heart.click()
+
+    // The login opens over the page the visitor is on; the URL does not change.
+    const dialog = page.getByRole('dialog', { name: 'Entrar' })
+    await expect(dialog).toContainText('Emerald Ape #042 vai para a sua lista de interesse assim que você entrar.')
+    await expect(page).toHaveURL(/\/nft\/emerald-ape-042$/)
+    await dialog.getByRole('button', { name: 'Preencher' }).click()
+    await dialog.getByRole('button', { name: 'Entrar', exact: true }).click()
+
+    await expect(dialog).toBeHidden()
+    await expect(page).toHaveURL(/\/nft\/emerald-ape-042$/)
+    await expect(heart).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByText('Emerald Ape #042 salvo na sua lista de interesse.')).toBeVisible()
   })
 })

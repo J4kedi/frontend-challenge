@@ -1,11 +1,12 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useNavigate, useRouterState } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { favorites, type Favorites } from '@/contracts/account'
+import { loginPrompt } from '@/features/auth/login-prompt'
 import { useSession } from '@/features/auth/session'
 import { announce } from '@/shared/a11y/announcer'
 import { request } from '@/shared/api/client'
 import { queryKeys } from '@/shared/api/query-keys'
+import { sessionStore } from '@/shared/session/session-store'
 
 const favoritesApi = {
   list: (signal?: AbortSignal) => request(favorites, { url: '/me/favorites', signal }),
@@ -32,19 +33,18 @@ export function useIsFavorite(nftId: string) {
 /**
  * Optimistic toggle (the challenge's required optimistic interaction): the
  * heart flips immediately, and a failed request restores the previous list.
- * Visitors are sent to login and come back to the same page.
+ * Visitors sign in over the same page, and the favorite is saved right after.
  */
 export function useToggleFavorite() {
   const queryClient = useQueryClient()
   const { user } = useSession()
-  const navigate = useNavigate()
-  const href = useRouterState({ select: (s) => s.location.href })
 
   const mutation = useMutation({
     mutationFn: ({ nftId, favorite }: { nftId: string; favorite: boolean; name: string }) =>
       favorite ? favoritesApi.add(nftId) : favoritesApi.remove(nftId),
     onMutate: async ({ nftId, favorite }) => {
-      const key = queryKeys.user(user!.id).favorites
+      // Read at call time: after a sign-in prompt the hook has not re-rendered yet.
+      const key = queryKeys.user(sessionStore.userId()!).favorites
       await queryClient.cancelQueries({ queryKey: key })
       const previous = queryClient.getQueryData<Favorites>(key)
       const ids = new Set(previous?.nftIds ?? [])
@@ -58,7 +58,9 @@ export function useToggleFavorite() {
       toast.error(`Não foi possível atualizar ${name} na sua lista. Tente novamente.`)
       announce(`Falha ao atualizar ${name} na lista de interesse. O estado anterior foi restaurado.`)
     },
-    onSuccess: (data, { favorite, name }, context) => {
+    onSuccess: async (data, { favorite, name }, context) => {
+      // A list fetched before this write (e.g. right after sign-in) must not overwrite it.
+      await queryClient.cancelQueries({ queryKey: context.key })
       queryClient.setQueryData(context.key, data)
       announce(favorite ? `${name} adicionado à lista de interesse.` : `${name} removido da lista de interesse.`)
     },
@@ -68,8 +70,12 @@ export function useToggleFavorite() {
     isPending: mutation.isPending,
     toggle(nftId: string, name: string, currentlyFavorite: boolean) {
       if (!user) {
-        toast.info('Entre na sua conta para salvar favoritos.')
-        void navigate({ to: '/login', search: { redirect: href } })
+        loginPrompt.open({
+          reason: `${name} vai para a sua lista de interesse assim que você entrar.`,
+          // Add, not toggle: the account may already have it.
+          onSignedIn: () =>
+            mutation.mutate({ nftId, favorite: true, name }, { onSuccess: () => toast.success(`${name} salvo na sua lista de interesse.`) }),
+        })
         return
       }
       mutation.mutate({ nftId, favorite: !currentlyFavorite, name })
