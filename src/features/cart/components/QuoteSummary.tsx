@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Quote } from '@/contracts/commerce'
@@ -55,8 +55,8 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
   const [error, setError] = useState<string | null>(null)
   const applied = quote?.coupon?.status === 'applied' ? quote.coupon : null
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  // Not a <form>: the coupon also lives inside the checkout form, and forms cannot nest.
+  async function submit() {
     setError(null)
     if (!code.trim()) return setError('Informe o código promocional')
     try {
@@ -89,7 +89,7 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
 
   const pill = variant === 'pill'
   return (
-    <form onSubmit={submit} noValidate className="space-y-2" aria-label="Código promocional">
+    <div role="group" className="space-y-2" aria-label="Código promocional">
       {!pill && (
         <label htmlFor="coupon" className="text-body-sm font-bold text-foreground">
           Código promocional
@@ -100,6 +100,12 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
           id="coupon"
           value={code}
           onChange={(e) => setCode(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              void submit()
+            }
+          }}
           placeholder="Digite o código promocional..."
           aria-label={pill ? 'Código promocional' : undefined}
           aria-invalid={error ? true : undefined}
@@ -110,7 +116,7 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
             pill ? 'rounded-full' : 'rounded-l-sm border border-primary focus-visible:border-accent',
           )}
         />
-        <Button type="submit" className={cn('h-10', pill ? 'rounded-full px-5' : 'rounded-l-none')} disabled={apply.isPending} aria-busy={apply.isPending}>
+        <Button type="button" onClick={() => void submit()} className={cn('h-10', pill ? 'rounded-full px-5' : 'rounded-l-none')} disabled={apply.isPending} aria-busy={apply.isPending}>
           Aplicar
         </Button>
       </div>
@@ -119,6 +125,6 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
           {error}
         </p>
       )}
-    </form>
+    </div>
   )
 }
