@@ -1,0 +1,298 @@
+{
+  "fileKey": "Ff0SksUi7UFtPWUO8kyNtw",
+  "version": "2397163412428844678",
+  "lastModified": "2026-09-09T09:31:48Z",
+  "frames": [
+    {
+      "id": "2:2",
+      "name": "Desktop / Início",
+      "width": 1440,
+      "height": 3668,
+      "file": "docs/design/frames/desktop-inicio.webp"
+    },
+    {
+      "id": "10:244",
+      "name": "Desktop / Detalhes do NFT",
+      "width": 1440,
+      "height": 2246.000244140625,
+      "file": "docs/design/frames/desktop-detalhes-do-nft.webp"
+    },
+    {
+      "id": "11:1278",
+      "name": "Desktop / Carrinho de NFTs",
+      "width": 1440,
+      "height": 1754.0001220703125,
+      "file": "docs/design/frames/desktop-carrinho-de-nfts.webp"
+    },
+    {
+      "id": "11:2862",
+      "name": "Desktop / Pagamento",
+      "width": 1440,
+      "height": 1657,
+      "file": "docs/design/frames/desktop-pagamento.webp"
+    },
+    {
+      "id": "11:4385",
+      "name": "Desktop / Confirmação de Pedido",
+      "width": 1440,
+      "height": 1657,
+      "file": "docs/design/frames/desktop-confirmacao-de-pedido.webp"
+    },
+    {
+      "id": "9:115",
+      "name": "Desktop / Login",
+      "width": 1440,
+      "height": 1981,
+      "file": "docs/design/frames/desktop-login.webp"
+    },
+    {
+      "id": "9:1022",
+      "name": "Desktop / Cadastro",
+      "width": 1440,
+      "height": 1981,
+      "file": "docs/design/frames/desktop-cadastro.webp"
+    },
+    {
+      "id": "9:1238",
+      "name": "Desktop / Perfil do Colecionador",
+      "width": 1440,
+      "height": 1080,
+      "file": "docs/design/frames/desktop-perfil-do-colecionador.webp"
+    },
+    {
+      "id": "9:1670",
+      "name": "Desktop / Carteiras",
+      "width": 1440,
+      "height": 1080,
+      "file": "docs/design/frames/desktop-carteiras.webp"
+    },
+    {
+      "id": "14:5226",
+      "name": "Mobile / Início",
+      "width": 414,
+      "height": 896,
+      "file": "docs/design/frames/mobile-inicio.webp"
+    },
+    {
+      "id": "15:5536",
+      "name": "Mobile / Detalhes do NFT",
+      "width": 414,
+      "height": 896,
+      "file": "docs/design/frames/mobile-detalhes-do-nft.webp"
+    },
+    {
+      "id": "16:360",
+      "name": "Mobile / Carrinho de NFTs",
+      "width": 414,
+      "height": 896,
+      "file": "docs/design/frames/mobile-carrinho-de-nfts.webp"
+    },
+    {
+      "id": "16:748",
+      "name": "Mobile / Pagamento",
+      "width": 414,
+      "height": 896,
+      "file": "docs/design/frames/mobile-pagamento.webp"
+    },
+    {
+      "id": "16:1022",
+      "name": "Mobile / Login",
+      "width": 414,
+      "height": 896,
+      "file": "docs/design/frames/mobile-login.webp"
+    },
+    {
+      "id": "16:1228",
+      "name": "Mobile / Cadastro",
+      "width": 414,
+      "height": 896,
+      "file": "docs/design/frames/mobile-cadastro.webp"
+    }
+  ],
+  "images": [
+    {
+      "ref": "2986a7cb16d09de8970824d2dd58bf0bb021702c",
+      "usedBy": "NFT Artwork 18",
+      "file": "design/assets/nfts/sage.png",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "9b25d8d72395aa62f919f6ad33b95b7ba7bbfee6049e95cf159a319b03ecb8d9"
+    },
+    {
+      "ref": "8459204731e6eba9d474cbc8ebc37071360d3ba5",
+      "usedBy": "Frame 136",
+      "file": "design/assets/nfts/emerald.png",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "f20b58b99de12b6eceede2090607e4b999275bba95de7674bb14f26b59666b21"
+    },
+    {
+      "ref": "87580f2def9af0ce13f4b6f6ce17bb2449bcfc16",
+      "usedBy": "NFT Artwork 09",
+      "file": "design/assets/nfts/golden.png",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "2a42ba5adc341c3d0e1ad6905058e2762d995fc988113a7cd28b0d15f6a4ba28"
+    },
+    {
+      "ref": "9df2ff42dd27ba657621c304557d1a855a4be6a5",
+      "usedBy": "NFT Artwork 05",
+      "file": "design/assets/nfts/ivory.png",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "326df4c1c08c31c88b9f407e51be3991e46667183af62aa1501927adc76f52b5"
+    }
+  ],
+  "icons": [
+    {
+      "id": "I70522:3240;70504:3015;70486:527",
+      "name": "Iconly/Curved/Logout",
+      "file": "src/assets/icons/curved-logout.svg",
+      "sha256": "8000763a58183f1f1bf00f87523d9becc871ac03ed722249ec6bf7b62fe4651d"
+    },
+    {
+      "id": "4:152",
+      "name": "Iconly/Two-tone/Arrow - Down 2",
+      "file": "src/assets/icons/two-tone-arrow-down-2.svg",
+      "sha256": "ed97fda8119be3fe8b39c71ed7bdec02fb01a531c0f82460f70362ebc6c461dc"
+    },
+    {
+      "id": "4:392",
+      "name": "Iconly/Curved/Arrow - Right 2",
+      "file": "src/assets/icons/curved-arrow-right-2.svg",
+      "sha256": "126873139b12577a7bf6b6dc6ee5d31119dd8d91e80859ba2a1ba7f953a75b01"
+    },
+    {
+      "id": "5:99",
+      "name": "Iconly/Curved/Arrow - Right",
+      "file": "src/assets/icons/curved-arrow-right.svg",
+      "sha256": "0057f1cb0987b99fa4c2cae2a3929c4b876d9143eb933285a5aab9707b12d0e3"
+    },
+    {
+      "id": "11:1195",
+      "name": "Iconly/Bold/Star",
+      "file": "src/assets/icons/bold-star.svg",
+      "sha256": "a5adc4100fb2fa0fcbe5cf8e0e276fdbc08434e17859a6201c8d1af10a12f0a5"
+    },
+    {
+      "id": "11:2029",
+      "name": "Iconly/Curved/Delete",
+      "file": "src/assets/icons/curved-delete.svg",
+      "sha256": "16ed817353b91e7d8535a0d25fdce1308210aa071048ced97b59860756570c58"
+    },
+    {
+      "id": "I70522:3321;70504:3064",
+      "name": "Arrow-Down",
+      "file": "src/assets/icons/arrow-down.svg",
+      "sha256": "28c050c4b9ca8ac0c9ba5d4302be79681b3aa944dac510feaefa452b334a5bce"
+    },
+    {
+      "id": "12:5223",
+      "name": "X",
+      "file": "src/assets/icons/x.svg",
+      "sha256": "6ad686cab94f28dbde0c665918b25695f56a56d7f9774b51cd285772bed01be8"
+    },
+    {
+      "id": "9:963",
+      "name": "Iconly/Curved/Hide",
+      "file": "src/assets/icons/curved-hide.svg",
+      "sha256": "926c72f1262e88c90f49458bc92be41457410607359fc2abd02c56c91c55d661"
+    },
+    {
+      "id": "70484:260",
+      "name": "Provider=Google",
+      "file": "src/assets/icons/provider-google.svg",
+      "sha256": "4f5906190ceb7ffa244b44ec6ebc1a8f4a6a31e4b1cdfb8431ef83b734898b33"
+    },
+    {
+      "id": "70484:240",
+      "name": "Provider=Facebook",
+      "file": "src/assets/icons/provider-facebook.svg",
+      "sha256": "4a4fa3f26e3be4bd15054f774d10d59b0de698af30903879fca099a41d32e32d"
+    },
+    {
+      "id": "70420:4541",
+      "name": "User",
+      "file": "src/assets/icons/user.svg",
+      "sha256": "b296be1ab6d3dbadc2ba5de25174383ac2a11ff2ba949e046dfa526bea8a906d"
+    },
+    {
+      "id": "70420:4544",
+      "name": "Iconly/Light-Outline/Location",
+      "file": "src/assets/icons/light-outline-location.svg",
+      "sha256": "51fa578749c2c8eadb2fc2437c35cdf30e11eaf38ee39e0c60a8ea84c0203101"
+    },
+    {
+      "id": "70420:4555",
+      "name": "Iconly/Curved/Activity",
+      "file": "src/assets/icons/curved-activity.svg",
+      "sha256": "2d55f8048e8067ff2d00fd4ba30a21cafb6e460ec0e24bc4f6b2836909151a3d"
+    },
+    {
+      "id": "70420:4558",
+      "name": "Iconly/Curved/Download",
+      "file": "src/assets/icons/curved-download.svg",
+      "sha256": "569c03370c8677d666bd9ab82ff212d96ea72cefee3f796bcabe29c87efbb705"
+    },
+    {
+      "id": "70420:4561",
+      "name": "Iconly/Curved/Danger Triangle",
+      "file": "src/assets/icons/curved-danger-triangle.svg",
+      "sha256": "e16cc550403becdfa6f0e62873c2c9db25cf4881fb4acf3d2a695badac4c0798"
+    },
+    {
+      "id": "9:1560",
+      "name": "Iconly/Curved/Image 2",
+      "file": "src/assets/icons/curved-image-2.svg",
+      "sha256": "34e5347c18e9c31fcdcc963e2ff3f46b5c2e186d927cbae511906037ac68219c"
+    },
+    {
+      "id": "I70522:3144;70504:2972",
+      "name": "Iconly/Light-Outline/Hide",
+      "file": "src/assets/icons/light-outline-hide.svg",
+      "sha256": "76123388f20cc5bd3b2dee510fbc8e8ac0ac5f9115c309cb548d1f3b27f320e9"
+    },
+    {
+      "id": "15:5488",
+      "name": "Iconly/Curved/Filter",
+      "file": "src/assets/icons/curved-filter.svg",
+      "sha256": "3aa8f24c26f3c763e888d36c0e2b31bc0333d8042c772af27db945caf103d6b4"
+    },
+    {
+      "id": "15:5519",
+      "name": "Iconly/Bold/Home",
+      "file": "src/assets/icons/bold-home.svg",
+      "sha256": "221793fbc6bf9bc89b3414423c44d4566f9ea8e2028885dc71d8e4ddf858d9c6"
+    },
+    {
+      "id": "15:5745",
+      "name": "Iconly/Curved/Arrow - Left 2",
+      "file": "src/assets/icons/curved-arrow-left-2.svg",
+      "sha256": "dd000f405a334c72c2c709a54f997b3e67e721ce39d15668dac2531adfc23754"
+    },
+    {
+      "id": "16:357",
+      "name": "Shop",
+      "file": "src/assets/icons/shop.svg",
+      "sha256": "89298c5b0324863320f6e7476a8bdfb231302332ebb8b02003cb397c95f54411"
+    },
+    {
+      "id": "23:1379",
+      "name": "Iconly/Curved/Wallet",
+      "file": "src/assets/icons/curved-wallet.svg",
+      "sha256": "8cf1d5516ae68ba24fc181302623edcb1bdb52e65914c7ead493b25b0048f563"
+    },
+    {
+      "id": "11:1248",
+      "name": "Message",
+      "file": "src/assets/icons/message.svg",
+      "sha256": "20d9437ad3a4200f186ff7c5c8a55d7bf823078b7be38b7b36f98898119e0cee"
+    },
+    {
+      "id": "15:5331",
+      "name": "Search",
+      "file": "src/assets/icons/search.svg",
+      "sha256": "f5e374cf1163f4deedea16f7ae0924ccb9563ee9efc403ed2c58778959af9d29"
+    }
+  ]
+}
