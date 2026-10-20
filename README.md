@@ -85,13 +85,15 @@ Cupons: `KURIO10` (10%), `LANCAMENTO15` (15%), `EXPIRADO5` (expirado).
 Qualquer outro código é inválido.
 
 As senhas ficam no banco simulado só como hash PBKDF2-SHA256 com sal; nenhuma
-senha é armazenada em claro.
+senha é armazenada em claro. Na tela de login, **Preencher** completa a conta
+da Ana; no painel "Mocks", **Entrar como…** entra direto com qualquer uma das
+duas (e troca de usuário sem recarregar).
 
 ## Cenários de mock
 
 Escolha um cenário pela URL, com `?scenario=<nome>` (ele fica salvo), ou pelo
 **painel "Mocks"**. Para voltar ao estado inicial: `?mock-reset`, o botão
-"Resetar todos os dados do mock" no painel, ou `POST /api/__mock/reset`.
+"Restaurar os dados iniciais" no painel, ou `POST /api/__mock/reset`.
 
 | Cenário | Efeito |
 | --- | --- |
@@ -107,9 +109,21 @@ Escolha um cenário pela URL, com `?scenario=<nome>` (ele fica salvo), ou pelo
 | `wallet-rejected` | a extensão de carteira recusa a conexão |
 | `events-chaos` | todo evento chega duplicado e seguido de uma versão antiga |
 
-O painel também dispara eventos pelo servidor simulado: altera o preço ou
-esgota o 1º item do carrinho, derruba o Socket.IO, reenvia o último evento e
-expira a sessão. Tudo passa pela API de controle
+### Painel "Mocks"
+
+Botão no canto inferior esquerdo, com o status do tempo real (ponto verde,
+âmbar ou vermelho). Cada ação diz o que vai fazer e com quais dados:
+
+| Seção | O que faz |
+| --- | --- |
+| Cenário | troca o cenário ativo e explica o efeito dele |
+| Tempo real | mostra a conexão; derruba o Socket.IO por 5, 10 ou 30 s (o servidor recusa reconexões nesse intervalo, com contagem regressiva); reenvia o último evento, nomeado (`nft.updated · Emerald Ape #042 · v2`), ou uma versão mais antiga dele |
+| Carrinho | sobe o preço ou esgota a edição do 1º item, pelo nome (`Subir o preço de Emerald Ape #042 para 1.29 ETH`) |
+| Conta | login rápido como Ana ou Bruno, troca de usuário e expiração da sessão no servidor |
+| Dados | restaura o seed e recarrega |
+
+O resultado volta num toast (`Emerald Ape #042: 1.19 → 1.29 ETH. O servidor
+publicou nft.updated.`). Esc fecha o painel. Tudo passa pela API de controle
 ([`docs/contracts/rest.md`](docs/contracts/rest.md#api-de-controle-da-simulação-api__mock)),
 que atualiza o REST **e** publica o evento.
 
@@ -120,16 +134,18 @@ que atualiza o REST **e** publica o evento.
 | Busca com respostas fora de ordem | `/?scenario=jitter`: marque e desmarque filtros depressa. O resultado final corresponde sempre ao último filtro. |
 | Falha e nova tentativa | `/?scenario=http-5xx`: depois de 3 falhas aparece "Não foi possível carregar o catálogo"; "Tentar novamente" carrega. |
 | Sem conexão | `/?scenario=offline`: mensagem de rede em cada bloco. |
+| Favorito como visitante | sem login, toque no coração de um NFT. O login abre sobre a própria página; ao entrar, o favorito é salvo e você continua onde estava. |
 | Favorito com rollback | entre como Ana; no painel, escolha "Falha em mutation" e favorite um NFT. O coração volta e um toast explica. |
 | Cupom inválido ou expirado | no carrinho, use `EXPIRADO5` ou `ABC123`. |
-| Preço muda durante o pagamento | com um item no carrinho, abra o pagamento e use "Alterar preço do 1º item" no painel. O aviso aparece, o total muda, e a revisão exige "Aceitar novos preços". |
-| Edição esgota durante a compra | painel → "Esgotar a edição do 1º item": a compra fica bloqueada até ajustar o carrinho. |
+| Preço muda durante o pagamento | com um item no carrinho, abra o pagamento e use "Subir o preço de …" no painel. O aviso aparece, o total muda, e a revisão exige "Aceitar novos preços". |
+| Edição esgota durante a compra | painel → "Esgotar …": a compra fica bloqueada até ajustar o carrinho. |
+| Evento perdido durante a queda | no detalhe do NFT que está no carrinho, derrube a conexão por 10 s e, durante a queda, suba o preço pelo painel. A tela fica com o preço antigo e o aviso de queda; quando o servidor volta, o app recarrega pelo REST e mostra o preço novo. |
 | Pagamento recusado | `?scenario=payment-declined` e conclua a compra: o pedido aparece recusado e o carrinho continua igual. |
 | Timeout com recuperação | `?scenario=order-timeout` e confirme: depois de ~8 s o cliente reenvia com a mesma chave e recebe o **mesmo** pedido. |
 | Carteira recusa | `?scenario=wallet-rejected` e clique em "Conectar carteira". |
 | Eventos duplicados ou antigos | `/nft/emerald-ape-042?scenario=events-chaos` e mude o preço pelo painel. O preço novo nunca regride. |
 | Desconexão com pedido pendente | `?scenario=slow`, confirme uma compra, derrube o Socket.IO pelo painel e recarregue: o mesmo pedido termina confirmado. |
-| Sessão expirada no meio do pagamento | painel → "Expirar a sessão agora" e continue. O login volta para onde você estava, com o formulário preenchido. |
+| Sessão expirada no meio do pagamento | painel → "Expirar a sessão no servidor" e continue. O login volta para onde você estava, com o formulário preenchido. |
 
 ## Testes
 

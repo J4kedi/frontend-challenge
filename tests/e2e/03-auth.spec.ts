@@ -1,4 +1,4 @@
-import { expect, isMobile, mockControl, openApp, submitLogin, test, USERS, waitForMocks } from './support/app'
+import { addToCartFromDetail, expect, isMobile, mockControl, openApp, submitLogin, test, USERS, waitForMocks } from './support/app'
 
 test.describe('03 · conta e sessão', () => {
   test('cadastro com conflito e sucesso', async ({ page }) => {
@@ -31,6 +31,18 @@ test.describe('03 · conta e sessão', () => {
     await page.getByLabel('Senha', { exact: true }).fill('senha-errada1')
     await page.getByRole('button', { name: 'Entrar', exact: true }).click()
     await expect(page.getByRole('alert').filter({ hasText: 'E-mail ou senha incorretos' })).toBeVisible()
+  })
+
+  test('fechar o login aberto pelo carrinho volta ao carrinho', async ({ page }) => {
+    test.skip(isMobile(page), 'No mobile o login é tela cheia, sem botão de fechar; o voltar do navegador faz o mesmo caminho')
+    await openApp(page, '/')
+    await addToCartFromDetail(page, 'emerald-ape-042')
+    await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
+    await expect(page).toHaveURL(/\/login\?redirect=%2Fcheckout/)
+    // Going to the redirect (/checkout, private) would bounce straight back to this login.
+    await page.getByRole('dialog', { name: 'Entrar' }).getByRole('button', { name: 'Fechar' }).click()
+    await expect(page).toHaveURL(/\/cart$/)
+    await expect(page.getByRole('dialog')).toBeHidden()
   })
 
   test('expiração durante a navegação, logout e troca de usuário sem vazar dados', async ({ page }) => {

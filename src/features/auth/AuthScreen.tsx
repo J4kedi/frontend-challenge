@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useRouter } from '@tanstack/react-router'
-import { useState } from 'react'
+import { Link, useRouter, useRouterState } from '@tanstack/react-router'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import facebookLogo from '@/assets/brand/facebook.svg'
@@ -14,8 +14,9 @@ import { Input } from '@/components/ui/input'
 import { loginBody, signupBody, type LoginBody, type SignupBody } from '@/contracts/account'
 import { PromoCards } from '@/features/catalog/components/HomeEditorial'
 import { HomeHero } from '@/features/catalog/components/HomeHero'
+import { config, DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/shared/config'
 import { DESKTOP_QUERY, useMediaQuery } from '@/shared/hooks/use-media-query'
-import { cn } from '@/shared/lib/cn'
+import { loginPrompt, type LoginPromptRequest } from './login-prompt'
 import { safeRedirect, useLogin, useSignup } from './session'
 
 type Mode = 'login' | 'signup'
@@ -30,7 +31,7 @@ const COPY: Record<Mode, { title: string; mobileTitle: string; intro: string }> 
 }
 
 /**
- * Login and sign-up. Desktop: modal over the marketplace (Figma "Desktop /
+ * Login and sign-up routes. Desktop: modal over the marketplace (Figma "Desktop /
  * Login|Cadastro"); mobile: full screen (Figma "Mobile / Login|Cadastro").
  * After success the collector returns to `redirect` (internal paths only).
  */
@@ -38,6 +39,7 @@ export function AuthScreen({ mode, redirect, reason }: { mode: Mode; redirect?: 
   const desktop = useMediaQuery(DESKTOP_QUERY)
   const router = useRouter()
   const copy = COPY[mode]
+  const goToRedirect = () => void router.navigate({ href: safeRedirect(redirect), replace: true })
   const body = (
     <>
       {reason === 'expired' && (
@@ -45,28 +47,24 @@ export function AuthScreen({ mode, redirect, reason }: { mode: Mode; redirect?: 
           Sua sessão expirou. Entre novamente para continuar de onde parou.
         </p>
       )}
-      {mode === 'login' ? <LoginForm redirect={redirect} /> : <SignupForm redirect={redirect} />}
+      {mode === 'login' ? <LoginForm onSuccess={goToRedirect} /> : <SignupForm onSuccess={goToRedirect} />}
       <SocialLogin />
     </>
   )
 
   if (desktop) {
+    // Closing returns to the page the collector came from. Going to `redirect`
+    // instead would bounce off a private page (/checkout) straight back here.
+    const close = () => (router.history.canGoBack() ? router.history.back() : void router.navigate({ to: '/' }))
     return (
       <>
         <div inert aria-hidden="true" className="pointer-events-none select-none">
           <HomeHero />
           <PromoCards />
         </div>
-        <Dialog open onOpenChange={(open) => !open && void router.navigate({ href: safeRedirect(redirect) === router.state.location.href ? '/' : safeRedirect(redirect) })}>
-          <DialogContent className="max-w-[500px] gap-0 overflow-hidden rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0 shadow-overlay">
-            <div className="px-16 pt-10 pb-8">
-              <AuthTabs mode={mode} redirect={redirect} />
-              <DialogTitle className="sr-only">{copy.title}</DialogTitle>
-              <DialogDescription className="mt-8 text-center text-body-sm text-foreground">{copy.intro}</DialogDescription>
-              <div className="mt-6 space-y-4">{body}</div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <AuthDialog mode={mode} redirect={redirect} description={copy.intro} onClose={close}>
+          {body}
+        </AuthDialog>
       </>
     )
   }
@@ -95,33 +93,104 @@ export function AuthScreen({ mode, redirect, reason }: { mode: Mode; redirect?: 
   )
 }
 
-function AuthTabs({ mode, redirect }: { mode: Mode; redirect?: string }) {
-  const tab = (active: boolean) => cn('text-title-lg transition-colors', active ? 'text-accent' : 'text-foreground hover:text-accent')
+/**
+ * Sign-in asked for in the middle of an action (see login-prompt.ts): the same
+ * modal, over the page the collector is on. Nothing navigates; on success the
+ * dialog closes and the interrupted action resumes.
+ */
+export function LoginPrompt({ request }: { request: LoginPromptRequest }) {
+  const [mode, setMode] = useState<Mode>('login')
+  const href = useRouterState({ select: (s) => s.location.href })
+  const [openedOn] = useState(href)
+  // The prompt belongs to the page it was opened on.
+  useEffect(() => {
+    if (href !== openedOn) loginPrompt.close()
+  }, [href, openedOn])
+
+  const done = () => {
+    loginPrompt.close()
+    request.onSignedIn?.()
+  }
+  return (
+    <AuthDialog mode={mode} onSelectMode={setMode} description={request.reason} onClose={loginPrompt.close}>
+      {mode === 'login' ? <LoginForm onSuccess={done} /> : <SignupForm onSuccess={done} />}
+      <SocialLogin />
+    </AuthDialog>
+  )
+}
+
+function AuthDialog({
+  mode,
+  redirect,
+  onSelectMode,
+  description,
+  onClose,
+  children,
+}: {
+  mode: Mode
+  redirect?: string
+  onSelectMode?: (mode: Mode) => void
+  description: string
+  onClose: () => void
+  children: ReactNode
+}) {
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-[500px] gap-0 overflow-hidden rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0 shadow-overlay">
+        <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto px-6 pt-10 pb-8 sm:px-16">
+          <AuthTabs mode={mode} redirect={redirect} onSelectMode={onSelectMode} />
+          <DialogTitle className="sr-only">{COPY[mode].title}</DialogTitle>
+          <DialogDescription className="mt-8 text-center text-body-sm text-foreground">{description}</DialogDescription>
+          <div className="mt-6 space-y-4">{children}</div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/** Routes switch tabs by URL (replace); the prompt switches in place, without leaving the page. */
+function AuthTabs({ mode, redirect, onSelectMode }: { mode: Mode; redirect?: string; onSelectMode?: (mode: Mode) => void }) {
+  const tab = (target: Mode) => {
+    const label = COPY[target].title
+    if (target === mode) {
+      return (
+        <span aria-current="page" className="text-title-lg text-accent">
+          {label}
+        </span>
+      )
+    }
+    const className = 'text-title-lg text-foreground transition-colors hover:text-accent'
+    return onSelectMode ? (
+      <button type="button" className={className} onClick={() => onSelectMode(target)}>
+        {label}
+      </button>
+    ) : (
+      <Link to={target === 'login' ? '/login' : '/signup'} search={{ redirect }} replace className={className}>
+        {label}
+      </Link>
+    )
+  }
   return (
     <nav aria-label="Entrar ou criar conta" className="flex items-center justify-center gap-2">
-      <Link to="/login" search={{ redirect }} replace className={tab(mode === 'login')} aria-current={mode === 'login' ? 'page' : undefined}>
-        Entrar
-      </Link>
+      {tab('login')}
       <span aria-hidden="true" className="h-6 w-px bg-primary" />
-      <Link to="/signup" search={{ redirect }} replace className={tab(mode === 'signup')} aria-current={mode === 'signup' ? 'page' : undefined}>
-        Criar conta
-      </Link>
+      {tab('signup')}
     </nav>
   )
 }
 
-function LoginForm({ redirect }: { redirect?: string }) {
+function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const form = useForm<LoginBody>({ resolver: zodResolver(loginBody), defaultValues: { email: '', password: '' } })
   const login = useLogin()
-  const router = useRouter()
   const [formError, setFormError] = useState<string | null>(null)
   const { errors } = form.formState
+  const demo = DEMO_ACCOUNTS[0]
 
   const onSubmit = form.handleSubmit(async (values) => {
     setFormError(null)
     try {
       await login.mutateAsync(values)
-      void router.navigate({ href: safeRedirect(redirect), replace: true })
+      onSuccess()
     } catch (error) {
       setFormError(applyServerErrors(form, error, ['email', 'password']))
     }
@@ -129,6 +198,24 @@ function LoginForm({ redirect }: { redirect?: string }) {
 
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-4" aria-label="Entrar">
+      {config.mocksEnabled && (
+        <p className="flex items-center justify-between gap-3 rounded-sm border border-border-soft px-3 py-2 text-caption text-muted-foreground">
+          <span>
+            Conta de teste: <span className="text-foreground">{demo.email}</span> · senha{' '}
+            <span className="text-foreground">{DEMO_PASSWORD}</span>
+          </span>
+          <button
+            type="button"
+            className="shrink-0 font-bold text-accent hover:underline"
+            onClick={() => {
+              form.setValue('email', demo.email, { shouldValidate: true })
+              form.setValue('password', DEMO_PASSWORD, { shouldValidate: true })
+            }}
+          >
+            Preencher
+          </button>
+        </p>
+      )}
       <FormError message={formError} />
       <FormField label="E-mail" hideLabel error={errors.email?.message}>
         {(field) => <Input {...field} {...form.register('email')} type="email" autoComplete="email" placeholder="contato@email.com" className="h-12" />}
@@ -152,13 +239,12 @@ function LoginForm({ redirect }: { redirect?: string }) {
   )
 }
 
-function SignupForm({ redirect }: { redirect?: string }) {
+function SignupForm({ onSuccess }: { onSuccess: () => void }) {
   const form = useForm<SignupBody>({
     resolver: zodResolver(signupBody),
     defaultValues: { username: '', email: '', password: '', confirmPassword: '' },
   })
   const signup = useSignup()
-  const router = useRouter()
   const [formError, setFormError] = useState<string | null>(null)
   const { errors } = form.formState
 
@@ -167,7 +253,7 @@ function SignupForm({ redirect }: { redirect?: string }) {
     try {
       await signup.mutateAsync(values)
       toast.success('Conta criada. Bem-vindo à Kurio!')
-      void router.navigate({ href: safeRedirect(redirect), replace: true })
+      onSuccess()
     } catch (error) {
       setFormError(applyServerErrors(form, error, ['username', 'email', 'password', 'confirmPassword']))
     }

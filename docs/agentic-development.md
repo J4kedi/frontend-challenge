@@ -51,6 +51,19 @@ que passaram pela revisão visual:
 Cada correção virou um commit `fix(...)` com o motivo na mensagem. O teste
 que pegou o defeito ficou na suíte.
 
+## O que o teste humano pegou depois da entrega
+
+Com a demo publicada, o Kauan usou o app como um avaliador usaria. Cada
+relato virou causa raiz, correção e um teste que fixa o comportamento:
+
+| Relato | Causa | Correção e teste |
+| --- | --- | --- |
+| O header some ao rolar e "Mercado" não fica marcado | header no fluxo da página; o `Link` do router marca `aria-current` em `/` | header fixo com scroll-spy (`14-navigation.spec.ts`) |
+| Favoritar no detalhe "vai para o início" | o visitante era levado a `/login`, que no desktop mostra o modal sobre a home | login sobre a própria página e favorito salvo ao entrar (`04-favorites.spec.ts`) |
+| O X do login aberto pelo carrinho não fecha | fechar navegava para o `redirect` (`/checkout`), rota privada que devolve ao login | fechar volta pela pilha do histórico (`03-auth.spec.ts`) |
+| "Derrubar a conexão" some em 1 s | a reconexão automática do Socket.IO volta em ~0,5 s | servidor fora do ar pelo tempo escolhido; o teste prova evento perdido e recuperação pelo REST (`10`, `15`) |
+| O painel de mocks precisa de mais UI/UX e de detalhe por ação | rótulos genéricos ("1º item do carrinho") | seções, rótulos com o dado real, descrição do efeito, login rápido e axe no painel (`15-mock-panel.spec.ts`) |
+
 ## Contrato para os próximos agentes
 
 O [`AGENTS.md`](../AGENTS.md) (carregado pelo `CLAUDE.md`) é o contrato curto

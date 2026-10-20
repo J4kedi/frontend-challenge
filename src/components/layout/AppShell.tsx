@@ -2,6 +2,7 @@ import { HeadContent, Outlet } from '@tanstack/react-router'
 import { WifiOffIcon } from 'lucide-react'
 import { lazy, Suspense } from 'react'
 import { Toaster } from '@/components/ui/sonner'
+import { useLoginPrompt } from '@/features/auth/login-prompt'
 import { LiveRegion } from '@/shared/a11y/announcer'
 import { config } from '@/shared/config'
 import { useRealtimeStatus } from '@/shared/realtime/RealtimeProvider'
@@ -10,8 +11,10 @@ import { SiteFooter } from './SiteFooter'
 import { SiteHeader } from './SiteHeader'
 
 const MockPanel = lazy(() => import('@/mocks/panel/MockPanel'))
+const LoginPrompt = lazy(() => import('@/features/auth/AuthScreen').then((m) => ({ default: m.LoginPrompt })))
 
 export function AppShell() {
+  const loginRequest = useLoginPrompt()
   return (
     <div className="flex min-h-dvh flex-col">
       <HeadContent />
@@ -31,6 +34,11 @@ export function AppShell() {
       {/* Bottom: toasts never cover the sticky header (desktop) and sit above the tab bar (mobile). */}
       <Toaster position="bottom-right" closeButton mobileOffset={{ bottom: 96 }} />
       <LiveRegion />
+      {loginRequest && (
+        <Suspense fallback={null}>
+          <LoginPrompt request={loginRequest} />
+        </Suspense>
+      )}
       {config.mocksEnabled && config.mockPanel && (
         <Suspense fallback={null}>
           <MockPanel />
@@ -40,12 +48,15 @@ export function AppShell() {
   )
 }
 
-/** Visible only while the realtime connection is down; prices may be stale until it comes back. */
+/**
+ * Visible only while the realtime connection is down; prices may be stale until
+ * it comes back. Sticky under the header, so it shows at any scroll position.
+ */
 function RealtimeNotice() {
   const status = useRealtimeStatus()
   if (status !== 'offline') return null
   return (
-    <div role="status" className="bg-surface-dark px-4 py-2 text-center text-body-sm text-foreground">
+    <div role="status" className="sticky top-0 z-30 bg-surface-dark px-4 py-2 text-center text-body-sm text-foreground shadow-raised md:top-header">
       <WifiOffIcon className="mr-2 inline size-4 text-amber" aria-hidden="true" />
       Conexão em tempo real perdida. Reconectando… Preços e pedidos serão atualizados quando voltar.
     </div>

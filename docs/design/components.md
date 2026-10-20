@@ -25,7 +25,7 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 
 ### AppShell
 - **Arquivo:** `src/components/layout/AppShell.tsx`
-- **Uso:** casca de todas as rotas: link "Pular para o conteúdo", Header, aviso de tempo real, `<main id="conteudo">`, Footer, TabBar mobile, Toaster, LiveRegion e o painel de mocks (lazy).
+- **Uso:** casca de todas as rotas: link "Pular para o conteúdo", Header, aviso de tempo real (fixo sob o header, visível em qualquer rolagem), `<main id="conteudo">`, Footer, TabBar mobile, Toaster, LiveRegion, o login em contexto e o painel de mocks (os dois lazy).
 - **A11y:** o skip link é o primeiro foco; o `main` recebe foco programático.
 
 ### SiteHeader
@@ -120,7 +120,7 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 
 ### FavoriteButton
 - **Arquivo:** `src/features/favorites/FavoriteButton.tsx` · **Figma:** "Favoritar", coração
-- **Estados:** coração preenchido (forma) e `aria-pressed`. A troca é otimista, com rollback e toast se a API falhar.
+- **Estados:** coração preenchido (forma) e `aria-pressed`. A troca é otimista, com rollback e toast se a API falhar. Visitante: abre o login sobre a página (ver AuthDialog) e o favorito é salvo logo depois de entrar.
 
 ### EditionPicker · PurchasePanel · Gallery
 - **Arquivo:** `src/features/nft/NftDetailPage.tsx` · **Figma:** "Edição: 1/1 · 1/10 · 1/50 · ABERTA", galeria com zoom
@@ -131,6 +131,12 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 - **Guidelines:** os valores vêm só da cotação da API. O cupom é um `group`, não um `form`, porque também vive dentro do formulário de pagamento. O aviso de mudança tem "Aceitar novos preços".
 
 ## Pagamento, pedido e conta
+
+### AuthDialog · LoginPrompt
+- **Arquivo:** `src/features/auth/AuthScreen.tsx` · **Figma:** "Desktop / Login", "Desktop / Cadastro" (modal com abas "Entrar | Criar conta" e borda inferior laranja)
+- **Uso:** o mesmo modal serve às rotas `/login` e `/signup` (sobre o marketplace, como no Figma) e ao `LoginPrompt`, que abre sobre a página atual quando uma ação pede login (favoritar como visitante). No prompt, as abas trocam o formulário no lugar, sem navegar.
+- **Estados:** sessão expirada (aviso âmbar), erro de credencial (`role="alert"`), enviando (`aria-busy`). Na demo, uma dica de conta de teste com **Preencher**.
+- **Guidelines:** fechar volta para a página anterior; o sucesso segue para o `redirect` (rotas) ou retoma a ação interrompida (prompt).
 
 ### CheckoutPage · WalletChooser · ConnectionStatus · ReviewDialog
 - **Arquivos:** `src/features/checkout/*` · **Figma:** "Desktop / Pagamento", "Mobile / Pagamento" (revisão não desenhada; segue o modal de confirmação)
@@ -152,4 +158,6 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 
 ### MockPanel
 - **Arquivo:** `src/mocks/panel/MockPanel.tsx` (camada de mocks, lazy)
-- **Uso:** demonstração: cenário, reset e gatilhos de evento. Só fala com a API de controle (`/api/__mock/*`). Nos testes visuais, fica oculto.
+- **Uso:** demonstração, em seções: Cenário, Tempo real, Carrinho, Conta e Dados. Só fala com a API de controle (`/api/__mock/*`) e com os hooks do app (sessão, carrinho, status do socket). Nos testes visuais, fica oculto (`[data-mock-panel]`).
+- **Estados:** cada ação tem título com o dado que vai tocar ("Subir o preço de Emerald Ape #042 para 1.29 ETH"), linha de contexto opcional e descrição do efeito; fica desabilitada com o motivo quando não se aplica (carrinho vazio, nenhum evento ainda). O botão mostra o status do tempo real; a seção mostra a contagem regressiva da queda.
+- **A11y:** painel não modal (`region` rotulada) que recebe foco ao abrir; Esc fecha e devolve o foco ao botão. Ação em andamento ignora cliques em vez de desabilitar o botão, para o foco não se perder. O axe roda no painel aberto (`15-mock-panel.spec.ts`).

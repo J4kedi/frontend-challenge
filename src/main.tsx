@@ -34,6 +34,8 @@ setSessionExpiredHandler((code) => {
   void router.navigate({
     to: '/login',
     search: { redirect: href, reason: code === 'SESSION_EXPIRED' ? 'expired' : undefined },
+    // A private page left in history would send "back" (closing the login) straight to the login again.
+    replace: router.state.matches.some((match) => match.routeId === '/_auth'),
   })
 })
 
