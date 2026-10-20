@@ -23,6 +23,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // MSW only needs tough-cookie for Set-Cookie on mocked responses; this API has no cookies.
+      'tough-cookie': fileURLToPath(new URL('./src/mocks/shims/tough-cookie.ts', import.meta.url)),
     },
   },
 })

@@ -18,7 +18,8 @@ function sources(dir: string): string[] {
 }
 
 const RULES: { name: string; pattern: RegExp }[] = [
-  { name: 'hex color', pattern: /#[0-9a-fA-F]{3,8}\b/g },
+  // 6/8-digit hex, or 3/4-digit with a letter: token ids like "#0042" are not colors.
+  { name: 'hex color', pattern: /#(?:[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?|(?=[0-9]*[a-fA-F])[0-9a-fA-F]{3,4})\b/g },
   { name: 'rgb()/hsl() color', pattern: /\b(?:rgba?|hsla?|oklch)\(/g },
   { name: 'arbitrary color utility', pattern: /\b(?:text|bg|border|ring|fill|stroke|from|to|via)-\[(?:#|rgb|hsl|oklch)/g },
   { name: 'arbitrary font family', pattern: /\bfont-\[/g },

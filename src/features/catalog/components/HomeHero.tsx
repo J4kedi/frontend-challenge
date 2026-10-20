@@ -73,7 +73,7 @@ export function HomeHero() {
 
 function SlideDots({ index, onSelect, className }: { index: number; onSelect: (i: number) => void; className?: string }) {
   return (
-    <div className={cn('flex gap-2', className)}>
+    <div className={cn('flex', className)}>
       {SLIDES.map((s, i) => (
         <button
           key={s.artwork}
@@ -81,8 +81,10 @@ function SlideDots({ index, onSelect, className }: { index: number; onSelect: (i
           onClick={() => onSelect(i)}
           aria-label={`Mostrar destaque ${i + 1} de ${SLIDES.length}`}
           aria-current={i === index ? 'true' : undefined}
-          className={cn('size-2 rounded-full transition-all', i === index ? 'w-5 bg-primary' : 'bg-primary/60 hover:bg-primary')}
-        />
+          className="group grid h-6 min-w-6 place-items-center"
+        >
+          <span aria-hidden="true" className={cn('h-2 rounded-full transition-all', i === index ? 'w-5 bg-primary' : 'w-2 bg-primary/60 group-hover:bg-primary')} />
+        </button>
       ))}
     </div>
   )
