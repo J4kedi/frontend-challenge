@@ -28,7 +28,7 @@ export function HomePage() {
 
       <HomeHero />
 
-      <section id="mercado" aria-labelledby="mercado-title" className="mx-auto mt-10 max-w-page scroll-mt-6 px-4 md:mt-16 md:px-6 xl:px-0">
+      <section id="mercado" aria-labelledby="mercado-title" className="mx-auto mt-10 max-w-page px-4 md:mt-16 md:px-6 xl:px-0">
         <h2 id="mercado-title" className="sr-only">
           Mercado de NFTs
         </h2>

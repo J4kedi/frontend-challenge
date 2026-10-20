@@ -66,8 +66,8 @@ enunciado, a acessibilidade ou a coerência do fluxo pedem.
 | 10 | Pagamento, mobile | sem formulário de comprador | formulário recolhido em "Revisar dados", abrindo sozinho se algo for inválido | os dados do comprador são obrigatórios na API |
 | 11 | Detalhe | galeria com a mesma imagem 4× | mantido | o arquivo só tem 4 artes |
 | 12 | TabBar mobile | botão central sem rótulo | "Buscar NFTs" | botão sem função definida no Figma |
-| 13 | Header no perfil e carteiras | "Início" ativo | nenhum item ativo | essas páginas não são o início |
-| 14 | Links do rodapé, Criadores, Aprenda, blog | links | visíveis, mas indisponíveis ("Em breve") | o enunciado exclui páginas editoriais; ações fora do escopo não podem parecer funcionar |
+| 13 | Header | "Início" ativo também no perfil e nas carteiras; header rola com a página | ativo conforme a seção na tela (Início ou Mercado na home; Mercado nas telas de compra; nenhum no perfil); header fixo no topo | a navegação precisa continuar alcançável e mostrar onde a pessoa está |
+| 14 | Links do rodapé, Criadores, Aprenda, blog | links na mesma cor dos ativos | visíveis, esmaecidos e marcados como indisponíveis; no header, o clique avisa "ainda não faz parte desta demonstração" | o enunciado exclui páginas editoriais; ações fora do escopo não podem parecer funcionar nem parecer quebradas |
 | 15 | Newsletter, login social, "Esqueceu a senha?" | ações | toast explicando que não fazem parte da demonstração | mesmo motivo |
 | 16 | Confirmação | "Ver no Etherscan" | diálogo com o hash e o aviso de transação simulada | um link real daria 404 no explorador |
 | 17 | Paginação | 1 2 3 4 > | janela de 4 páginas ao redor da atual, ‹ › | o catálogo inteiro tem 27 páginas |
