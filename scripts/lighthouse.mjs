@@ -53,7 +53,10 @@ async function waitForServer(url, timeoutMs = 30_000) {
 if (!process.argv.includes('--no-build')) execSync('pnpm build', { stdio: 'inherit' })
 await mkdir(OUT, { recursive: true })
 
-const preview = spawn('pnpm', ['preview'], { shell: true, stdio: 'ignore' })
+// Vite is spawned directly (no shell), so killing this pid really stops the server on every OS.
+const preview = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--port', String(PORT), '--strictPort'], {
+  stdio: 'ignore',
+})
 const results = []
 let chromeVersion = 'unknown'
 
@@ -95,13 +98,6 @@ try {
   }
 } finally {
   preview.kill()
-  if (process.platform === 'win32' && preview.pid) {
-    try {
-      execSync(`taskkill /pid ${preview.pid} /t /f`, { stdio: 'ignore' })
-    } catch {
-      // already gone
-    }
-  }
 }
 
 const summary = []
