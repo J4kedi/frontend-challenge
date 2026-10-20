@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { DESKTOP_QUERY, useMediaQuery } from '@/shared/hooks/use-media-query'
 import { CatalogFilters } from './components/CatalogFilters'
 import { CatalogResults } from './components/CatalogResults'
 import { FiltersSheet, SearchField, SortSelect, TabsFilter } from './components/CatalogToolbar'
@@ -13,13 +14,17 @@ export function HomePage() {
   const { search, setFilters, clearFilters } = useCatalogSearch()
   const list = useQuery(nftListOptions(toListQuery(search)))
   const facets = list.data?.facets
+  // One search box in the DOM (ids and labels stay unique): top bar on mobile, toolbar from md up.
+  const desktop = useMediaQuery(DESKTOP_QUERY)
 
   return (
     <>
-      <div className="mx-auto flex max-w-page gap-3 px-4 pt-6 md:hidden">
-        <SearchField value={search.q} onSearch={(q) => setFilters({ q }, { replace: true })} className="flex-1" />
-        <FiltersSheet facets={facets} search={search} total={list.data?.total} onChange={setFilters} />
-      </div>
+      {!desktop && (
+        <div className="mx-auto flex max-w-page gap-3 px-4 pt-6">
+          <SearchField value={search.q} onSearch={(q) => setFilters({ q }, { replace: true })} className="flex-1" />
+          <FiltersSheet facets={facets} search={search} total={list.data?.total} onChange={setFilters} />
+        </div>
+      )}
 
       <HomeHero />
 
@@ -36,12 +41,14 @@ export function HomePage() {
           </aside>
 
           <div>
-            <div className="hidden items-center gap-3 md:flex">
-              <SearchField value={search.q} onSearch={(q) => setFilters({ q }, { replace: true })} className="flex-1" />
-              <div className="lg:hidden">
-                <FiltersSheet facets={facets} search={search} total={list.data?.total} onChange={setFilters} />
+            {desktop && (
+              <div className="flex items-center gap-3">
+                <SearchField value={search.q} onSearch={(q) => setFilters({ q }, { replace: true })} className="flex-1" />
+                <div className="lg:hidden">
+                  <FiltersSheet facets={facets} search={search} total={list.data?.total} onChange={setFilters} />
+                </div>
               </div>
-            </div>
+            )}
             <div className="mt-0 mb-6 flex flex-wrap items-center justify-between gap-4 md:mt-6">
               <TabsFilter value={search.tab} onChange={setFilters} />
               <div className="hidden md:block">

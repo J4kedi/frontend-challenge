@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { COLLECTION_LABEL, NETWORK_LABEL, type Collection, type Network, type NftListResponse } from '@/contracts/nft'
@@ -58,7 +58,7 @@ function FacetGroup({
   selected: string[] | undefined
   onToggle: (id: string) => void
 }) {
-  const headingId = `facet-${title}`
+  const headingId = useId()
   return (
     <section aria-labelledby={headingId}>
       <h3 id={headingId} className="text-title-sm font-bold text-foreground">
@@ -109,6 +109,7 @@ function PriceFilter({
     search.priceMax ? Number(search.priceMax) : max,
   ])
   const active = Boolean(search.priceMin || search.priceMax)
+  const headingId = useId()
 
   function apply() {
     const [low, high] = range
@@ -119,8 +120,8 @@ function PriceFilter({
   }
 
   return (
-    <section aria-labelledby="facet-price">
-      <h3 id="facet-price" className="text-title-sm font-bold text-foreground">
+    <section aria-labelledby={headingId}>
+      <h3 id={headingId} className="text-title-sm font-bold text-foreground">
         Faixa de preço
       </h3>
       {facets ? (
