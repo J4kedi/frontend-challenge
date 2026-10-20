@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Quote } from '@/contracts/commerce'
@@ -30,12 +30,12 @@ export function QuoteTotals({ quote, className }: { quote: Quote | undefined; cl
         <dt>Desconto do lançamento{quote.coupon?.status === 'applied' && ` (${quote.coupon.code})`}</dt>
         <dd data-testid="quote-discount">(-) {formatEth(quote.discountEth)}</dd>
       </div>
-      <div>
-        <div className={row}>
-          <dt>Taxa de rede</dt>
-          <dd data-testid="quote-fee">{formatEth(quote.networkFeeEth)}</dd>
-        </div>
-        <p className="mt-1 text-right text-caption text-accent">Taxa estimada</p>
+      <div className={row}>
+        <dt>Taxa de rede</dt>
+        <dd className="text-right">
+          <span data-testid="quote-fee">{formatEth(quote.networkFeeEth)}</span>
+          <span className="mt-1 block text-caption text-accent">Taxa estimada</span>
+        </dd>
       </div>
       <div className={cn(row, 'border-t border-border pt-4 font-bold')}>
         <dt>Total</dt>
@@ -51,6 +51,7 @@ export function QuoteTotals({ quote, className }: { quote: Quote | undefined; cl
 export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefined; variant?: 'boxed' | 'pill' }) {
   const apply = useApplyCoupon()
   const remove = useRemoveCoupon()
+  const id = useId()
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const applied = quote?.coupon?.status === 'applied' ? quote.coupon : null
@@ -91,13 +92,13 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
   return (
     <div role="group" className="space-y-2" aria-label="Código promocional">
       {!pill && (
-        <label htmlFor="coupon" className="text-body-sm font-bold text-foreground">
+        <label htmlFor={`${id}-coupon`} className="text-body-sm font-bold text-foreground">
           Código promocional
         </label>
       )}
       <div className={cn('flex', pill ? 'rounded-full bg-surface-raised p-1' : '')}>
         <input
-          id="coupon"
+          id={`${id}-coupon`}
           value={code}
           onChange={(e) => setCode(e.target.value)}
           onKeyDown={(e) => {
@@ -109,7 +110,7 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
           placeholder="Digite o código promocional..."
           aria-label={pill ? 'Código promocional' : undefined}
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? 'coupon-error' : undefined}
+          aria-describedby={error ? `${id}-coupon-error` : undefined}
           autoComplete="off"
           className={cn(
             'h-10 min-w-0 flex-1 bg-transparent px-3 text-body-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none',
@@ -121,7 +122,7 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
         </Button>
       </div>
       {error && (
-        <p id="coupon-error" className="text-caption text-danger-text" role="alert">
+        <p id={`${id}-coupon-error`} className="text-caption text-danger-text" role="alert">
           {error}
         </p>
       )}

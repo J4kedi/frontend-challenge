@@ -70,5 +70,43 @@ export async function addToCartFromDetail(page: Page, nftId: string, { goToCart 
   }
 }
 
+/** Mobile and tablet keep filters and sort in a sheet; desktop shows the sidebar. */
+export async function withFilters(page: Page, action: () => Promise<void>) {
+  const sheet = isMobile(page)
+  if (sheet) await page.getByRole('button', { name: /^Filtros/ }).click()
+  await action()
+  if (sheet) {
+    await page.getByRole('dialog', { name: 'Filtros' }).getByRole('button', { name: 'Fechar' }).click()
+    await expect(page.getByRole('dialog', { name: 'Filtros' })).toBeHidden()
+  }
+}
+
+export const visibleTestId = (page: Page, testId: string) => page.getByTestId(testId).filter({ visible: true })
+
+/** Orders of the signed-in collector, read from the mock API for assertions. */
+export async function ordersOf(page: Page) {
+  return page.evaluate(async () => {
+    const session = JSON.parse(localStorage.getItem('kurio:session') ?? '{}') as { token?: string }
+    const response = await fetch('/api/orders', { headers: { Authorization: `Bearer ${session.token}` } })
+    return ((await response.json()) as { items: { id: string; status: string }[] }).items
+  })
+}
+
+/** From the cart: go to checkout (logging in when asked), connect the wallet and open the review. */
+export async function goToReview(page: Page, { login = true }: { login?: boolean } = {}) {
+  await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
+  if (login) {
+    await expect(page).toHaveURL(/\/login/)
+    await submitLogin(page)
+  }
+  await expect(page).toHaveURL(/\/checkout$/)
+  await page.getByRole('button', { name: 'Conectar carteira' }).click()
+  await expect(page.getByTestId('wallet-connection')).toContainText('conectada')
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
+  const review = page.getByRole('dialog', { name: 'Revise sua compra' })
+  await expect(review).toBeVisible()
+  return review
+}
+
 export const test = base
 export { expect }
