@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { FavoritesPage } from '@/features/favorites/FavoritesPage'
 
 export const Route = createFileRoute('/_auth/favorites')({
-  component: () => <h1 className="p-8 text-heading font-bold">Lista de interesse</h1>,
+  head: () => ({ meta: [{ title: 'Lista de interesse — Kurio' }] }),
+  component: FavoritesPage,
 })
