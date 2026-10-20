@@ -51,13 +51,16 @@ export function AuthScreen({ mode, redirect, reason }: { mode: Mode; redirect?: 
   )
 
   if (desktop) {
+    // Closing returns to the page the collector came from. Going to `redirect`
+    // instead would bounce off a private page (/checkout) straight back here.
+    const close = () => (router.history.canGoBack() ? router.history.back() : void router.navigate({ to: '/' }))
     return (
       <>
         <div inert aria-hidden="true" className="pointer-events-none select-none">
           <HomeHero />
           <PromoCards />
         </div>
-        <Dialog open onOpenChange={(open) => !open && void router.navigate({ href: safeRedirect(redirect) === router.state.location.href ? '/' : safeRedirect(redirect) })}>
+        <Dialog open onOpenChange={(open) => !open && close()}>
           <DialogContent className="max-w-[500px] gap-0 overflow-hidden rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0 shadow-overlay">
             <div className="px-16 pt-10 pb-8">
               <AuthTabs mode={mode} redirect={redirect} />
