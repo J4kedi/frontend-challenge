@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { loginBody, signupBody, type LoginBody, type SignupBody } from '@/contracts/account'
 import { PromoCards } from '@/features/catalog/components/HomeEditorial'
 import { HomeHero } from '@/features/catalog/components/HomeHero'
+import { config, DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/shared/config'
 import { DESKTOP_QUERY, useMediaQuery } from '@/shared/hooks/use-media-query'
 import { cn } from '@/shared/lib/cn'
 import { safeRedirect, useLogin, useSignup } from './session'
@@ -119,6 +120,7 @@ function LoginForm({ redirect }: { redirect?: string }) {
   const router = useRouter()
   const [formError, setFormError] = useState<string | null>(null)
   const { errors } = form.formState
+  const demo = DEMO_ACCOUNTS[0]
 
   const onSubmit = form.handleSubmit(async (values) => {
     setFormError(null)
@@ -132,6 +134,24 @@ function LoginForm({ redirect }: { redirect?: string }) {
 
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-4" aria-label="Entrar">
+      {config.mocksEnabled && (
+        <p className="flex items-center justify-between gap-3 rounded-sm border border-border-soft px-3 py-2 text-caption text-muted-foreground">
+          <span>
+            Conta de teste: <span className="text-foreground">{demo.email}</span> · senha{' '}
+            <span className="text-foreground">{DEMO_PASSWORD}</span>
+          </span>
+          <button
+            type="button"
+            className="shrink-0 font-bold text-accent hover:underline"
+            onClick={() => {
+              form.setValue('email', demo.email, { shouldValidate: true })
+              form.setValue('password', DEMO_PASSWORD, { shouldValidate: true })
+            }}
+          >
+            Preencher
+          </button>
+        </p>
+      )}
       <FormError message={formError} />
       <FormField label="E-mail" hideLabel error={errors.email?.message}>
         {(field) => <Input {...field} {...form.register('email')} type="email" autoComplete="email" placeholder="contato@email.com" className="h-12" />}
