@@ -97,8 +97,8 @@ export const catalogHandlers = [
       const nft = findNft(String(params.id))
       if (!nft) return fail(404, 'NOT_FOUND', 'NFT não encontrado')
       const related = db()
-        .nfts.filter((n) => n.id !== nft.id && n.artwork !== nft.artwork)
-        .slice(0, 4)
+        .nfts.filter((n) => n.id !== nft.id && n.collection === nft.collection)
+        .slice(0, 5)
       return HttpResponse.json({ items: related.map(toNftSummary) })
     }),
   ),
