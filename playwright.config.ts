@@ -1,12 +1,14 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const PORT = 4173
+/** E2E_BASE_URL runs the same suite against a deployed URL (e.g. the Vercel demo) instead of a local preview. */
+const EXTERNAL = process.env.E2E_BASE_URL
 
 /**
  * E2E against the demo build (same bundle as the deploy, mocks enabled).
  * Visual baselines are Linux-only: font rasterization differs per OS, so other
  * platforms run every functional assertion and skip the pixel comparison.
- * Regenerate them with the CI "update-snapshots" input (docs/quality/testing.md).
+ * Regenerate them in the official Linux image: `pnpm test:visual:update` (docs/quality/testing.md).
  */
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -23,7 +25,7 @@ export default defineConfig({
   ignoreSnapshots: process.platform !== 'linux',
   snapshotPathTemplate: '{testDir}/__screenshots__/{projectName}/{testFilePath}/{arg}{ext}',
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: EXTERNAL ?? `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     locale: 'pt-BR',
@@ -33,10 +35,12 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
     { name: 'mobile', use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } } },
   ],
-  webServer: {
-    command: 'pnpm build && pnpm preview',
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  webServer: EXTERNAL
+    ? undefined
+    : {
+        command: 'pnpm build && pnpm preview',
+        url: `http://localhost:${PORT}`,
+        reuseExistingServer: !process.env.CI,
+        timeout: 180_000,
+      },
 })
