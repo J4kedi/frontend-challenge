@@ -1,0 +1,10 @@
+# Single-package repo: this file only carries pnpm settings.
+# Build scripts are opt-in. sharp is used by scripts/optimize-images.mjs;
+# the MSW worker is committed in public/, so msw needs no postinstall.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  msw: false
+onlyBuiltDependencies:
+  - esbuild
+  - sharp

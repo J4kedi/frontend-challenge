@@ -1,0 +1,21 @@
+node_modules
+dist
+*.tsbuildinfo
+.env.local
+.env.*.local
+
+# Playwright
+playwright-report
+test-results
+blob-report
+
+# Lighthouse scratch (final reports live in reports/lighthouse)
+.lighthouse-tmp
+
+# Local design references (Figma export, prints)
+_ref
+.progress.md
+
+.DS_Store
+*.log
+.figma-cache
