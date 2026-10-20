@@ -84,6 +84,8 @@ totais do Figma). Nada monetário passa por `Number`.
 - Login ou cadastro devolvem `{ token, expiresAt, user }`. O token, opaco e válido por 30 min, fica no `localStorage`; o usuário é estado de servidor (`GET /auth/session`). Um refresh restaura a sessão.
 - **Por que não cookie HttpOnly:** o "servidor" roda na página (MSW), então um cookie seria escrito pelo próprio JavaScript e não teria proteção real. O token opaco é a opção honesta para a simulação. Com uma API real, o caminho é cookie HttpOnly + SameSite + CSRF; o interceptor do Axios é o único ponto a mudar.
 - **Expiração:** o 401 `SESSION_EXPIRED` cai no interceptor, que só reage se o token da requisição é o token atual (resposta atrasada de outra sessão não derruba a nova). Ele limpa os dados privados e leva para `/login?redirect=<onde estava>&reason=expired`. No pagamento, o rascunho fica no sessionStorage do usuário, então quem entra de novo volta ao formulário preenchido.
+- **Login no meio de uma ação:** favoritar como visitante abre o login sobre a própria página (`loginPrompt`, em `src/features/auth/login-prompt.ts`), sem navegar. Ao entrar, o diálogo fecha e a ação continua: o favorito é **adicionado**, nunca alternado, porque a conta pode já tê-lo. As rotas `/login` e `/signup` seguem o Figma (modal sobre o marketplace) e atendem acesso direto e rotas privadas.
+- **Fechar o login volta para a página anterior** (`history.back`), não para o `redirect`: o redirect de uma rota privada (`/checkout`) mandaria de volta ao login. Pelo mesmo motivo, a expiração numa rota privada substitui a entrada do histórico em vez de empilhar.
 - **Logout e troca de usuário:** removem `['user', id]` e `['session']`, fecham o socket (o provider recria com o novo token) e iniciam um carrinho de visitante novo.
 - Rotas privadas (`/_auth`): `beforeLoad` confirma a sessão pelo Query e redireciona com `redirect`. Só destinos internos são aceitos (`safeRedirect`), sem open redirect.
 
@@ -112,6 +114,7 @@ Detalhes em [`docs/contracts/realtime.md`](docs/contracts/realtime.md). Em resum
 - `nft.updated` corrige preço e estoque em lista, detalhe e destaques. Se o NFT está no carrinho, anuncia a mudança e busca de novo carrinho e cotação, o que bloqueia o pagamento até o colecionador aceitar.
 - `order.updated` só é aceito para o usuário atual. O servidor também só entrega ao dono.
 - Na reconexão, as queries ativas são invalidadas (reconciliação com o REST). Listeners e sockets são liberados no cleanup do efeito.
+- **Queda com duração** (`POST /__mock/socket/drop { seconds }`): o servidor simulado fica fora do ar e conexões novas não recebem handshake até o prazo, como um host inalcançável. O cliente segue "reconectando", com o aviso fixo sob o header. Eventos publicados nesse intervalo não chegam a ninguém; a invalidação na volta recupera o estado pelo REST, e um toast confirma a reconexão (`10-realtime-resilience.spec.ts` prova o evento perdido e a recuperação).
 
 ### Prontidão do mock e ordem de carga
 

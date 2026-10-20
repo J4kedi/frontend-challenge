@@ -132,10 +132,10 @@ publica o evento Socket.IO correspondente, como um servidor real faria.
 
 | Método e rota | Efeito |
 | --- | --- |
-| `GET /__mock/state` | cenário ativo e lista de cenários |
+| `GET /__mock/state` | cenário ativo, lista de cenários e resumo do último evento publicado (`lastEvent: { type, version, subject }`) |
 | `PUT /__mock/scenario` `{ name }` | troca o cenário |
 | `POST /__mock/reset` | restaura o seed inteiro e derruba os sockets |
 | `POST /__mock/nfts/:id` `{ editionId?, priceEth?, available? }` | muda preço ou estoque e publica `nft.updated` |
 | `POST /__mock/session/expire` | expira todas as sessões |
-| `POST /__mock/socket/drop` | derruba as conexões Socket.IO (o cliente reconecta) |
+| `POST /__mock/socket/drop` `{ seconds? }` | derruba as conexões Socket.IO. Sem `seconds`, o cliente reconecta logo; com `seconds` (até 60), o servidor recusa reconexões nesse intervalo e os eventos publicados nele se perdem |
 | `POST /__mock/events/replay` `{ mode: 'duplicate' \| 'stale' }` | reenvia o último evento, igual ou uma versão mais antiga |

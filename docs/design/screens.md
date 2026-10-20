@@ -44,7 +44,9 @@ Todos seguem os tokens e a composição das telas vizinhas.
 | Conexão da carteira | pagamento | desconectada, aguardando aprovação, conectada e recusada |
 | Pedido pendente ou recusado | `/orders/$id` | spinner com texto; recusa com motivo e volta ao carrinho |
 | Sessão expirada | login | aviso âmbar acima do formulário + toast |
-| Tempo real offline | todas | faixa "Conexão em tempo real perdida. Reconectando…" |
+| Login pedido no meio de uma ação | qualquer página (favoritar como visitante) | o modal de Login abre sobre a própria página, com o motivo como descrição |
+| Conta de teste | login (só na demo) | dica com e-mail e senha fictícios e botão "Preencher" |
+| Tempo real offline | todas | faixa "Conexão em tempo real perdida. Reconectando…", fixa sob o header; toast quando volta |
 | Tablet (768–1023 px) | todas | header desktop; filtros no Sheet; grid em 3 colunas |
 
 ## Desvios do Figma
