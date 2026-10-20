@@ -70,9 +70,13 @@ export default function MockPanel() {
     'w-full rounded-sm border border-border-soft px-3 py-2 text-left text-caption text-foreground hover:border-primary disabled:opacity-50'
 
   return (
-    <details className="fixed bottom-24 left-3 z-50 max-w-72 text-caption md:bottom-4">
-      <summary className="cursor-pointer list-none rounded-full border border-primary bg-surface-raised px-4 py-2 font-bold text-accent shadow-raised">
-        Mocks · {SCENARIOS[active].label}
+    <details className="fixed bottom-20 left-2 z-50 max-w-72 text-caption md:bottom-4 md:left-3">
+      <summary
+        aria-label={`Painel de mocks, cenário ${SCENARIOS[active].label}`}
+        className="cursor-pointer list-none rounded-full border border-primary bg-surface-raised px-3 py-1.5 font-bold text-accent shadow-raised md:px-4 md:py-2"
+      >
+        <span className="md:hidden">Mocks</span>
+        <span className="hidden md:inline">Mocks · {SCENARIOS[active].label}</span>
       </summary>
       <div className="mt-2 max-h-[70vh] space-y-3 overflow-y-auto rounded-lg border border-border-soft bg-surface-raised p-3 shadow-raised">
         <label className="block space-y-1">
