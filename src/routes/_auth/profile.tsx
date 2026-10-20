@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { ProfilePage } from '@/features/account/ProfilePage'
 
 export const Route = createFileRoute('/_auth/profile')({
-  component: () => <h1 className="p-8 text-heading font-bold">Perfil do colecionador</h1>,
+  head: () => ({ meta: [{ title: 'Perfil do colecionador — Kurio' }] }),
+  component: ProfilePage,
 })
