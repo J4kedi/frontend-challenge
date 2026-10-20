@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { ethAmount } from '@/contracts/common'
 import { db, persist, resetDb } from '../db/store'
 import { api, fail, readBody } from '../http'
-import { dropConnections, nftUpdated, publish, replayLast } from '../realtime/server'
+import { dropConnections, lastEventSummary, nftUpdated, publish, replayLast } from '../realtime/server'
 import { isScenario, SCENARIOS, scenario, setScenario } from '../scenarios'
 import { findNft, toNftDetail } from '../views'
 
@@ -21,7 +21,7 @@ const updateNftBody = z.object({
 
 export const controlHandlers = [
   http.get(api('/__mock/state'), () =>
-    HttpResponse.json({ scenario: scenario(), scenarios: SCENARIOS }),
+    HttpResponse.json({ scenario: scenario(), scenarios: SCENARIOS, lastEvent: lastEventSummary() }),
   ),
 
   http.put(api('/__mock/scenario'), async ({ request }) => {
@@ -64,7 +64,12 @@ export const controlHandlers = [
     return HttpResponse.json({ expired: sessions.length })
   }),
 
-  http.post(api('/__mock/socket/drop'), () => HttpResponse.json({ dropped: dropConnections() })),
+  // { seconds?: 0–60 }: how long the server refuses to come back.
+  http.post(api('/__mock/socket/drop'), async ({ request }) => {
+    const body = (await request.json().catch(() => null)) as { seconds?: unknown } | null
+    const seconds = Math.min(Math.max(Number(body?.seconds) || 0, 0), 60)
+    return HttpResponse.json(dropConnections(seconds))
+  }),
 
   http.post(api('/__mock/events/replay'), async ({ request }) => {
     const body = (await request.json().catch(() => null)) as { mode?: string } | null

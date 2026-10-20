@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useSyncExternalStore } from 'react'
 import type { Socket } from 'socket.io-client'
+import { toast } from 'sonner'
 import { REALTIME_EVENT_TYPES, realtimeEvent } from '@/contracts/events'
 import { config } from '@/shared/config'
 import { useStoredSession } from '@/shared/session/session-store'
@@ -63,6 +64,7 @@ export function RealtimeProvider({ transportReady }: { transportReady: Promise<v
             predicate: (q) => ['nfts', 'user', 'guest'].includes(String(q.queryKey[0])),
             refetchType: 'active',
           })
+          toast.success('Conexão em tempo real restabelecida. Sincronizando preços e pedidos.', { id: 'realtime-back' })
         }
         hasConnected = true
         setStatus('online')

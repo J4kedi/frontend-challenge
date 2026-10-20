@@ -22,11 +22,20 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     await openApp(page, '/nft/emerald-ape-042')
     const price = page.getByTestId('detail-price')
     await expect(price).toContainText('1.19 ETH')
-    await mockControl(page, '/socket/drop')
-    await expect(page.getByText('Conexão em tempo real perdida')).toBeVisible()
-    await expect(page.getByText('Conexão em tempo real perdida')).toBeHidden({ timeout: 10_000 })
+    const offline = page.getByText('Conexão em tempo real perdida')
+
+    // The server stays down for 3 s: the price change published meanwhile reaches nobody.
+    await mockControl(page, '/socket/drop', { seconds: 3 })
+    await expect(offline).toBeVisible()
     await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.59' })
+    await page.waitForTimeout(1000)
+    await expect(offline).toBeVisible()
+    await expect(price).toContainText('1.19 ETH')
+
+    // Back online, the client refetches what is on screen and gets the new price over REST.
+    await expect(offline).toBeHidden({ timeout: 10_000 })
     await expect(price).toContainText('1.59 ETH')
+    await expect(page.getByText('Conexão em tempo real restabelecida')).toBeVisible()
   })
 
   test('pedido pendente sobrevive a desconexão e reload sem criar outra compra', async ({ page }) => {

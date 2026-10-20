@@ -1,9 +1,10 @@
 import { toSocketIo } from '@mswjs/socket.io-binding'
-import { ws } from 'msw'
+import { ws, type WebSocketHandlerConnection } from 'msw'
 import type { NftUpdatedEvent, OrderUpdatedEvent, RealtimeEvent } from '@/contracts/events'
 import { db, persist } from '../db/store'
 import type { NftRecord, OrderRecord } from '../db/types'
 import { scenario } from '../scenarios'
+import { findNft } from '../views'
 
 /**
  * Socket.IO server of the mock layer, on top of MSW WebSocket interception and
@@ -24,8 +25,19 @@ interface Peer {
 
 const peers = new Set<Peer>()
 const realtime = ws.link(`${SOCKET_URL}/*`)
+/** Until this instant (ms) the simulated server is "down" (see dropConnections). */
+let downUntil = 0
 
 export const realtimeHandler = realtime.addEventListener('connection', (connection) => {
+  // While down, a new connection gets no handshake until the server is back,
+  // like an unreachable host: the client stays "reconnecting" the whole time.
+  const wait = downUntil - Date.now()
+  if (wait <= 0) return accept(connection)
+  const timer = setTimeout(() => accept(connection), wait)
+  connection.client.addEventListener('close', () => clearTimeout(timer))
+})
+
+function accept(connection: WebSocketHandlerConnection) {
   const io = toSocketIo(connection)
   const peer: Peer = { io, userId: null, close: () => connection.client.close() }
   peers.add(peer)
@@ -44,7 +56,7 @@ export const realtimeHandler = realtime.addEventListener('connection', (connecti
     peer.userId = session?.userId ?? null
     io.client.emit('session.subscribed', { userId: peer.userId })
   })
-})
+}
 
 function deliver(event: RealtimeEvent) {
   for (const peer of peers) {
@@ -83,11 +95,24 @@ export function replayLast(mode: 'duplicate' | 'stale') {
   return event
 }
 
-/** Server-side disconnect of every peer; Socket.IO clients reconnect on their own. */
-export function dropConnections() {
-  const count = peers.size
+/**
+ * Server-side disconnect of every peer. Socket.IO clients reconnect on their
+ * own; with `seconds`, the server stays down that long first, so events
+ * published meanwhile are lost and the client must reconcile over REST.
+ */
+export function dropConnections(seconds = 0) {
+  downUntil = Date.now() + seconds * 1000
+  const dropped = peers.size
   for (const peer of [...peers]) peer.close()
-  return count
+  return { dropped, downUntil: new Date(downUntil).toISOString() }
+}
+
+/** What the last published event was about, so the mock panel can name it. */
+export function lastEventSummary() {
+  const last = db().events.at(-1)
+  if (!last) return null
+  const subject = last.type === 'nft.updated' ? (findNft(last.resource.id)?.name ?? last.resource.id) : `pedido ${last.resource.id}`
+  return { type: last.type, version: last.version, subject }
 }
 
 const eventId = () => `evt_${crypto.randomUUID()}`

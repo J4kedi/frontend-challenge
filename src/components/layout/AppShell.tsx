@@ -48,12 +48,15 @@ export function AppShell() {
   )
 }
 
-/** Visible only while the realtime connection is down; prices may be stale until it comes back. */
+/**
+ * Visible only while the realtime connection is down; prices may be stale until
+ * it comes back. Sticky under the header, so it shows at any scroll position.
+ */
 function RealtimeNotice() {
   const status = useRealtimeStatus()
   if (status !== 'offline') return null
   return (
-    <div role="status" className="bg-surface-dark px-4 py-2 text-center text-body-sm text-foreground">
+    <div role="status" className="sticky top-0 z-30 bg-surface-dark px-4 py-2 text-center text-body-sm text-foreground shadow-raised md:top-header">
       <WifiOffIcon className="mr-2 inline size-4 text-amber" aria-hidden="true" />
       Conexão em tempo real perdida. Reconectando… Preços e pedidos serão atualizados quando voltar.
     </div>
