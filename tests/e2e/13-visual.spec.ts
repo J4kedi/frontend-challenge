@@ -8,7 +8,7 @@ import { addToCartFromDetail, expect, openApp, submitLogin, test } from './suppo
  */
 async function settle(page: Page) {
   // The demo's mock panel is not part of the Figma screens.
-  await page.addStyleTag({ content: 'details:has(> summary[aria-label^="Painel de mocks"]) { display: none !important; }' })
+  await page.addStyleTag({ content: '[data-mock-panel] { display: none !important; }' })
   await page.waitForLoadState('networkidle')
   await page.evaluate(() => document.fonts.ready)
 }
