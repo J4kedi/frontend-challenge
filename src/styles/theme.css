@@ -132,7 +132,13 @@
     -webkit-text-size-adjust: 100%;
   }
 
-  /* Mobile: focused or scrolled-to elements must not end up under the fixed tab bar (WCAG 2.4.11). */
+  /* Focused or scrolled-to elements never end up under the sticky header (desktop)
+     or the fixed tab bar (mobile) — WCAG 2.4.11. */
+  @media (min-width: 768px) {
+    html {
+      scroll-padding-top: calc(var(--spacing-header) + 1rem);
+    }
+  }
   @media (max-width: 767px) {
     html {
       scroll-padding-bottom: 8rem;

@@ -1,7 +1,10 @@
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
+import type { MouseEvent, ReactNode } from 'react'
+import { toast } from 'sonner'
 import { CartIcon, LogoutIcon, SearchIcon, UserIcon } from '@/components/icons'
 import { useSession } from '@/features/auth/session'
 import { useCartCount } from '@/features/cart/queries'
+import { scrollBehavior, useSectionInView } from '@/shared/hooks/use-section-in-view'
 import { cn } from '@/shared/lib/cn'
 import { focusCatalogSearch } from './focus-search'
 
@@ -13,10 +16,23 @@ export function SiteHeader() {
   const count = useCartCount()
   const navigate = useNavigate()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
-  const onMarket = MARKET_PATHS.some((p) => pathname.startsWith(p))
+  const onHome = pathname === '/'
+  // On the home page the active item follows the section on screen (scroll-spy).
+  const marketInView = useSectionInView('mercado', onHome)
+  const marketActive = MARKET_PATHS.some((p) => pathname.startsWith(p)) || marketInView
+  const homeActive = onHome && !marketInView
+
+  // On the home page these items scroll to their section; elsewhere they navigate there.
+  const goToSection = (hash: 'mercado' | undefined) => () => {
+    if (!onHome) return void navigate({ to: '/', hash })
+    if (hash) document.getElementById(hash)?.scrollIntoView({ behavior: scrollBehavior() })
+    else window.scrollTo({ top: 0, behavior: scrollBehavior() })
+  }
+  const notInDemo = (label: string) => () =>
+    toast.info(`${label} ainda não faz parte desta demonstração.`, { id: 'nav-not-in-demo' })
 
   return (
-    <header className="hidden border-b border-border md:block">
+    <header className="sticky top-0 z-40 hidden border-b border-border bg-ink/95 backdrop-blur md:block">
       <div className="mx-auto flex h-header max-w-page items-center justify-between gap-6 px-6 xl:px-0">
         <Link to="/" className="text-body-sm font-bold tracking-wide text-foreground" aria-label="Kurio, página inicial">
           KURIO
@@ -24,26 +40,30 @@ export function SiteHeader() {
 
         <nav aria-label="Principal" className="self-stretch">
           <ul className="flex h-full items-stretch gap-10">
-            <NavItem active={pathname === '/'}>
-              <Link to="/" className="flex h-full items-center">
+            <NavItem active={homeActive}>
+              <SectionLink href="/" active={homeActive} onActivate={goToSection(undefined)}>
                 Início
-              </Link>
+              </SectionLink>
             </NavItem>
-            <NavItem active={onMarket}>
-              <Link to="/" hash="mercado" className="flex h-full items-center">
+            <NavItem active={marketActive}>
+              <SectionLink href="/#mercado" active={marketActive} onActivate={goToSection('mercado')}>
                 Mercado
-              </Link>
+              </SectionLink>
             </NavItem>
-            <NavItem>
-              <span aria-disabled="true" title="Em breve" className="flex h-full cursor-not-allowed items-center">
-                Criadores
-              </span>
-            </NavItem>
-            <NavItem>
-              <span aria-disabled="true" title="Em breve" className="flex h-full cursor-not-allowed items-center">
-                Aprenda
-              </span>
-            </NavItem>
+            {(['Criadores', 'Aprenda'] as const).map((label) => (
+              <NavItem key={label}>
+                <button
+                  type="button"
+                  aria-disabled="true"
+                  title="Em breve"
+                  onClick={notInDemo(label)}
+                  className="flex h-full cursor-not-allowed items-center text-muted-foreground"
+                >
+                  {label}
+                  <span className="sr-only"> (em breve)</span>
+                </button>
+              </NavItem>
+            ))}
           </ul>
         </nav>
 
@@ -95,7 +115,29 @@ export function SiteHeader() {
   )
 }
 
-function NavItem({ active = false, children }: { active?: boolean; children: React.ReactNode }) {
+/**
+ * Plain anchor for the home sections: the router's <Link> always marks itself
+ * aria-current on "/", which would fight the scroll-spy. Modified clicks
+ * (new tab, new window) keep the browser's default behavior.
+ */
+function SectionLink({ href, active, onActivate, children }: { href: string; active: boolean; onActivate: () => void; children: ReactNode }) {
+  return (
+    <a
+      href={href}
+      aria-current={active ? 'page' : undefined}
+      className="flex h-full items-center"
+      onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+        event.preventDefault()
+        onActivate()
+      }}
+    >
+      {children}
+    </a>
+  )
+}
+
+function NavItem({ active = false, children }: { active?: boolean; children: ReactNode }) {
   return (
     <li
       className={cn(
@@ -103,9 +145,7 @@ function NavItem({ active = false, children }: { active?: boolean; children: Rea
         active
           ? 'text-accent after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:bg-primary'
           : 'text-foreground [&_a]:hover:text-accent',
-        !active && '[&_span[aria-disabled]]:text-foreground',
       )}
-      aria-current={active ? 'page' : undefined}
     >
       {children}
     </li>
