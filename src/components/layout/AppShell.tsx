@@ -1,4 +1,4 @@
-import { Outlet } from '@tanstack/react-router'
+import { HeadContent, Outlet } from '@tanstack/react-router'
 import { WifiOffIcon } from 'lucide-react'
 import { lazy, Suspense } from 'react'
 import { Toaster } from '@/components/ui/sonner'
@@ -14,6 +14,7 @@ const MockPanel = lazy(() => import('@/mocks/panel/MockPanel'))
 export function AppShell() {
   return (
     <div className="flex min-h-dvh flex-col">
+      <HeadContent />
       <a
         href="#conteudo"
         className="sr-only z-50 rounded-sm bg-primary px-4 py-2 font-bold text-ink focus:not-sr-only focus:fixed focus:top-2 focus:left-2"

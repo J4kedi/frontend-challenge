@@ -1,7 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { catalogSearch } from '@/features/catalog/search'
+import { HomePage } from '@/features/catalog/HomePage'
+import { nftListOptions } from '@/features/catalog/queries'
+import { catalogSearch, toListQuery } from '@/features/catalog/search'
 
 export const Route = createFileRoute('/')({
   validateSearch: catalogSearch,
-  component: () => <h1 className="p-8 text-heading font-bold">Início</h1>,
+  // Warms the list on preload; the page renders its own skeletons, so nothing awaits here.
+  loaderDeps: ({ search }) => toListQuery(search),
+  loader: ({ context, deps }) => {
+    // A cancelled prefetch (key changed, page left) is not an error.
+    context.queryClient.ensureQueryData(nftListOptions(deps)).catch(() => undefined)
+  },
+  head: () => ({ meta: [{ title: 'Kurio — Marketplace de NFTs' }] }),
+  component: HomePage,
 })
