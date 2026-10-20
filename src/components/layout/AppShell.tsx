@@ -28,7 +28,8 @@ export function AppShell() {
       </main>
       <SiteFooter />
       <MobileTabBar />
-      <Toaster position="top-center" closeButton />
+      {/* Bottom: toasts never cover the sticky header (desktop) and sit above the tab bar (mobile). */}
+      <Toaster position="bottom-right" closeButton mobileOffset={{ bottom: 96 }} />
       <LiveRegion />
       {config.mocksEnabled && config.mockPanel && (
         <Suspense fallback={null}>
