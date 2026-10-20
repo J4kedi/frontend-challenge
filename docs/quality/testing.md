@@ -72,6 +72,5 @@ corrigidos antes da entrega:
 | Suíte | Resultado |
 | --- | --- |
 | Vitest | 17/17 |
-| Playwright desktop (Windows, sem pixel) | 35/35 |
-| Playwright mobile (Windows, sem pixel) | 31 passaram + 1 pulado (diálogo só no desktop) |
+| Playwright, desktop + mobile (Windows, asserts de pixel ignorados) | 77 passaram + 1 pulado (diálogo só no desktop), 39 testes por projeto, 3,0 min com 2 workers |
 | Regressão visual (Docker Linux) | 8/8, conferida numa segunda execução sem atualizar |
