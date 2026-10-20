@@ -41,9 +41,12 @@ pnpm test:visual:update   # regera as baselines visuais
 | 11 | Pular para o conteúdo, foco preso no diálogo e Esc, erros ligados aos campos, axe WCAG 2.1 AA em 4 telas | `11-accessibility.spec.ts` | ✅ | ✅¹ |
 | 12 | Skeletons em rede lenta, falha 503 com "Tentar novamente", sem conexão | `12-loading-and-failures.spec.ts` | ✅ | ✅ |
 | — | Regressão visual: início, detalhe, carrinho e pagamento | `13-visual.spec.ts` | ✅ | ✅ |
+| — | Header fixo, item ativo por seção (scroll-spy), itens fora do escopo avisam, Mercado a partir de outra página | `14-navigation.spec.ts` | ✅ | —² |
 
 ¹ O teste de foco preso no diálogo de login roda só no desktop: no mobile o
 login é tela cheia (Figma), sem diálogo.
+
+² O header de navegação é desktop; no mobile a navegação é a tab bar.
 
 ## Testes unitários
 
@@ -72,7 +75,7 @@ corrigidos antes da entrega:
 | Suíte | Resultado |
 | --- | --- |
 | Vitest | 17/17 |
-| Playwright, desktop + mobile (Windows, asserts de pixel ignorados) | 77 passaram + 1 pulado (diálogo só no desktop), 39 testes por projeto, 3,0 min com 2 workers |
+| Playwright, desktop + mobile (Windows, asserts de pixel ignorados) | 78 passaram + 2 pulados (diálogo e header só no desktop), 40 testes por projeto, 2,9 min com 2 workers |
 | Regressão visual (Docker Linux) | 8/8, conferida numa segunda execução sem atualizar |
 | **CI (GitHub Actions)** — E2E + visual dentro de `mcr.microsoft.com/playwright:v1.64.1-noble` | 77 passaram em 2,5 min; `verify` (typecheck, lint, unit, build) verde. Na primeira execução o CI pegou uma baseline visual desatualizada (pontos do carrossel), regerada no mesmo commit do CI |
 | Playwright contra a **URL publicada** (`E2E_BASE_URL`, sem visual) | 69 passaram + 1 pulado, 2,7 min |

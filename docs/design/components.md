@@ -30,9 +30,18 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 
 ### SiteHeader
 - **Arquivo:** `src/components/layout/SiteHeader.tsx` · **Figma:** `Header With Divider`, `Header Row` (Active=Home / Active=Market)
-- **Uso:** desktop e tablet (`md+`). Logo, navegação (Início, Mercado, Criadores, Aprenda), busca, carrinho com contador e Entrar/usuário.
-- **Estados:** item ativo em `accent` com sublinhado `primary`, com `aria-current="page"`; Criadores e Aprenda aparecem desabilitados (fora do escopo).
-- **Guidelines:** o contador do carrinho é a soma das quantidades, e o link anuncia "Carrinho, N itens".
+- **Uso:** desktop e tablet (`md+`), **fixo no topo** (`sticky`). Logo, navegação (Início, Mercado, Criadores, Aprenda), busca, carrinho com contador e Entrar/usuário.
+- **Estados:**
+  - item ativo em `accent` com sublinhado `primary` e `aria-current="page"`;
+  - na home, o ativo segue a seção na tela (scroll-spy com `useSectionInView`): no mercado, **Mercado**; acima dele, **Início**;
+  - em detalhe, carrinho, pagamento e pedido, fica **Mercado**;
+  - Criadores e Aprenda aparecem esmaecidos (`aria-disabled`) e, ao clicar, avisam que não fazem parte da demonstração.
+- **Guidelines:**
+  - Início e Mercado são âncoras próprias (`SectionLink`), não `<Link>`: o `<Link>` do router sempre se marca ativo em `/`, o que brigaria com o scroll-spy;
+  - clicar no item da página atual rola até a seção; Ctrl+clique abre em nova aba;
+  - `scroll-padding-top` no `html` impede que foco ou âncora fiquem sob o header fixo;
+  - toasts ficam embaixo, para nunca cobrir o header;
+  - o contador do carrinho é a soma das quantidades, e o link anuncia "Carrinho, N itens".
 
 ### MobileTabBar
 - **Arquivo:** `src/components/layout/MobileTabBar.tsx` · **Figma:** `Tab Bar` (Mobile / Início)
