@@ -7,7 +7,7 @@ Toda a API, a autenticação, as carteiras e o pagamento são simulados na camad
 de rede, com MSW e Socket.IO.
 
 - **Demo publicada:** https://kurio-nft-marketplace-vert.vercel.app
-- **Repositório:** https://github.com/kauan-pardini/frontend-challenge
+- **Repositório:** https://github.com/J4kedi/frontend-challenge
 - **Arquitetura:** [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Design system:** [docs/design](docs/design/README.md) · página viva em `/design-system`
 - **Contratos:** [REST](docs/contracts/rest.md) · [Socket.IO](docs/contracts/realtime.md)
@@ -132,6 +132,8 @@ que atualiza o REST **e** publica o evento.
 | Sessão expirada no meio do pagamento | painel → "Expirar a sessão agora" e continue. O login volta para onde você estava, com o formulário preenchido. |
 
 ## Testes
+
+O CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) roda typecheck, lint, testes unitários e build, e depois a suíte E2E com a regressão visual dentro da mesma imagem Linux do Playwright que gerou as baselines.
 
 ```bash
 pnpm test:unit
