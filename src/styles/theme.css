@@ -132,6 +132,13 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /* Mobile: focused or scrolled-to elements must not end up under the fixed tab bar (WCAG 2.4.11). */
+  @media (max-width: 767px) {
+    html {
+      scroll-padding-bottom: 8rem;
+    }
+  }
+
   body {
     @apply bg-ink font-sans text-foreground antialiased;
     min-height: 100dvh;
