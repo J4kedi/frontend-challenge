@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { OrderPage } from '@/features/orders/OrderPage'
 
 export const Route = createFileRoute('/_auth/orders/$orderId')({
-  component: () => <h1 className="p-8 text-heading font-bold">Pedido</h1>,
+  head: () => ({ meta: [{ title: 'Pedido — Kurio' }] }),
+  component: OrderPage,
 })

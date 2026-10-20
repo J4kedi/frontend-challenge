@@ -142,6 +142,8 @@ const icons = new Map()
   if (name && ICON_NAMES.test(name) && !icons.has(name) && node.visible !== false) icons.set(name, node.id)
   for (const child of node.children ?? []) walk(child)
 })(page)
+// Illustration of the order confirmation modal (a frame, not a component).
+icons.set('thank-you', '11:5150')
 // Local components without instances render by their own id.
 for (const [id, component] of Object.entries(file.components)) {
   if (ICON_NAMES.test(component.name) && !icons.has(component.name)) icons.set(component.name, id)
