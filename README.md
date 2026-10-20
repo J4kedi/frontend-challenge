@@ -6,7 +6,8 @@ desktop e mobile, fiel ao [Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8
 Toda a API, a autenticação, as carteiras e o pagamento são simulados na camada
 de rede, com MSW e Socket.IO.
 
-- **Demo publicada:** _URL da Vercel (ver seção Deploy)_
+- **Demo publicada:** https://kurio-nft-marketplace-vert.vercel.app
+- **Repositório:** https://github.com/kauan-pardini/frontend-challenge
 - **Arquitetura:** [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Design system:** [docs/design](docs/design/README.md) · página viva em `/design-system`
 - **Contratos:** [REST](docs/contracts/rest.md) · [Socket.IO](docs/contracts/realtime.md)
@@ -53,6 +54,8 @@ Nenhum serviço externo é necessário: o checkout limpo roda sozinho.
 | `pnpm test:unit` | Vitest: dinheiro em wei, gate de eventos, `cn`, guard de tokens |
 | `pnpm test:e2e` | Playwright: build + preview, projetos `desktop` (1440) e `mobile` (390) |
 | `pnpm test:e2e:report` | abre o relatório HTML (traces das falhas incluídos) |
+| `E2E_BASE_URL=<url> pnpm test:e2e` | roda a mesma suíte contra uma URL publicada (sem build local) |
+| `pnpm test:visual` | compara a regressão visual no container Linux oficial do Playwright (Docker) |
 | `pnpm test:visual:update` | regera as baselines visuais Linux no container oficial do Playwright (Docker) |
 | `pnpm lighthouse` | auditoria Lighthouse: início e detalhe, mobile e desktop, 3 execuções, mediana |
 | `pnpm figma:extract` | exporta frames, artes e ícones do Figma (exige `FIGMA_TOKEN`) |
@@ -143,6 +146,12 @@ baselines são Linux-only e versionadas: fora do Linux esses asserts são
 ignorados. Regere com `pnpm test:visual:update`, que usa Docker.
 
 ## Deploy
+
+Publicado na Vercel: **https://kurio-nft-marketplace-vert.vercel.app**. O deploy sai do commit da `main` marcado com a tag `v1.0.0`, e a suíte E2E roda também contra a URL publicada:
+
+```bash
+E2E_BASE_URL=https://kurio-nft-marketplace-vert.vercel.app pnpm exec playwright test --grep-invert @visual
+```
 
 A demo é o próprio build de produção (`.env.production` liga os mocks).
 `vercel.json` configura instalação com pnpm, fallback de SPA (refresh e acesso
