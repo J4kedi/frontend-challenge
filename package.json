@@ -17,10 +17,11 @@
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report",
-    "test:visual:update": "playwright test --grep @visual --update-snapshots",
+    "test:visual:update": "bash scripts/visual-baselines.sh",
     "lighthouse": "node scripts/lighthouse.mjs",
     "figma:extract": "node scripts/figma-extract.mjs",
-    "images": "node scripts/optimize-images.mjs"
+    "images": "node scripts/optimize-images.mjs",
+    "test:visual": "bash scripts/visual-baselines.sh --reporter=line"
   },
   "dependencies": {
     "@fontsource-variable/roboto-mono": "5.3.0",
