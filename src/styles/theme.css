@@ -1,0 +1,173 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@fontsource-variable/roboto-mono';
+
+/*
+ * Design tokens of the Kurio design system.
+ * Source: Figma "Frontend Challenge", version 2397163412428844678.
+ * Figma style → token → utility map: docs/design/tokens.md.
+ *
+ * The default Tailwind palette is reset on purpose: only these tokens exist,
+ * so a color that is not in the Figma file cannot be written as a utility.
+ */
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+
+  --font-sans: 'Roboto Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-mono: var(--font-sans);
+
+  /* Surfaces */
+  --color-ink: #140d0a; /* Color/Ink — page background */
+  --color-surface: #241612; /* Color/Surface Card */
+  --color-surface-raised: #2f1d15; /* Color/Surface Raised */
+  --color-surface-dark: #38220f; /* Color/Surface Dark */
+  --color-surface-light: #fbfbfb; /* Color/Background Elevated */
+
+  /* Brand */
+  --color-primary: #d28a4c; /* Color/Primary — buttons, active states */
+  --color-accent: #e89b55; /* Text/Accent — active nav, prices */
+  --color-secondary: #b39463; /* Color/Secondary */
+  --color-coral: #f0805f; /* Text/Coral */
+  --color-amber: #e3a44e; /* Color/Amber */
+
+  /* Text */
+  --color-foreground: #f5f1eb; /* Color/Foreground */
+  --color-muted-foreground: #cfb28c; /* Text/Secondary */
+
+  /* Lines */
+  --color-border: #3f2319; /* Color/Border */
+  --color-border-soft: #55321f; /* Color/Border Soft */
+
+  /* Status */
+  --color-success: #00a66c; /* Color/Success */
+  --color-danger: #ed1b2e; /* Color/Error — fills and borders */
+  --color-danger-text: #ff7a84; /* a11y: Color/Error lightened to reach 4.5:1 on ink for small text */
+
+  /* Neutrals */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-light: #ededed; /* Color/Gray Light */
+
+  /* shadcn/ui semantic aliases, mapped onto the Figma tokens */
+  --color-background: var(--color-ink);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-foreground);
+  --color-popover: var(--color-surface-raised);
+  --color-popover-foreground: var(--color-foreground);
+  --color-primary-foreground: var(--color-ink);
+  --color-secondary-foreground: var(--color-ink);
+  --color-accent-foreground: var(--color-ink);
+  --color-muted: var(--color-surface-raised);
+  --color-destructive: var(--color-danger);
+  --color-input: var(--color-border-soft);
+  --color-ring: var(--color-accent);
+
+  /* Radius scale (Figma uses 3/4/6/8/16) */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Elevation (Figma drop shadows) */
+  --shadow-card: 0 4px 12px 0 rgb(20 13 10 / 0.15);
+  --shadow-raised: 0 6px 20px 0 rgb(10 6 4 / 0.45);
+  --shadow-overlay: 0 0 20px 0 rgb(10 6 4 / 0.45);
+
+  /* Type scale: Figma text styles (size / line height). Roboto Mono only. */
+  --text-micro: 9px;
+  --text-micro--line-height: 12px;
+  --text-tiny: 10px;
+  --text-tiny--line-height: 13px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-caption-lg: 13px;
+  --text-caption-lg--line-height: 22px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body: 15px;
+  --text-body--line-height: 20px;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 21px;
+  --text-title-sm: 18px;
+  --text-title-sm--line-height: 24px;
+  --text-title: 20px;
+  --text-title--line-height: 28px;
+  --text-title-lg: 22px;
+  --text-title-lg--line-height: 29px;
+  --text-heading: 24px;
+  --text-heading--line-height: 32px;
+  --text-heading-lg: 28px;
+  --text-heading-lg--line-height: 37px;
+  --text-display: 32px;
+  --text-display--line-height: 42px;
+  --text-display-lg: 43px;
+  --text-display-lg--line-height: 70px;
+
+  --tracking-wide: 0.1em;
+
+  /* Content width of the desktop frames (1440 frame, 120 px margins) */
+  --container-page: 1200px;
+
+  /* Header height of the desktop frames */
+  --spacing-header: 69px;
+
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+
+  @keyframes shimmer {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: -100% 0;
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ink font-sans text-foreground antialiased;
+    min-height: 100dvh;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-primary);
+    color: var(--color-ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Skeleton with shimmer. Reduced motion falls back to a static block (rule above). */
+@utility skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-surface) 0%,
+    var(--color-surface-raised) 50%,
+    var(--color-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+  border-radius: var(--radius-md);
+}
