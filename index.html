@@ -10,18 +10,13 @@
       content="Kurio é um marketplace de NFTs selecionados de criadores emergentes e consagrados. Descubra, colecione e compre arte digital."
     />
     <title>Kurio — Marketplace de NFTs</title>
-    <link
-      rel="preload"
-      as="image"
-      type="image/avif"
-      href="/images/nfts/emerald-720.avif"
-      imagesrcset="/images/nfts/emerald-360.avif 360w, /images/nfts/emerald-720.avif 720w, /images/nfts/emerald-1080.avif 1080w"
-      imagesizes="(min-width: 1024px) 450px, 100vw"
-      fetchpriority="high"
-    />
+    <!-- LCP art (Emerald Ape #042): desktop hero image, and the first catalog card on mobile.
+         Same srcset/sizes as the <img> elements, so the browser reuses the preloaded file. -->
+    <link rel="preload" as="image" type="image/avif" media="(min-width: 768px)" imagesrcset="/images/nfts/emerald-360.avif 360w, /images/nfts/emerald-720.avif 720w, /images/nfts/emerald-1080.avif 1080w" imagesizes="450px" fetchpriority="high" />
+    <link rel="preload" as="image" type="image/avif" media="(max-width: 767px)" imagesrcset="/images/nfts/emerald-360.avif 360w, /images/nfts/emerald-720.avif 720w, /images/nfts/emerald-1080.avif 1080w" imagesizes="45vw" fetchpriority="high" />
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/boot.ts"></script>
   </body>
 </html>

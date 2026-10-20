@@ -6,32 +6,14 @@ import { createRoot } from 'react-dom/client'
 import { toast } from 'sonner'
 import { createQueryClient } from '@/app/query-client'
 import { createAppRouter } from '@/app/router'
+import { transportReady } from '@/app/transport'
 import { signOutLocally } from '@/features/auth/session'
-import { takeMockParams } from '@/mocks/params'
 import { apiClient, setSessionExpiredHandler } from '@/shared/api/client'
 import { config } from '@/shared/config'
 import { RealtimeProvider } from '@/shared/realtime/RealtimeProvider'
 
 const queryClient = createQueryClient()
 const router = createAppRouter(queryClient)
-
-/**
- * Mock layer (VITE_ENABLE_MOCKS). The app renders right away; REST calls wait
- * for MSW through the interceptor below and the socket is only created after
- * it, so nothing reaches the network before interception is active.
- */
-const transportReady: Promise<void> = config.mocksEnabled
-  ? (() => {
-      const params = takeMockParams()
-      return import('@/mocks/browser')
-        .then(({ startMocks }) => startMocks(params))
-        .then(() => {
-          // E2E tests wait for this flag before talking to the mock backend.
-          document.documentElement.dataset.mocks = 'ready'
-        })
-        .catch((error: unknown) => console.error('Mock layer failed to start', error))
-    })()
-  : Promise.resolve()
 
 if (config.mocksEnabled) {
   apiClient.interceptors.request.use(async (request) => {
