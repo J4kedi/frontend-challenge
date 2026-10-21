@@ -79,6 +79,8 @@ export const nftSummary = z.object({
   priceEth: ethAmount,
   previousPriceEth: ethAmount.nullable(),
   available: z.number().int().min(0),
+  /** Rarity tier "Raro": a badge on the mobile cards (Figma "Mobile / Início"). */
+  rare: z.boolean(),
   listedAt: isoDateTime,
   version: z.number().int().min(1),
 })

@@ -70,6 +70,7 @@ const SAMPLE = {
   priceEth: '1.19',
   previousPriceEth: '1.39',
   available: 12,
+  rare: true,
   listedAt: '2026-10-20T12:00:00.000Z',
   version: 1,
 } as const
@@ -192,7 +193,7 @@ export function DesignSystemPage() {
             <NftCard nft={SAMPLE} />
           </li>
           <li>
-            <NftCard nft={{ ...SAMPLE, id: 'sample-sold', name: 'Golden Beat #207', artwork: 'golden', previousPriceEth: null, available: 0 }} />
+            <NftCard nft={{ ...SAMPLE, id: 'sample-sold', name: 'Golden Beat #207', artwork: 'golden', previousPriceEth: null, available: 0, rare: false }} />
           </li>
           <li>
             <NftCardSkeleton />

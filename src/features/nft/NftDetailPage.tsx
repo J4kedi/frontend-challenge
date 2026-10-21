@@ -130,7 +130,7 @@ function Gallery({ nft }: { nft: NftDetail }) {
         ))}
       </div>
 
-      <div className="relative md:rounded-xl md:bg-surface md:p-5">
+      <div className="relative self-start md:rounded-xl md:bg-surface md:p-5">
         <NftImage
           artwork={artwork}
           alt={`Arte do NFT ${nft.name}`}
