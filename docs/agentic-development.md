@@ -154,6 +154,44 @@ Ficaram de fora, com registro:
   - o merge do carrinho corta no limite por pedido sem avisar;
   - a sessão que expira no perfil perde edições não salvas (o pagamento tem rascunho, o perfil não).
 
+### Quarta rodada
+
+O avaliador sem contexto rodou sobre a v1.0.7 e deu **89/100**, com os eliminatórios passando. Em paralelo, o agente principal mediu o Lighthouse no CI e comparou cada tela mobile com o JSON do Figma.
+
+Corrigido a partir do avaliador:
+
+- **Perfil gravado pela metade.** Com um nome de usuário já em uso, a senha mudava e o resto era recusado. Agora perfil e senha vão numa requisição só (`PATCH /me/profile` com `password` opcional), e o servidor confere tudo antes de gravar qualquer coisa (`08`).
+- **Filtros digitados na URL.** `?priceMin=1` chegava como número e `?networks=solana` como texto, e os dois eram descartados. Agora valem como os escolhidos na tela (`01`).
+- **"Esgotou" para quem comprou.** Comprar a última unidade anunciava ao comprador que ela tinha esgotado. Durante o envio do pedido, e por alguns segundos depois, o esgotamento de um item do carrinho não é anunciado (`06`, que falha sem a correção).
+- **ETH arredondado.** A tela mostrava 4 casas e a API cobrava 10. Agora a tela mostra todas as casas significativas.
+- **Botão "Mocks" sobre o conteúdo.** No cenário padrão, fechado, ele virou um botão redondo pequeno. Em outro cenário, o nome do cenário continua escrito nele. Ele também só carrega quando o navegador fica ocioso.
+- **Login sem foco no e-mail.** O diálogo agora abre no primeiro campo (`11`).
+- **Carrinho desktop fora do frame.** Colunas nas proporções do Figma, resumo com a tipografia do frame e vitrine com 5 NFTs e os pontos do carrossel.
+- **Testes.** O timeout do pedido roda no relógio controlado: o Axios passou ao adapter `fetch`, cujo timeout é um `setTimeout`. Também entraram testes para:
+  - sessão expirando sozinha;
+  - sessão expirando no pagamento;
+  - conflito de perfil com troca de senha.
+- **Docs.** `realtime.md` dizia que os eventos não cruzam abas, e o `lighthouse.md` citava a versão anterior.
+
+Corrigido a partir da revisão do agente principal:
+
+- **Telas mobile fora do Figma.**
+  - Tab bar com o recorte sob o botão central.
+  - Hero com a segunda arte e os círculos.
+  - Detalhe com arte inset, painel arredondado e barra de compra fixa; o frame do detalhe não tem tab bar.
+  - Resumo do carrinho como folha inferior.
+  - Login desktop sobre o marketplace inteiro.
+  - Os três desvios que estavam documentados (20 a 22) saíram da tabela.
+- **Acessibilidade.** O axe passou a incluir a regra WCAG 2.1 A e as telas logadas (perfil, carteiras, favoritos, pagamento com a revisão aberta e recibo). Isso achou duas diferenças entre o texto visível e o nome acessível: o "Favoritar" do detalhe e as ações do painel.
+- **Performance.**
+  - No celular, o hero de desktop escondido ainda baixava a arte de 1080 px, e o card do LCP reaproveitava esse arquivo em vez do de 360 px pré-carregado.
+  - A sidebar escondida renderizava abaixo de `lg`.
+  - O zod compilava um parser por schema na primeira validação.
+  - A grade de cards era uma tarefa longa.
+  - Tirar o code-splitting das rotas de entrada foi testado e revertido: o TBT subiu e o LCP não mudou.
+  - Os números, com o antes e o depois, estão em [`lighthouse.md`](quality/lighthouse.md).
+- **Corrida achada pela suíte.** Um `nft.updated` que chegava enquanto a cotação ainda fazia a primeira busca era engolido: o TanStack Query reaproveitava a requisição em andamento, cuja resposta podia ser anterior à mudança. Agora carrinho e cotação são cancelados antes de buscar de novo.
+
 ## Contrato para os próximos agentes
 
 O [`AGENTS.md`](../AGENTS.md) (carregado pelo `CLAUDE.md`) é o contrato curto
@@ -173,5 +211,5 @@ ler antes de editar a área.
 ## Limites do processo
 
 - **Revisão.** A revisão de código foi do próprio agente, apoiada nos testes e auditorias. O agente abriu e mergeou os PRs com autorização do humano, que tomou as decisões de produto e acompanhou o processo.
-- **Medições locais.** As medições de Lighthouse são da máquina local, com o ambiente registrado no relatório; números de outra máquina variam.
+- **Medições.** O Lighthouse roda no CI, sobre o build e sobre a URL publicada, com o ambiente registrado em cada relatório. Números de outra máquina, sobretudo ocupada com outros processos, variam: o TBT é o mais sensível.
 - **Regressão visual em Linux.** As baselines visuais valem para Linux. Em outro SO, a comparação roda pelo container (`pnpm test:visual`).
