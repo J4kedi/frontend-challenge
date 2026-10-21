@@ -243,7 +243,7 @@ Corrigido:
 - **axe `landmark-unique`.** O menu da conta e o rodapé tinham uma `nav` com o mesmo nome.
 - **Painel de mocks** cortado no topo da tela do celular, no detalhe.
 - **Duas abas liquidando o mesmo pedido.** Cada aba roda o backend simulado. As duas podiam liquidar o pedido e descontar o carrinho duas vezes. Agora elas se revezam por Web Locks e releem o estado salvo antes de liquidar.
-- **Teste de skeleton** que prometia "dimensões do conteúdo" e só checava visibilidade: agora compara a posição e o tamanho do primeiro card com os do skeleton (`12`).
+- **Teste de skeleton** que prometia "dimensões do conteúdo" e só checava visibilidade: o título agora diz o que ele checa. Comparar a posição e o tamanho do primeiro card com os do skeleton foi tentado e saiu, porque contra a demo publicada dependia de quando a arte do hero chegava e de o skeleton ainda estar na tela na hora da medida. As dimensões ficam cobertas pelo CLS 0 do Lighthouse.
 - **Docs.** O ARCHITECTURE dizia que só o `main.tsx` importava os mocks; o desvio 22 registra "Mais desta coleção" sem os pontos do carrossel; o `lighthouse.md` passou à v1.0.9.
 
 Ficou como estava:
