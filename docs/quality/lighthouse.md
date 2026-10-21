@@ -20,6 +20,8 @@ Configuração versionada em [`scripts/lighthouse.mjs`](../../scripts/lighthouse
   - relatórios HTML e JSON de cada execução em [`reports/lighthouse/`](../../reports/lighthouse/);
   - medianas em [`summary.md`](../../reports/lighthouse/summary.md) e [`summary.json`](../../reports/lighthouse/summary.json), com ambiente e versões.
 
+No Windows, o clone precisa estar num caminho curto: os arquivos do Lighthouse em `node_modules/.pnpm` passam do limite de 260 caracteres quando o projeto fica fundo (por exemplo, em pastas temporárias), e o import quebra com `does not provide an export named 'default'`. Habilitar caminhos longos no Windows também resolve.
+
 Nenhuma simplificação é exclusiva da auditoria: as mesmas imagens, fontes,
 mocks, painel de mocks e tempo real da demo publicada são carregados.
 

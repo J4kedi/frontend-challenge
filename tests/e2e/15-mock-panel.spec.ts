@@ -40,8 +40,8 @@ test.describe('15 · painel de mocks', () => {
     await panel.getByRole('button', { name: 'Derrubar a conexão por 5 s' }).click()
     const offline = page.getByText('Conexão em tempo real perdida')
     await expect(offline).toBeVisible()
-    await expect(panel.getByText(/o servidor volta em \d s/)).toBeVisible()
-    await page.waitForTimeout(2500)
+    // Seconds pass on the countdown and the outage holds.
+    await expect(panel.getByText(/o servidor volta em [1-2] s/)).toBeVisible({ timeout: 10_000 })
     await expect(offline).toBeVisible()
     await expect(offline).toBeHidden({ timeout: 10_000 })
     await expect(page.getByText('Conexão em tempo real restabelecida')).toBeVisible()

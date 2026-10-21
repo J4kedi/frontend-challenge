@@ -22,6 +22,7 @@ export function toNftSummary(nft: NftRecord): NftSummary {
     priceEth: edition.priceEth,
     previousPriceEth: nft.previousPriceEth,
     available: edition.available,
+    rare: nft.attributes.includes('Raro'),
     listedAt: nft.listedAt,
     version: nft.version,
   }

@@ -51,6 +51,16 @@ export const sessionStore = {
   },
 }
 
+// Signing in, out or as someone else in another tab changes who this tab is:
+// reload, so no screen keeps showing (or sending) the previous user's data.
+window.addEventListener('storage', (event) => {
+  if (event.key !== SESSION_KEY) return
+  const next = read()
+  if (next?.userId !== current?.userId) return window.location.reload()
+  current = next
+  listeners.forEach((listener) => listener())
+})
+
 export function useStoredSession() {
   return useSyncExternalStore(sessionStore.subscribe, sessionStore.get, sessionStore.get)
 }

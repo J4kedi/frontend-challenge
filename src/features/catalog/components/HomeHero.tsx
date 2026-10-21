@@ -33,9 +33,9 @@ export function HomeHero() {
     <section aria-roledescription="carrossel" aria-label="Destaques da Kurio" className="mx-auto max-w-page px-4 md:px-6 xl:px-0">
       {/* Desktop and tablet */}
       <div className="hidden min-h-112 grid-cols-[1fr_450px] items-center gap-10 pt-8 md:grid">
-        <div className="relative self-stretch pt-12">
+        <div className="relative self-stretch pt-12 lg:pl-10">
           <p className="text-body-sm font-medium text-foreground">Bem-vindo à Kurio</p>
-          <h1 className="mt-4 max-w-xl text-display font-bold text-foreground uppercase lg:text-display-lg">{slide.title}</h1>
+          <h1 className="mt-4 max-w-xl text-display font-bold text-balance text-foreground uppercase lg:text-display-lg">{slide.title}</h1>
           <p className="mt-4 max-w-xl text-body-sm leading-6 text-muted-foreground">{slide.text}</p>
           <Button asChild className="mt-8 w-35 uppercase">
             <Link to="/" hash="mercado">

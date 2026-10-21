@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import type { MouseEvent, ReactNode } from 'react'
 import { toast } from 'sonner'
 import { CartIcon, LogoutIcon, SearchIcon, UserIcon } from '@/components/icons'
+import { Skeleton } from '@/components/ui/skeleton'
 import { promptVisitor } from '@/features/auth/login-prompt'
 import { useSession } from '@/features/auth/session'
 import { useCartCount } from '@/features/cart/queries'
@@ -13,14 +14,14 @@ const MARKET_PATHS = ['/nft', '/cart', '/checkout', '/orders']
 
 /** Desktop and tablet header (Figma: "Header With Divider"). Mobile uses MobileTabBar. */
 export function SiteHeader() {
-  const { user, isAuthenticated } = useSession()
+  const { user, isAuthenticated, isChecking } = useSession()
   const count = useCartCount()
   const navigate = useNavigate()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const onHome = pathname === '/'
   // On the home page the active item follows the section on screen (scroll-spy).
   const marketInView = useSectionInView('mercado', onHome)
-  const marketActive = MARKET_PATHS.some((p) => pathname.startsWith(p)) || marketInView
+  const marketActive = MARKET_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`)) || marketInView
   const homeActive = onHome && !marketInView
 
   // On the home page these items scroll to their section; elsewhere they navigate there.
@@ -92,7 +93,10 @@ export function SiteHeader() {
               </span>
             )}
           </Link>
-          {isAuthenticated && user ? (
+          {isChecking ? (
+            // A stored session is being confirmed: neither "Entrar" nor a name yet.
+            <Skeleton className="h-9 w-28" />
+          ) : isAuthenticated && user ? (
             <Link
               to="/profile"
               className="flex h-9 items-center gap-2 rounded-sm border border-primary px-3 text-body-lg font-medium text-accent hover:bg-surface"

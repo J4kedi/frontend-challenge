@@ -2,7 +2,7 @@ import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/r
 import { toast } from 'sonner'
 import { favorites, type Favorites } from '@/contracts/account'
 import { loginPrompt } from '@/features/auth/login-prompt'
-import { useSession } from '@/features/auth/session'
+import { sessionQueryOptions, useSession } from '@/features/auth/session'
 import { announce } from '@/shared/a11y/announcer'
 import { request } from '@/shared/api/client'
 import { queryKeys } from '@/shared/api/query-keys'
@@ -74,8 +74,13 @@ export function useToggleFavorite() {
 
   return {
     isPending: mutation.isPending,
-    toggle(nftId: string, name: string, currentlyFavorite: boolean) {
-      if (!user) {
+    async toggle(nftId: string, name: string, currentlyFavorite: boolean) {
+      // A stored session still being confirmed (right after a reload) is not a
+      // visitor: wait for it instead of asking a signed-in collector to log in.
+      const token = sessionStore.token()
+      const signedIn =
+        user ?? (token ? await queryClient.fetchQuery(sessionQueryOptions(token)).then((session) => session?.user ?? null, () => null) : null)
+      if (!signedIn) {
         loginPrompt.open({
           reason: `${name} vai para a sua lista de interesse assim que você entrar.`,
           // Add, not toggle: the account may already have it.

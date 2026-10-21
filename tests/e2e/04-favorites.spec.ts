@@ -53,7 +53,9 @@ test.describe('04 · favoritos', () => {
     // The simulated latency is a hash of method + URL: pick the NFT whose PUT is
     // slowest relative to its DELETE, so unserialized writes would land reversed.
     const nftId = await page.evaluate(async () => {
-      const hash = (text: string) => {
+      // Same as stableHash (src/mocks/db/store.ts), which hashes the JSON of the value.
+      const hash = (value: string) => {
+        const text = JSON.stringify(value)
         let h = 0x811c9dc5
         for (let i = 0; i < text.length; i++) {
           h ^= text.charCodeAt(i)
@@ -65,14 +67,17 @@ test.describe('04 · favoritos', () => {
       const list = (await fetch('/api/nfts?pageSize=48').then((r) => r.json())) as { items: { id: string }[] }
       return list.items.map((n) => ({ id: n.id, lead: latency('PUT', n.id) - latency('DELETE', n.id) })).sort((a, b) => b.lead - a.lead)[0]!.id
     })
+    // The favorites list loads only for a signed-in collector: wait for it before going slow.
+    const favoritesLoaded = page.waitForResponse((response) => response.url().endsWith('/api/me/favorites'))
     await page.goto(`/nft/${nftId}`)
     await waitForMocks(page)
+    await favoritesLoaded
     await mockControl(page, '/scenario', { name: 'slow' }, 'PUT')
     const heart = page.getByRole('button', { name: /lista de interesse/ }).filter({ visible: true }).first()
     await expect(heart).toHaveAttribute('aria-pressed', 'false')
 
+    // The second click lands while the first write is still on the slow network.
     await heart.click()
-    await page.waitForTimeout(150)
     await heart.click()
     await expect(heart).toHaveAttribute('aria-pressed', 'false')
     // Both writes done: the screen never flips back, and the API agrees.
@@ -83,5 +88,38 @@ test.describe('04 · favoritos', () => {
       return ((await fetch('/api/me/favorites', { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json())) as { nftIds: string[] }).nftIds
     })
     expect(saved).not.toContain(nftId)
+  })
+
+  test('logado, o favorito funciona enquanto a sessão ainda é confirmada depois do reload', async ({ page }) => {
+    await openApp(page, '/')
+    await loginAs(page, USERS.ana, '/')
+    // jitter: each URL answers after its own fixed delay. Pick a detail page that
+    // answers well before the session check, so the heart shows while it is pending.
+    const nftId = await page.evaluate(async () => {
+      const hash = (value: string) => {
+        const text = JSON.stringify(value)
+        let h = 0x811c9dc5
+        for (let i = 0; i < text.length; i++) {
+          h ^= text.charCodeAt(i)
+          h = Math.imul(h, 0x01000193)
+        }
+        return h >>> 0
+      }
+      const latency = (path: string) => 30 + (hash(`GET ${location.origin}${path}`) % 1470)
+      const list = (await fetch('/api/nfts?pageSize=48').then((r) => r.json())) as { items: { id: string }[] }
+      const best = list.items
+        .map((n) => ({ id: n.id, lead: latency('/api/auth/session') - latency(`/api/nfts/${n.id}`) }))
+        .sort((a, b) => b.lead - a.lead)[0]!
+      return best.lead > 400 ? best.id : null
+    })
+    expect(nftId, 'a detail page that answers before the session check').not.toBeNull()
+    await mockControl(page, '/scenario', { name: 'jitter' }, 'PUT')
+
+    await page.goto(`/nft/${nftId}`)
+    const heart = page.getByRole('button', { name: /lista de interesse/ }).filter({ visible: true }).first()
+    await heart.click()
+    // A stored session is not a visitor: no login, and the favorite is saved.
+    await expect(heart).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByRole('dialog', { name: 'Entrar' })).toHaveCount(0)
   })
 })

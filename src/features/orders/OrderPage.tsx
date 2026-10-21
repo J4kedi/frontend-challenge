@@ -130,11 +130,11 @@ function ReceiptContent({ order }: { order: Order }) {
   const explorer = EXPLORER_NAME[order.network]
   return (
     <div className="text-foreground">
-      <header className="flex flex-col items-center gap-4 px-8 pt-8 pb-6 text-center">
+      <header className="flex flex-col items-center gap-4 px-4 pt-8 pb-6 text-center sm:px-8">
         <ThankYouIllustration className="size-20 text-primary" />
         <DialogTitleOrHeading>Seus NFTs agora estão na sua carteira</DialogTitleOrHeading>
       </header>
-      <dl className="grid grid-cols-2 gap-y-3 border-y border-primary px-8 py-4 text-body-sm md:grid-cols-4 md:divide-x md:divide-primary">
+      <dl className="grid grid-cols-2 gap-y-3 border-y border-primary px-4 py-4 sm:px-8 text-body-sm md:grid-cols-4 md:divide-x md:divide-primary">
         <div className="md:pr-4">
           <dt className="font-bold">ID da transação</dt>
           <dd className="text-muted-foreground" data-testid="receipt-tx">
@@ -156,7 +156,7 @@ function ReceiptContent({ order }: { order: Order }) {
           <dd className="text-muted-foreground">{WALLET_PROVIDER_LABEL[order.wallet.provider]}</dd>
         </div>
       </dl>
-      <section className="px-8 py-6" aria-labelledby="receipt-details">
+      <section className="px-4 py-6 sm:px-8" aria-labelledby="receipt-details">
         <h2 id="receipt-details" className="text-body-lg font-bold">
           Detalhes da transação
         </h2>
@@ -179,7 +179,7 @@ function ReceiptContent({ order }: { order: Order }) {
               <tr key={line.editionId}>
                 <td className="py-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-16 shrink-0 overflow-hidden rounded-sm">
+                    <div className="hidden w-16 shrink-0 overflow-hidden rounded-sm min-[360px]:block">
                       <NftImage artwork={line.artwork} alt="" sizes="64px" />
                     </div>
                     <div>

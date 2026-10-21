@@ -1,21 +1,32 @@
-import { addToCartFromDetail, expect, goToReview, mockControl, openApp, ordersOf, test, waitForMocks } from './support/app'
+import { addToCartFromDetail, expect, goToReview, isMobile, loginAs, mockControl, openApp, ordersOf, test, USERS, waitForMocks } from './support/app'
 
 test.describe('10 · eventos, desconexão e pedido pendente', () => {
   test('eventos duplicados ou antigos não regridem o estado', async ({ page }) => {
     await openApp(page, '/nft/emerald-ape-042', 'events-chaos')
     const price = page.getByTestId('detail-price')
     await expect(price).toContainText('1.19 ETH')
+    // Every price the page shows from here on: a regression must not appear even for a frame.
+    await page.evaluate(() => {
+      const read = () => document.querySelector('[data-testid="detail-price"]')?.textContent?.match(/[\d.]+ ETH/)?.[0] ?? ''
+      const shown = [read()]
+      ;(window as unknown as { shownPrices: string[] }).shownPrices = shown
+      new MutationObserver(() => read() !== shown.at(-1) && shown.push(read())).observe(document.body, {
+        subtree: true,
+        childList: true,
+        characterData: true,
+      })
+    })
 
-    // events-chaos: the event arrives twice and is followed by an older version.
+    // events-chaos: each event arrives twice and is followed by an older version.
     await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.49' })
     await expect(price).toContainText('1.49 ETH')
-    await page.waitForTimeout(500)
-    await expect(price).toContainText('1.49 ETH')
-
     await mockControl(page, '/events/replay', { mode: 'stale' })
     await mockControl(page, '/events/replay', { mode: 'duplicate' })
-    await page.waitForTimeout(500)
-    await expect(price).toContainText('1.49 ETH')
+    // Events go out in order: once this newer one shows, everything before it was handled.
+    await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.69' })
+    await expect(price).toContainText('1.69 ETH')
+    const shown = await page.evaluate(() => (window as unknown as { shownPrices: string[] }).shownPrices)
+    expect(shown).toEqual(['1.19 ETH', '1.49 ETH', '1.69 ETH'])
   })
 
   test('reconexão reconcilia com a API o que mudou enquanto estava offline', async ({ page }) => {
@@ -28,7 +39,6 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     await mockControl(page, '/socket/drop', { seconds: 3 })
     await expect(offline).toBeVisible()
     await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.59' })
-    await page.waitForTimeout(1000)
     await expect(offline).toBeVisible()
     await expect(price).toContainText('1.19 ETH')
 
@@ -49,5 +59,33 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     await waitForMocks(page)
     await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 20_000 })
     expect(await ordersOf(page)).toHaveLength(1)
+  })
+
+  test('duas abas: o preço e o logout de uma chegam à outra', async ({ page, context }) => {
+    await openApp(page, '/')
+    await loginAs(page, USERS.ana, '/nft/emerald-ape-042')
+    const other = await context.newPage()
+    await other.goto('/nft/emerald-ape-042')
+    await waitForMocks(other)
+    await expect(other.getByTestId('detail-price')).toContainText('1.19 ETH')
+
+    // Each tab runs its own copy of the simulated server; the event reaches both sockets.
+    await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.29' })
+    await expect(page.getByTestId('detail-price')).toContainText('1.29 ETH')
+    await expect(other.getByTestId('detail-price')).toContainText('1.29 ETH')
+
+    // Signing out in one tab signs out the other (it reloads as a visitor).
+    const otherReloaded = other.waitForEvent('load')
+    if (isMobile(page)) {
+      await page.evaluate(() => localStorage.removeItem('kurio:session'))
+    } else {
+      await page.goto('/profile')
+      await page.getByRole('button', { name: 'Sair' }).click()
+    }
+    await otherReloaded
+    await waitForMocks(other)
+    await expect(other.getByRole('button', { name: /^Adicionar Emerald Ape #042/ }).filter({ visible: true }).first()).toBeVisible()
+    await other.getByRole('button', { name: /^Adicionar Emerald Ape #042/ }).filter({ visible: true }).first().click()
+    await expect(other.getByRole('dialog', { name: 'Entrar' })).toBeVisible()
   })
 })

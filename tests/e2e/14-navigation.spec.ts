@@ -86,4 +86,28 @@ test.describe('14 · navegação do header', () => {
     await nav.getByText('Início').click()
     await expect(active).toHaveText('Início')
   })
+
+  test('sem rolagem lateral em 320 px e no perfil em 768 px', async ({ page }) => {
+    test.skip(!isMobile(page), 'Larguras fixas a partir do projeto mobile')
+    const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+    await page.setViewportSize({ width: 320, height: 720 })
+    for (const path of ['/', '/signup', '/nft/emerald-ape-042']) {
+      await openApp(page, path)
+      await expect(page.locator('main#conteudo')).toBeVisible()
+      expect(await overflow(), path).toBeLessThanOrEqual(0)
+    }
+    await loginAs(page, USERS.ana, '/profile')
+    for (const width of [320, 768]) {
+      await page.setViewportSize({ width, height: 1024 })
+      await expect(page.getByRole('button', { name: 'Remover' })).toBeVisible()
+      expect(await overflow(), `/profile at ${width}`).toBeLessThanOrEqual(0)
+    }
+  })
+
+  test('rota inexistente parecida com uma do mercado não marca Mercado', async ({ page }) => {
+    test.skip(isMobile(page), 'O header é desktop')
+    await openApp(page, '/nftx')
+    await expect(page.getByRole('heading', { name: /não encontrada/i }).first()).toBeVisible()
+    await expect(page.getByRole('navigation', { name: 'Principal' }).locator('[aria-current="page"]')).toHaveCount(0)
+  })
 })

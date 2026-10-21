@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button'
 import { QuantityStepper } from '@/components/ui/quantity-stepper'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { CartLine, Quote, QuoteLine } from '@/contracts/commerce'
+import type { Network } from '@/contracts/nft'
+import { walletsOptions } from '@/features/account/queries'
+import { useSession } from '@/features/auth/session'
 import { promptVisitor } from '@/features/auth/login-prompt'
 import { NftCard, NftCardSkeleton } from '@/features/catalog/components/NftCard'
 import { NftImage } from '@/features/catalog/components/NftImage'
@@ -23,7 +26,8 @@ import { useCart, useQuote, useRemoveCartLine, useUpdateCartLine } from './queri
 /** Carrinho de NFTs (Figma "Desktop / Carrinho de NFTs" and "Mobile / Carrinho de NFTs"). */
 export function CartPage() {
   const cart = useCart()
-  const quote = useQuote('ethereum', Boolean(cart.data?.lines.length))
+  const network = useCheckoutNetwork()
+  const quote = useQuote(network ?? 'ethereum', Boolean(cart.data?.lines.length) && network !== null)
   const router = useRouter()
   const lines = cart.data?.lines ?? []
 
@@ -80,6 +84,18 @@ export function CartPage() {
       <RelatedProducts />
     </div>
   )
+}
+
+/**
+ * The network the payment page starts on (the primary wallet's), so the fee and
+ * total here match the ones there. Visitors see Ethereum; null while loading.
+ */
+function useCheckoutNetwork(): Network | null {
+  const { user } = useSession()
+  const wallets = useQuery({ ...walletsOptions(user?.id ?? 'anonymous'), enabled: Boolean(user) })
+  if (!user) return 'ethereum'
+  if (wallets.isError) return 'ethereum'
+  return wallets.data ? (wallets.data.items.find((w) => w.slot === 'primary')?.network ?? 'ethereum') : null
 }
 
 function CheckoutButton({ quote }: { quote: Quote | undefined }) {
@@ -233,7 +249,7 @@ function CartCard({ line, status }: { line: CartLine; status: QuoteLine | undefi
         <NftImage artwork={line.artwork} alt="" sizes="96px" className="h-full" />
       </div>
       <div className="min-w-0 flex-1 py-3">
-        <p className="truncate text-body font-bold">{line.name}</p>
+        <p className="text-body font-bold">{line.name}</p>
         <p className="text-caption text-muted-foreground">Edição: {line.editionLabel}</p>
         <LineStatus status={status} />
         <p className="mt-2 text-title-sm font-bold text-accent">{formatEth(multiplyEth(line.unitPriceEth, line.quantity))}</p>

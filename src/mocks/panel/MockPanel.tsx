@@ -54,7 +54,7 @@ export default function MockPanel() {
   }
 
   return (
-    <div data-mock-panel className="fixed bottom-20 left-2 z-50 flex flex-col items-start gap-2 md:bottom-4 md:left-3">
+    <div data-mock-panel className="pointer-events-auto fixed bottom-20 left-2 z-60 flex flex-col items-start gap-2 md:bottom-4 md:left-3">
       {open && (
         <PanelContent
           id={panelId}

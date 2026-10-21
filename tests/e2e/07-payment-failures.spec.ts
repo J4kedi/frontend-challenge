@@ -56,6 +56,35 @@ test.describe('07 · falhas de pagamento', () => {
     expect(statuses).toEqual([201, 200, 409])
   })
 
+  test('com um pedido em processamento, outra compra do mesmo carrinho é recusada', async ({ page }) => {
+    await openApp(page, '/')
+    const result = await page.evaluate(async () => {
+      const login = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'ana@kurio.test', password: 'kurio2026' }),
+      }).then((r) => r.json() as Promise<{ token: string }>)
+      const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${login.token}` }
+      await fetch('/api/cart/items', { method: 'POST', headers, body: JSON.stringify({ nftId: 'emerald-ape-042', editionId: 'emerald-ape-042:1-50', quantity: 1 }) })
+      await fetch('/api/me/wallets/wal_ana_primary/connect', { method: 'POST', headers, body: JSON.stringify({ provider: 'metamask', network: 'ethereum' }) })
+      const buyer = { displayName: 'Ana', username: 'ana.coleciona', profileName: 'Ana', email: 'ana@kurio.test', ensName: 'anacoleciona', referralCode: 'KURIO-ANA' }
+      // Each attempt takes a fresh quote and its own key, as checkout does after going back.
+      const order = async (key: string) => {
+        const quote = await fetch('/api/cart/quote?network=ethereum', { headers }).then((r) => r.json() as Promise<{ id: string }>)
+        const response = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { ...headers, 'Idempotency-Key': key },
+          body: JSON.stringify({ quoteId: quote.id, network: 'ethereum', walletId: 'wal_ana_primary', provider: 'metamask', buyer }),
+        })
+        return { status: response.status, body: (await response.json()) as { error?: { code: string } } }
+      }
+      const first = await order('first-attempt-123')
+      const second = await order('second-attempt-456')
+      return [first.status, second.status, second.body.error?.code]
+    })
+    expect(result).toEqual([201, 409, 'ORDER_IN_PROGRESS'])
+  })
+
   test('tentar de novo depois do pagamento recusado cria outro pedido', async ({ page }) => {
     await openApp(page, '/', 'payment-declined')
     await addToCartFromDetail(page, 'emerald-ape-042')

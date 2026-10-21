@@ -75,3 +75,5 @@ enunciado, a acessibilidade ou a coerência do fluxo pedem.
 | 15 | Newsletter, login social, "Esqueceu a senha?" | ações | toast explicando que não fazem parte da demonstração | mesmo motivo |
 | 16 | Confirmação | "Ver no Etherscan" | diálogo com o hash e o aviso de transação simulada | um link real daria 404 no explorador |
 | 17 | Paginação | 1 2 3 4 > | janela de 4 páginas ao redor da atual, ‹ › | o catálogo inteiro tem 27 páginas |
+| 18 | Card, mobile | selo "RARO" num card ilustrativo | selo nos NFTs cujo atributo de raridade é "Raro" | o selo precisa de um dado por trás, não de uma posição fixa |
+| 19 | Pagamento, "Confirmar compra" | botão sempre ativo | desabilitado com pedido pendente, com link "Acompanhar pedido" | evita cobrar o mesmo carrinho duas vezes |

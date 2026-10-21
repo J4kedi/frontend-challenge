@@ -90,12 +90,40 @@ um num clone limpo:
 | Valores do resumo quebram linha | coluna de 332 px | valores sem quebra |
 | Carteira conectada junto com "Conecte a carteira" | erro gravado durante a conexão pendente | sucesso limpa o erro |
 
-O que ficou de fora, por escolha e com registro:
-- **Fidelidade fina:** placa dos cards, cor do texto do detalhe, selo "RARO" e
-  grid escalonado no mobile. Redesenhar no último dia arriscaria regressão
-  visual.
-- **CLS do detalhe:** apareceu em 2 de 3 execuções do Lighthouse do avaliador.
-- **Lighthouse:** o relatório versionado é de um commit anterior à entrega.
+### Segunda rodada
+
+Os mesmos papéis rodaram de novo sobre a v1.0.5:
+
+- **Avaliador:** 82/100, com os eliminatórios passando.
+- **Caçador de bugs:** 11 defeitos novos.
+- **Teste manual do Kauan:** mais 2 defeitos, os 404 com a aba parada e o header na home.
+
+A fidelidade fina que tinha ficado de fora entrou nesta rodada: placa dos
+cards, grid escalonado e selo "RARO" no mobile, placa da galeria e hero. Os
+valores foram tirados do JSON do arquivo Figma.
+
+| Achado | Causa | Correção e teste |
+| --- | --- | --- |
+| Aba parada: toda chamada `/api/*` dá 404 | o navegador desliga o service worker ocioso, e o worker do MSW esquece a aba ao reiniciar | a aba se registra de novo depois de 20 s sem requisições (`12`, com o worker desligado via CDP) |
+| Depois de comprar, "Mercado" fica ativo na home mesmo clicando "Início" | o scroll-spy procurava `#mercado` antes de a home renderizar e desistia | espera a seção aparecer (`14`) |
+| Voltar logo depois de confirmar cobra o carrinho de novo | o mock aceitava outro pedido enquanto o primeiro estava pendente | `409 ORDER_IN_PROGRESS` e lista de pendentes atualizada (`07`) |
+| Logado, o favorito abre o login logo após um reload | a sessão guardada ainda não tinha sido confirmada | espera a confirmação; placeholder no header (`04`) |
+| Duas abas: pedido some, logout e preço não chegam à outra | cada aba tinha seu banco em memória e seu servidor de eventos | banco sincronizado por `storage`, eventos por `BroadcastChannel`, reload na troca de sessão (`10`) |
+| Foco no `body` ao fechar a revisão e o explorador | diálogos abertos por código, sem `Dialog.Trigger` | o `DialogContent` compartilhado devolve o foco a quem o abriu (`11`) |
+| Estouro a 320 px na home, na revisão e no recibo, e a 768 px no perfil | grids sem coluna explícita, linha do avatar sem quebra | `grid-cols-1`, quebra e padding menor (`06`, `14`) |
+| Total do carrinho ≠ total do pagamento na Polygon | o carrinho cotava sempre na Ethereum | cota na rede da carteira principal (`05`) |
+| Cupom usado continua no carrinho seguinte | a confirmação não limpava o cupom | limpo ao confirmar |
+| "Mercado" ativo em 404 como `/nftx` | `startsWith` sem fronteira de segmento | só o próprio segmento (`14`) |
+| Mobile: tab bar no carrinho, no pagamento e no login, sem voltar no pagamento | divergência dos frames | segue os frames |
+| Teste 04 escolhia o NFT com um hash diferente do mock | o mock faz o hash do JSON da string | mesmo cálculo |
+
+Também saíram duas dependências sem uso (`cn` e `next-themes`), e cinco
+`waitForTimeout` viraram esperas por condição: respostas pendentes,
+histórico de valores com um evento sentinela e a contagem regressiva.
+
+Ficaram de fora, com registro:
+- **Performance mobile:** 78–88 nas medições, abaixo da meta; a causa está em [`lighthouse.md`](quality/lighthouse.md).
+- **Duas abas escrevendo ao mesmo tempo:** ainda vale "a última vence", um limite de um servidor que roda no navegador.
 
 ## Contrato para os próximos agentes
 

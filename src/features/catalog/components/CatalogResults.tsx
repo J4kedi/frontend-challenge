@@ -82,7 +82,8 @@ export function CatalogResults({
       ) : (
         <ul className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:gap-x-11 lg:gap-y-10">
           {data.items.map((nft, index) => (
-            <li key={nft.id}>
+            // Mobile grid is staggered: the right column sits 32 px lower (Figma "Mobile / Início").
+            <li key={nft.id} className="max-md:even:translate-y-8">
               <NftCard nft={nft} priority={index < 3} />
             </li>
           ))}

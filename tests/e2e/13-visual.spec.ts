@@ -9,6 +9,11 @@ import { addToCartFromDetail, expect, openApp, submitLogin, test } from './suppo
 async function settle(page: Page) {
   // The demo's mock panel is not part of the Figma screens.
   await page.addStyleTag({ content: '[data-mock-panel] { display: none !important; }' })
+  // Lazy images outside the viewport load or not depending on timing: load them all.
+  await page.evaluate(() => {
+    for (const image of Array.from(document.images)) image.loading = 'eager'
+  })
+  await page.waitForFunction(() => Array.from(document.images).every((image) => image.complete))
   await page.waitForLoadState('networkidle')
   await page.evaluate(() => document.fonts.ready)
 }

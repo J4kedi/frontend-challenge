@@ -60,6 +60,11 @@ test.describe('01 · catálogo', () => {
     await openApp(page, '/', 'jitter')
     const status = page.getByTestId('catalog-status')
     await expect(status).toHaveText('239 NFTs encontrados')
+    // Track the burst of list requests: the check below runs after the slowest answer landed.
+    const inFlight = new Set<unknown>()
+    page.on('request', (request) => request.url().includes('/api/nfts?') && inFlight.add(request))
+    page.on('requestfinished', (request) => inFlight.delete(request))
+    page.on('requestfailed', (request) => inFlight.delete(request))
     await withFilters(page, async () => {
       await page.getByRole('button', { name: /^Música/ }).click()
       await page.getByRole('button', { name: /^Música/ }).click()
@@ -67,8 +72,7 @@ test.describe('01 · catálogo', () => {
     })
     await expect(page).toHaveURL(/collections=.*jogos/)
     await expect(status).toHaveText('19 NFTs encontrados')
-    // Longest jitter is 1.5 s: no late answer may replace the result after that.
-    await page.waitForTimeout(1600)
+    await expect.poll(() => inFlight.size, { message: 'every list request answered' }).toBe(0)
     await expect(status).toHaveText('19 NFTs encontrados')
   })
 

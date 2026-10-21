@@ -1,4 +1,4 @@
-import { addToCartFromDetail, expect, isMobile, mockControl, openApp, submitLogin, test, visibleTestId, waitForMocks } from './support/app'
+import { addToCartFromDetail, expect, isMobile, loginAs, mockControl, openApp, submitLogin, test, USERS, visibleTestId, waitForMocks } from './support/app'
 
 test.describe('05 · carrinho', () => {
   test('quantidades, remoção, cupom e persistência após refresh e login', async ({ page }) => {
@@ -72,5 +72,17 @@ test.describe('05 · carrinho', () => {
     await expect(visibleTestId(page, 'cart-line')).toHaveCount(1)
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBeLessThanOrEqual(0)
+  })
+
+  test('o total do carrinho é o mesmo do pagamento, na rede da carteira principal', async ({ page }) => {
+    // Bruno's primary wallet is on Polygon, and his seeded cart has one item.
+    await openApp(page, '/')
+    await loginAs(page, USERS.bruno, '/cart')
+    const total = page.getByTestId('quote-total').filter({ visible: true })
+    await expect(total).toHaveText(/ETH$/)
+    const inCart = await total.textContent()
+    await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
+    await expect(page).toHaveURL(/\/checkout$/)
+    await expect(page.getByTestId('quote-total').filter({ visible: true })).toHaveText(inCart!)
   })
 })

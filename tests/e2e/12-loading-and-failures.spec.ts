@@ -51,6 +51,9 @@ test.describe('12 · carregamento e falhas', () => {
     await page.clock.install()
     await openApp(page, '/')
     await expect(page.getByTestId('nft-card').first()).toBeVisible()
+    // Chrome stops only a worker that had no events for 30 s: let the boot requests settle
+    // (the socket connection refetches what is on screen) before stopping it.
+    await page.waitForLoadState('networkidle')
     const passedThrough: string[] = []
     page.on('response', (response) => {
       if (response.url().includes('/api/') && !response.fromServiceWorker()) passedThrough.push(response.url())
