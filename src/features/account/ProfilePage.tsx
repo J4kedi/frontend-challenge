@@ -158,8 +158,8 @@ function AvatarField({ user }: { user: User }) {
       <span id="avatar-label" className="text-body-sm text-foreground">
         Avatar
       </span>
-      <div className="flex items-center gap-6" role="group" aria-labelledby="avatar-label">
-        <span className="grid size-12 place-items-center overflow-hidden rounded-full bg-surface-dark text-accent">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3" role="group" aria-labelledby="avatar-label">
+        <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-surface-dark text-accent">
           {user.avatarUrl ? <img src={user.avatarUrl} alt={`Avatar de ${user.displayName}`} className="size-full object-cover" /> : <ImageIcon className="size-6" />}
         </span>
         <input ref={input} type="file" accept={AVATAR_TYPES.join(',')} className="sr-only" onChange={onFile} tabIndex={-1} aria-hidden="true" />

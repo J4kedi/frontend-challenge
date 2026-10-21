@@ -32,7 +32,7 @@ export function HomePage() {
         <h2 id="mercado-title" className="sr-only">
           Mercado de NFTs
         </h2>
-        <div className="grid gap-12 lg:grid-cols-[310px_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[310px_minmax(0,1fr)]">
           <aside aria-label="Filtros do catálogo" className="hidden space-y-12 lg:block">
             <div className="rounded-lg bg-surface p-5">
               <CatalogFilters facets={facets} search={search} onChange={setFilters} />
