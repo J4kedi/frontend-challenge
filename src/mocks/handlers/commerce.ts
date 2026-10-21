@@ -90,6 +90,8 @@ function settle(orderId: string) {
         if (line) line.quantity -= bought.quantity
       }
       cart.lines = cart.lines.filter((l) => l.quantity > 0)
+      // The coupon was spent on this order; the next cart starts without it.
+      if (order.couponCode) cart.couponCode = null
       cart.version += 1
     }
   } else {
@@ -310,6 +312,16 @@ export const commerceHandlers = [
         connection.provider !== body.data.provider
       ) {
         return fail(409, 'WALLET_DISCONNECTED', 'Conecte a carteira na rede escolhida antes de confirmar a compra')
+      }
+
+      // One purchase at a time: while an order is pending its items are still in the
+      // cart, so a second order (e.g. after going back to checkout) would charge them twice.
+      const inProgress = db().orders.find((o) => o.userId === user.id && o.status === 'pending')
+      if (inProgress) settleIfDue(inProgress)
+      if (inProgress?.status === 'pending') {
+        return fail(409, 'ORDER_IN_PROGRESS', 'Você tem uma compra em processamento. Aguarde a confirmação antes de comprar de novo.', {
+          details: { orderId: inProgress.id },
+        })
       }
 
       const cart = db().carts[`user:${user.id}`]

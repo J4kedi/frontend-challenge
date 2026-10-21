@@ -202,6 +202,8 @@ function CheckoutForm({ user, wallets }: { user: User; wallets: Wallet[] }) {
       })
       clearDraft(user.id)
       queryClient.setQueryData(queryKeys.user(user.id).order(order.id), order)
+      // Coming back to checkout now shows "compra em processamento" and blocks a second purchase.
+      void queryClient.invalidateQueries({ queryKey: queryKeys.user(user.id).pendingOrders })
       announce('Pedido enviado. Aguardando a confirmação da rede.')
       void navigate({ to: '/orders/$orderId', params: { orderId: order.id } })
     } catch (error) {
