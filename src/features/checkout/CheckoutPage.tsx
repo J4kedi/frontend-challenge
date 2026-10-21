@@ -147,7 +147,10 @@ function CheckoutForm({ user, wallets }: { user: User; wallets: Wallet[] }) {
     connect.mutate(
       { id: wallet.id, body: { provider, network } },
       {
-        onSuccess: () => announce(`${WALLET_PROVIDER_LABEL[provider]} conectada na ${NETWORK_LABEL[network]}.`),
+        onSuccess: () => {
+          setConnectError(null)
+          announce(`${WALLET_PROVIDER_LABEL[provider]} conectada na ${NETWORK_LABEL[network]}.`)
+        },
         onError: (error) => setConnectError(isApiError(error) ? error.message : 'Não foi possível conectar a carteira.'),
       },
     )
