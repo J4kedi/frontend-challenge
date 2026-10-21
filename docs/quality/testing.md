@@ -83,5 +83,5 @@ corrigidos antes da entrega:
 | Playwright, desktop + mobile (Windows, asserts de pixel ignorados) | 124 passaram + 10 pulados (testes que só fazem sentido num dos viewports), 67 testes por projeto, 4,5 min com 2 workers |
 | Regressão visual (Docker Linux) | 8/8, conferida numa segunda execução sem atualizar |
 | **CI (GitHub Actions)** — E2E + visual dentro de `mcr.microsoft.com/playwright:v1.64.1-noble` | 124 passaram + 10 pulados (testes de um só viewport) em 4,3 min, com as 8 telas da regressão visual comparadas; `verify` (typecheck, lint, unit, build) verde. Na primeira execução o CI pegou uma baseline visual desatualizada (pontos do carrossel), regerada no mesmo commit do CI |
-| Playwright contra a **URL publicada** (`E2E_BASE_URL`, sem visual) | 69 passaram + 1 pulado, 2,7 min |
+| Playwright contra a **URL publicada** (`E2E_BASE_URL`, sem visual) | 124 passaram + 10 pulados, 5,0 min |
 | Checkout limpo (`git clone` + `pnpm install --frozen-lockfile`) | typecheck, lint, unit (17/17), build e E2E 06 + 09 (6/6) |
