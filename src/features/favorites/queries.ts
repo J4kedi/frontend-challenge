@@ -35,11 +35,16 @@ export function useIsFavorite(nftId: string) {
  * heart flips immediately, and a failed request restores the previous list.
  * Visitors sign in over the same page, and the favorite is saved right after.
  */
+const FAVORITE_WRITE = ['favorite-write']
+
 export function useToggleFavorite() {
   const queryClient = useQueryClient()
   const { user } = useSession()
 
   const mutation = useMutation({
+    mutationKey: FAVORITE_WRITE,
+    // In click order: a quick add-then-remove must not reach the API reversed.
+    scope: { id: 'favorites' },
     mutationFn: ({ nftId, favorite }: { nftId: string; favorite: boolean; name: string }) =>
       favorite ? favoritesApi.add(nftId) : favoritesApi.remove(nftId),
     onMutate: async ({ nftId, favorite }) => {
@@ -61,7 +66,8 @@ export function useToggleFavorite() {
     onSuccess: async (data, { favorite, name }, context) => {
       // A list fetched before this write (e.g. right after sign-in) must not overwrite it.
       await queryClient.cancelQueries({ queryKey: context.key })
-      queryClient.setQueryData(context.key, data)
+      // A later toggle is still queued: its response carries the final list.
+      if (queryClient.isMutating({ mutationKey: FAVORITE_WRITE }) === 1) queryClient.setQueryData(context.key, data)
       announce(favorite ? `${name} adicionado à lista de interesse.` : `${name} removido da lista de interesse.`)
     },
   })
