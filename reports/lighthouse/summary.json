@@ -1,14 +1,14 @@
 {
   "environment": {
-    "date": "2026-10-21T04:17:10.046Z",
+    "date": "2026-10-21T13:57:18.174Z",
     "lighthouse": "13.5.0",
     "chrome": "Chrome/155.0.0.0",
-    "node": "v24.14.0",
-    "os": "Windows_NT 10.0.26200 (x64)",
-    "cpu": "Intel(R) Core(TM) Ultra 7 155H",
-    "memoryGb": 32,
+    "node": "v22.23.3",
+    "os": "Linux 6.17.0-1022-azure (x64)",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "memoryGb": 16,
     "throttling": "Lighthouse defaults: mobile = simulated slow 4G + 4x CPU slowdown; desktop = desktop-config (simulated, 1x CPU)",
-    "build": "pnpm build (demo build, mocks enabled), served by vite preview"
+    "build": "published demo at https://kurio-nft-marketplace-vert.vercel.app"
   },
   "summary": [
     {
@@ -16,14 +16,14 @@
       "profile": "mobile",
       "runs": 3,
       "median": {
-        "performance": 77,
+        "performance": 92,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 4049,
+        "lcpMs": 2861,
         "cls": 0,
-        "tbtMs": 291,
-        "fcpMs": 2486
+        "tbtMs": 177,
+        "fcpMs": 1923
       }
     },
     {
@@ -31,14 +31,14 @@
       "profile": "desktop",
       "runs": 3,
       "median": {
-        "performance": 99,
+        "performance": 100,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 966,
-        "cls": 0.002,
-        "tbtMs": 15,
-        "fcpMs": 653
+        "lcpMs": 566,
+        "cls": 0,
+        "tbtMs": 3,
+        "fcpMs": 377
       }
     },
     {
@@ -46,14 +46,14 @@
       "profile": "mobile",
       "runs": 3,
       "median": {
-        "performance": 77,
+        "performance": 95,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 3896,
+        "lcpMs": 2572,
         "cls": 0,
-        "tbtMs": 336,
-        "fcpMs": 2388
+        "tbtMs": 126,
+        "fcpMs": 1747
       }
     },
     {
@@ -61,14 +61,14 @@
       "profile": "desktop",
       "runs": 3,
       "median": {
-        "performance": 99,
+        "performance": 100,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 877,
+        "lcpMs": 568,
         "cls": 0,
         "tbtMs": 0,
-        "fcpMs": 607
+        "fcpMs": 397
       }
     }
   ],
@@ -78,180 +78,180 @@
       "profile": "mobile",
       "run": 1,
       "scores": {
-        "performance": 74,
+        "performance": 70,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 4682,
+      "lcpMs": 3135,
       "cls": 0,
-      "tbtMs": 263,
-      "fcpMs": 2604
+      "tbtMs": 1013,
+      "fcpMs": 2069
     },
     {
       "page": "inicio",
       "profile": "mobile",
       "run": 2,
       "scores": {
-        "performance": 78,
+        "performance": 92,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 3935,
+      "lcpMs": 2861,
       "cls": 0,
-      "tbtMs": 291,
-      "fcpMs": 2486
+      "tbtMs": 149,
+      "fcpMs": 1923
     },
     {
       "page": "inicio",
       "profile": "mobile",
       "run": 3,
       "scores": {
-        "performance": 77,
+        "performance": 93,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 4049,
+      "lcpMs": 2616,
       "cls": 0,
-      "tbtMs": 300,
-      "fcpMs": 2481
+      "tbtMs": 177,
+      "fcpMs": 1720
     },
     {
       "page": "inicio",
       "profile": "desktop",
       "run": 1,
       "scores": {
-        "performance": 98,
+        "performance": 100,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 975,
-      "cls": 0.002,
-      "tbtMs": 15,
-      "fcpMs": 655
+      "lcpMs": 566,
+      "cls": 0,
+      "tbtMs": 3,
+      "fcpMs": 377
     },
     {
       "page": "inicio",
       "profile": "desktop",
       "run": 2,
       "scores": {
-        "performance": 99,
+        "performance": 100,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 956,
-      "cls": 0.002,
-      "tbtMs": 17,
-      "fcpMs": 641
+      "lcpMs": 599,
+      "cls": 0,
+      "tbtMs": 3,
+      "fcpMs": 419
     },
     {
       "page": "inicio",
       "profile": "desktop",
       "run": 3,
       "scores": {
-        "performance": 99,
+        "performance": 100,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 966,
-      "cls": 0.002,
-      "tbtMs": 7,
-      "fcpMs": 653
+      "lcpMs": 566,
+      "cls": 0,
+      "tbtMs": 3,
+      "fcpMs": 377
     },
     {
       "page": "detalhe",
       "profile": "mobile",
       "run": 1,
       "scores": {
-        "performance": 81,
+        "performance": 95,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 3754,
+      "lcpMs": 2577,
       "cls": 0,
-      "tbtMs": 267,
-      "fcpMs": 2323
+      "tbtMs": 142,
+      "fcpMs": 1752
     },
     {
       "page": "detalhe",
       "profile": "mobile",
       "run": 2,
       "scores": {
-        "performance": 77,
+        "performance": 95,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 3901,
+      "lcpMs": 2572,
       "cls": 0,
-      "tbtMs": 336,
-      "fcpMs": 2388
+      "tbtMs": 126,
+      "fcpMs": 1747
     },
     {
       "page": "detalhe",
       "profile": "mobile",
       "run": 3,
       "scores": {
-        "performance": 73,
+        "performance": 95,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 3896,
+      "lcpMs": 2566,
       "cls": 0,
-      "tbtMs": 461,
-      "fcpMs": 2431
+      "tbtMs": 112,
+      "fcpMs": 1741
     },
     {
       "page": "detalhe",
       "profile": "desktop",
       "run": 1,
       "scores": {
-        "performance": 99,
+        "performance": 100,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 877,
+      "lcpMs": 563,
       "cls": 0,
       "tbtMs": 0,
-      "fcpMs": 607
+      "fcpMs": 389
     },
     {
       "page": "detalhe",
       "profile": "desktop",
       "run": 2,
       "scores": {
-        "performance": 99,
+        "performance": 100,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 869,
+      "lcpMs": 568,
       "cls": 0,
       "tbtMs": 0,
-      "fcpMs": 579
+      "fcpMs": 397
     },
     {
       "page": "detalhe",
       "profile": "desktop",
       "run": 3,
       "scores": {
-        "performance": 99,
+        "performance": 100,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 893,
+      "lcpMs": 598,
       "cls": 0,
       "tbtMs": 0,
-      "fcpMs": 620
+      "fcpMs": 407
     }
   ]
 }

@@ -82,9 +82,9 @@ corrigidos antes da entrega:
 
 | Suíte | Resultado |
 | --- | --- |
-| Vitest | 17/17 |
-| Playwright, desktop + mobile (Windows, asserts de pixel ignorados) | 124 passaram + 10 pulados (testes que só fazem sentido num dos viewports), 67 testes por projeto, 4,5 min com 2 workers |
-| Regressão visual (Docker Linux) | 8/8, conferida numa segunda execução sem atualizar |
-| **CI (GitHub Actions)** — E2E + visual dentro de `mcr.microsoft.com/playwright:v1.64.1-noble` | 124 passaram + 10 pulados (testes de um só viewport) em 4,3 min, com as 8 telas da regressão visual comparadas; `verify` (typecheck, lint, unit, build) verde. Na primeira execução o CI pegou uma baseline visual desatualizada (pontos do carrossel), regerada no mesmo commit do CI |
-| Playwright contra a **URL publicada** (`E2E_BASE_URL`, sem visual) | 124 passaram + 10 pulados, 5,0 min |
+| Vitest | 17/17 (o teste de dinheiro cobre o valor exato com 10 casas) |
+| Playwright, desktop + mobile (Windows, asserts de pixel ignorados) | 138 passaram + 10 pulados (testes que só fazem sentido num dos viewports), 74 testes por projeto, 3,0 min com 4 workers |
+| Regressão visual (Linux, imagem oficial do Playwright) | 8/8; as baselines desta versão foram geradas pelo próprio workflow (`update-snapshots`) e conferidas na execução seguinte, sem atualizar |
+| **CI (GitHub Actions)** — E2E + visual dentro de `mcr.microsoft.com/playwright:v1.64.1-noble` | 138 passaram + 10 pulados (testes de um só viewport) em 4,7 min, com as 8 telas da regressão visual comparadas; `verify` (typecheck, lint, unit, build) e Lighthouse verdes. Na primeira execução o CI pegou uma baseline visual desatualizada (pontos do carrossel), regerada no mesmo commit do CI |
+| Playwright contra a **URL publicada** (`E2E_BASE_URL`, sem visual), v1.0.8 | 138 passaram + 10 pulados, 3,2 min com 4 workers |
 | Checkout limpo (`git clone` + `pnpm install --frozen-lockfile`) | typecheck, lint, unit (17/17), build e E2E 06 + 09 (6/6) |
