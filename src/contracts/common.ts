@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+// Every contract imports this module first. Without JIT, zod skips compiling a
+// parser per schema (new Function) on the first parse: each schema here parses a
+// handful of responses, so the compile cost was a long task on page load.
+z.config({ jitless: true })
+
 /** ETH travels as a decimal string (up to 18 fraction digits) so no precision is lost on the way. */
 export const ethAmount = z.string().regex(/^\d+(\.\d{1,18})?$/, 'Valor em ETH inválido')
 export type EthAmount = z.infer<typeof ethAmount>

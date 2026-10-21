@@ -39,10 +39,11 @@ export const compareEth = (a: string, b: string) => {
 
 /**
  * Display format of the Figma file: dot separator and at least two decimals
- * ("1.19 ETH", "0.016 ETH", "26.846 ETH"). Extra decimals are kept up to
- * `maxDecimals`, rounding half up at the last kept digit.
+ * ("1.19 ETH", "0.016 ETH", "26.846 ETH"). By default every significant decimal
+ * is shown, so the screen says exactly what the API charges; `maxDecimals`
+ * rounds half up at the last kept digit where a shorter number is wanted.
  */
-export function formatEth(eth: string, { maxDecimals = 4, unit = true }: { maxDecimals?: number; unit?: boolean } = {}) {
+export function formatEth(eth: string, { maxDecimals = DECIMALS, unit = true }: { maxDecimals?: number; unit?: boolean } = {}) {
   const step = 10n ** BigInt(DECIMALS - maxDecimals)
   const rounded = ((toWei(eth) + step / 2n) / step) * step
   const [whole, fraction = ''] = fromWei(rounded).split('.')

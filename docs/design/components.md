@@ -45,7 +45,8 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 
 ### MobileTabBar
 - **Arquivo:** `src/components/layout/MobileTabBar.tsx` · **Figma:** `Tab Bar` (Mobile / Início)
-- **Uso:** navegação inferior fixa no mobile: Início, Lista de interesse, busca (botão central), Carrinho e Perfil.
+- **Uso:** navegação inferior fixa no mobile: Início, Lista de interesse, busca (botão central), Carrinho e Perfil. Não aparece no detalhe, no carrinho, no pagamento nem no login, porque os frames dessas telas não têm tab bar.
+- **Forma:** barra na cor de card com cantos superiores de 30 px e o recorte curvo sob o botão central, como no Figma. O recorte é uma peça SVG de largura fixa (126 px): botão de 65 px, berço de raio 44 px e ombros de 14 px, medidos no frame. As laterais esticam, então a curva não deforma em nenhuma largura. Sombra `drop-shadow-tab-bar`, que segue o recorte.
 - **A11y:** `nav` com rótulo; `scroll-padding-bottom` no `html` evita que um elemento focado fique escondido sob a barra (WCAG 2.4.11).
 
 ### SiteFooter
@@ -115,6 +116,7 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 ### HomeHero · FeaturedNft · PromoCards · BlogSection
 - **Arquivos:** `HomeHero.tsx`, `HomeEditorial.tsx` · **Figma:** `Hero`/`Hero Banner`, `NFT em destaque`, `Promo Card — Genesis Drops / Curated Art`, `Blog`
 - **Guidelines:** carrossel sem autoplay, com pontos acessíveis; "Ler mais" do blog aparece como indisponível (páginas editoriais fora do escopo).
+- **Hero Banner (mobile):** 190 px, cantos de 30 px, fundo em degradê de `primary` e os dois círculos decorativos do frame. A arte do slide tem 138 px, e uma segunda arte de 58 px fica sobre o canto inferior esquerdo dela. Só o layout do viewport atual vai para o DOM: um layout escondido ainda baixaria a arte prioritária dele.
 
 ## NFT, favoritos e carrinho
 
@@ -123,8 +125,14 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 - **Estados:** coração preenchido (forma) e `aria-pressed`. A troca é otimista, com rollback e toast se a API falhar. Visitante: abre o login sobre a página (ver AuthDialog) e o favorito é salvo logo depois de entrar.
 
 ### EditionPicker · PurchasePanel · Gallery
-- **Arquivo:** `src/features/nft/NftDetailPage.tsx` · **Figma:** "Edição: 1/1 · 1/10 · 1/50 · ABERTA", galeria com zoom
-- **A11y:** edições formam um radio group (setas navegam), e a esgotada vem riscada e com "esgotada" no nome.
+- **Arquivo:** `src/features/nft/NftDetailPage.tsx` · **Figma:** "Edição: 1/1 · 1/10 · 1/50 · ABERTA", galeria com zoom; no mobile, "Hero", "Details Sheet" e "Buy Bar"
+- **Mobile, como no frame:**
+  - voltar e favoritar (35 px) ficam acima da arte, que é inset com raio 24 e tem os pontos da galeria sobre ela;
+  - o painel de detalhes tem raio 31 e cobre 30 px da arte;
+  - ID do token, coleção e atributos vêm logo depois das edições;
+  - quantidade, preço, "Comprar NFT" e o carrinho ficam numa barra fixa embaixo, com raio 40;
+  - sem tab bar.
+- **A11y:** edições formam um radio group (setas navegam), e a esgotada vem riscada e com "esgotada" no nome. Os pontos da galeria são botões com nome ("Ver imagem 2 de 4") e `aria-pressed`.
 
 ### QuoteTotals · CouponForm · QuoteNotice
 - **Arquivos:** `src/features/cart/components/*` · **Figma:** "Resumo da carteira"

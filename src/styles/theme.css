@@ -1,4 +1,8 @@
 @import 'tailwindcss';
+/* Generated reports (Lighthouse HTML, Playwright) are not app source: their classes must not reach the CSS. */
+@source not '../../reports';
+@source not '../../playwright-report';
+@source not '../../test-results';
 @import 'tw-animate-css';
 @import '@fontsource-variable/roboto-mono';
 
@@ -75,6 +79,7 @@
   --shadow-card: 0 4px 12px 0 rgb(20 13 10 / 0.15);
   --shadow-raised: 0 6px 20px 0 rgb(10 6 4 / 0.45);
   --shadow-overlay: 0 0 20px 0 rgb(10 6 4 / 0.45);
+  --drop-shadow-tab-bar: 0 -10px 30px rgb(10 6 4 / 0.45); /* Mobile "Tab Bar", follows its curved cradle */
 
   /* Type scale: Figma text styles (size / line height). Roboto Mono only. */
   --text-micro: 9px;

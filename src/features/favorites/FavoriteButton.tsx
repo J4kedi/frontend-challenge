@@ -24,7 +24,14 @@ export function FavoriteButton({
     <button
       type="button"
       aria-pressed={isFavorite}
-      aria-label={isFavorite ? `Remover ${name} da lista de interesse` : `Adicionar ${name} à lista de interesse`}
+      aria-label={
+        variant === 'outline'
+          ? // Starts with the visible text, so speech input users can say what they see (WCAG 2.5.3).
+            `${isFavorite ? 'Favoritado' : 'Favoritar'}: ${isFavorite ? `remover ${name} da` : `adicionar ${name} à`} lista de interesse`
+          : isFavorite
+            ? `Remover ${name} da lista de interesse`
+            : `Adicionar ${name} à lista de interesse`
+      }
       onClick={(event) => {
         event.preventDefault()
         event.stopPropagation()

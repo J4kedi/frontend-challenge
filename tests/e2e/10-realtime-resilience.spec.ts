@@ -1,4 +1,4 @@
-import { addToCartFromDetail, expect, goToReview, isMobile, loginAs, mockControl, openApp, ordersOf, test, USERS, waitForMocks } from './support/app'
+import { addToCartFromDetail, expect, goToReview, isMobile, loginAs, mockControl, openApp, ordersOf, test, USERS, waitForMocks, waitForRealtime } from './support/app'
 
 test.describe('10 · eventos, desconexão e pedido pendente', () => {
   test('eventos duplicados ou antigos não regridem o estado', async ({ page }) => {
@@ -18,6 +18,7 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     })
 
     // events-chaos: each event arrives twice and is followed by an older version.
+    await waitForRealtime(page)
     await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.49' })
     await expect(price).toContainText('1.49 ETH')
     await mockControl(page, '/events/replay', { mode: 'stale' })
@@ -70,6 +71,8 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     await expect(other.getByTestId('detail-price')).toContainText('1.19 ETH')
 
     // Each tab runs its own copy of the simulated server; the event reaches both sockets.
+    await waitForRealtime(page)
+    await waitForRealtime(other)
     await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.29' })
     await expect(page.getByTestId('detail-price')).toContainText('1.29 ETH')
     await expect(other.getByTestId('detail-price')).toContainText('1.29 ETH')
@@ -84,8 +87,8 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     }
     await otherReloaded
     await waitForMocks(other)
-    await expect(other.getByRole('button', { name: /^Adicionar Emerald Ape #042/ }).filter({ visible: true }).first()).toBeVisible()
-    await other.getByRole('button', { name: /^Adicionar Emerald Ape #042/ }).filter({ visible: true }).first().click()
+    await expect(other.getByRole('button', { name: /adicionar Emerald Ape #042 à lista de interesse/i }).filter({ visible: true }).first()).toBeVisible()
+    await other.getByRole('button', { name: /adicionar Emerald Ape #042 à lista de interesse/i }).filter({ visible: true }).first().click()
     await expect(other.getByRole('dialog', { name: 'Entrar' })).toBeVisible()
   })
 })

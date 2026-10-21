@@ -1,4 +1,4 @@
-import { addToCartFromDetail, expect, isMobile, openApp, submitLogin, test } from './support/app'
+import { addToCartFromDetail, expect, goToReview, isMobile, openApp, submitLogin, test } from './support/app'
 
 test.describe('06 · compra completa', () => {
   test('do catálogo ao recibo confirmado, como visitante que entra no meio do caminho', async ({ page }) => {
@@ -41,5 +41,25 @@ test.describe('06 · compra completa', () => {
     // Only the purchased quantities leave the cart.
     await page.goto('/cart')
     await expect(page.getByTestId('cart-empty')).toBeVisible()
+  })
+
+  test('comprar a última unidade não anuncia, para quem comprou, que a edição esgotou', async ({ page }) => {
+    await openApp(page, '/nft/sage-nomad-009?edition=1-1')
+    await expect(page.locator('#nft-title')).toBeVisible()
+    await page.getByRole('button', { name: isMobile(page) ? 'Comprar NFT' : 'Comprar', exact: true }).click()
+    await expect(page).toHaveURL(/\/cart$/)
+    const review = await goToReview(page)
+
+    // Everything the polite live region says from here on.
+    await page.evaluate(() => {
+      const region = document.querySelector('[data-testid="live-region"]')!
+      const said: string[] = ((window as unknown as { said: string[] }).said = [])
+      new MutationObserver(() => said.push(region.textContent ?? '')).observe(region, { childList: true, characterData: true, subtree: true })
+    })
+    await review.getByTestId('confirm-purchase').click()
+    await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 15_000 })
+    const said = await page.evaluate(() => (window as unknown as { said: string[] }).said)
+    expect(said.some((text) => text.includes('Pagamento confirmado'))).toBe(true)
+    expect(said.filter((text) => text.includes('esgotou'))).toEqual([])
   })
 })

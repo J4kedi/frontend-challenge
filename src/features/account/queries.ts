@@ -47,10 +47,6 @@ export function useAvatar() {
   return { set, remove }
 }
 
-export function useChangePassword() {
-  return useMutation({ mutationFn: accountApi.changePassword })
-}
-
 function useStoreWallet() {
   const queryClient = useQueryClient()
   const userId = useUserId()

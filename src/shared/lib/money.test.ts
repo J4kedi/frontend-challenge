@@ -25,6 +25,8 @@ describe('money', () => {
     expect(formatEth('2')).toBe('2.00 ETH')
     expect(formatEth('0.016')).toBe('0.016 ETH')
     expect(formatEth('1.234567', { maxDecimals: 4 })).toBe('1.2346 ETH')
+    // Exact by default: a coupon on an odd price shows what the API charges.
+    expect(formatEth('1.0573827065')).toBe('1.0573827065 ETH')
     expect(formatEth('26.846', { unit: false })).toBe('26.846')
   })
 

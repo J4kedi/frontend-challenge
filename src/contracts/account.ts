@@ -77,6 +77,10 @@ export const passwordBody = z
   })
 export type PasswordBody = z.infer<typeof passwordBody>
 
+/** PATCH /me/profile: the profile and, optionally, a password change checked with it (all or nothing). */
+export const profileUpdateBody = profileBody.extend({ password: passwordBody.optional() })
+export type ProfileUpdateBody = z.infer<typeof profileUpdateBody>
+
 export const WALLET_PROVIDERS = ['metamask', 'walletconnect', 'coinbase'] as const
 export const walletProvider = z.enum(WALLET_PROVIDERS)
 export type WalletProvider = z.infer<typeof walletProvider>

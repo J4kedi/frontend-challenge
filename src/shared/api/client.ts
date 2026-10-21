@@ -12,6 +12,9 @@ import { ApiError, toApiError } from './errors'
 export const apiClient = axios.create({
   baseURL: config.apiUrl,
   timeout: config.requestTimeoutMs,
+  // fetch instead of XHR: the timeout runs on a JS timer (not the XHR's native one),
+  // so the E2E fake clock can drive it like every other timer of the app.
+  adapter: 'fetch',
   // collection=a&collection=b, the format the API expects for repeated filters
   paramsSerializer: { indexes: null },
 })

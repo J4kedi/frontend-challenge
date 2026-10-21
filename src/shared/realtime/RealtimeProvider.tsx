@@ -13,6 +13,8 @@ let status: Status = 'connecting'
 const listeners = new Set<() => void>()
 const setStatus = (next: Status) => {
   status = next
+  // E2E tests wait for "online" before publishing an event, as they wait for data-mocks.
+  document.documentElement.dataset.realtime = next
   listeners.forEach((l) => l())
 }
 

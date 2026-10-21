@@ -57,5 +57,9 @@ O transporte é o WebSocket interceptado pelo MSW 2.15 com `@mswjs/socket.io-bin
 - **Sem ping.** O binding responde ao handshake, mas não envia ping; sem ele o Engine.IO derruba o cliente em uns 30 s. O servidor simulado manda `"2"` a cada 20 s.
 - **Sem broadcast nem salas.** O servidor simulado mantém o próprio registro de conexões e entrega `order.updated` só aos sockets do dono.
 - **Auth do CONNECT ignorada.** O binding confirma a conexão antes de ler o pacote `40{…}`, por isso a identificação vai num evento (`session.subscribe`).
-- **Um servidor por aba.** O "servidor" roda dentro da página; duas abas são dois servidores com o mesmo banco no `localStorage`, e eventos não cruzam abas.
+- **Um servidor por aba.** O "servidor" roda dentro da página, então duas abas são dois servidores sobre o mesmo banco no `localStorage`. Elas se mantêm iguais assim:
+  - cada uma adota o que as outras gravam (evento `storage`);
+  - cada evento publicado é repassado às outras abas por `BroadcastChannel('kurio:realtime')` (`src/mocks/realtime/server.ts`), e o servidor de cada aba o entrega aos seus sockets.
+
+  Duas escritas ao mesmo tempo em abas diferentes ainda seguem "a última vence".
 - O MSW 3 já saiu, mas o binding exige `msw ^2.10.2`, então a versão fica travada em 2.15.0.
