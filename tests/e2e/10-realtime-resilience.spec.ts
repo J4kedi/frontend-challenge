@@ -1,4 +1,4 @@
-import { addToCartFromDetail, expect, goToReview, mockControl, openApp, ordersOf, test, waitForMocks } from './support/app'
+import { addToCartFromDetail, expect, goToReview, isMobile, loginAs, mockControl, openApp, ordersOf, test, USERS, waitForMocks } from './support/app'
 
 test.describe('10 · eventos, desconexão e pedido pendente', () => {
   test('eventos duplicados ou antigos não regridem o estado', async ({ page }) => {
@@ -59,5 +59,30 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     await waitForMocks(page)
     await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 20_000 })
     expect(await ordersOf(page)).toHaveLength(1)
+  })
+
+  test('duas abas: o preço e o logout de uma chegam à outra', async ({ page, context }) => {
+    await openApp(page, '/')
+    await loginAs(page, USERS.ana, '/nft/emerald-ape-042')
+    const other = await context.newPage()
+    await other.goto('/nft/emerald-ape-042')
+    await waitForMocks(other)
+    await expect(other.getByTestId('detail-price')).toContainText('1.19 ETH')
+
+    // Each tab runs its own copy of the simulated server; the event reaches both sockets.
+    await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.29' })
+    await expect(page.getByTestId('detail-price')).toContainText('1.29 ETH')
+    await expect(other.getByTestId('detail-price')).toContainText('1.29 ETH')
+
+    // Signing out in one tab signs out the other.
+    if (isMobile(page)) {
+      await page.evaluate(() => localStorage.removeItem('kurio:session'))
+    } else {
+      await page.goto('/profile')
+      await page.getByRole('button', { name: 'Sair' }).click()
+    }
+    await expect(other.getByRole('button', { name: /^Adicionar Emerald Ape #042/ }).filter({ visible: true }).first()).toBeVisible()
+    await other.getByRole('button', { name: /^Adicionar Emerald Ape #042/ }).filter({ visible: true }).first().click()
+    await expect(other.getByRole('dialog', { name: 'Entrar' })).toBeVisible()
   })
 })

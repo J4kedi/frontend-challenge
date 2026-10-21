@@ -36,6 +36,14 @@ export function db(): MockDb {
   return state!
 }
 
+// Every tab of the demo runs its own copy of the simulated backend over the same
+// localStorage: take the other tabs' writes, or the last tab to write would erase
+// orders and carts the others created.
+window.addEventListener('storage', (event) => {
+  if (event.key !== STORAGE_KEY) return
+  state = event.newValue ? (JSON.parse(event.newValue) as MockDb) : null
+})
+
 export function persist() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))

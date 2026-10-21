@@ -24,6 +24,11 @@ interface Peer {
 }
 
 const peers = new Set<Peer>()
+
+// The other tabs run their own copy of this server: relay what is published so
+// their sockets get it too (the data itself syncs through localStorage).
+const otherTabs = typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel('kurio:realtime')
+otherTabs?.addEventListener('message', (message: MessageEvent<RealtimeEvent>) => deliver(message.data))
 const realtime = ws.link(`${SOCKET_URL}/*`)
 /** Until this instant (ms) the simulated server is "down" (see dropConnections). */
 let downUntil = 0
@@ -80,6 +85,7 @@ export function publish(event: RealtimeEvent) {
   current.events = [...current.events.slice(-29), event]
   persist()
   deliver(event)
+  otherTabs?.postMessage(event)
   if (scenario() === 'events-chaos') {
     deliver(event)
     const stale = staleCopy(event)
