@@ -76,6 +76,17 @@ test.describe('01 · catálogo', () => {
     await expect(status).toHaveText('19 NFTs encontrados')
   })
 
+  test('filtros digitados à mão na URL valem como os escolhidos na tela', async ({ page }) => {
+    await openApp(page, '/?priceMin=1&priceMax=2&networks=solana')
+    const total = await page.evaluate(async () => {
+      const response = await fetch('/api/nfts?priceMin=1&priceMax=2&network=solana')
+      return ((await response.json()) as { total: number }).total
+    })
+    expect(total).toBeGreaterThan(0)
+    expect(total).toBeLessThan(239)
+    await expect(page.getByTestId('catalog-status')).toHaveText(`${total} NFTs encontrados`)
+  })
+
   test('resultado vazio oferece limpar filtros', async ({ page }) => {
     await openApp(page, '/')
     await page.getByRole('searchbox', { name: /Buscar NFTs/ }).fill('zzz-nada')
