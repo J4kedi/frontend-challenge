@@ -58,7 +58,8 @@ export function CartPage() {
             <CartTable lines={lines} quote={quote.data} />
             <CartCards lines={lines} quote={quote.data} />
           </section>
-          <aside aria-labelledby="summary-title" className="space-y-6 lg:pt-1">
+          {/* Mobile: the summary is the Figma bottom sheet, card-colored and rounded on top. */}
+          <aside aria-labelledby="summary-title" className="space-y-6 max-md:-mx-4 max-md:rounded-t-[40px] max-md:bg-surface max-md:px-6 max-md:pt-6 max-md:pb-8 lg:pt-1">
             <h2 id="summary-title" className="hidden border-b border-border pb-3 text-title-sm font-bold md:block">
               Resumo da carteira
             </h2>
@@ -111,7 +112,7 @@ function CheckoutButton({ quote }: { quote: Quote | undefined }) {
   return (
     <div>
       {ready ? (
-        <Button asChild size="lg" className="h-12 w-full max-md:h-15 max-md:rounded-full">
+        <Button asChild size="lg" className="h-12 w-full max-md:h-15 max-md:rounded-full max-md:bg-linear-to-br max-md:from-primary max-md:to-primary/80">
           <Link to="/checkout" onClick={signInFirst}>
             Conectar e finalizar
           </Link>

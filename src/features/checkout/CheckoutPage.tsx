@@ -381,7 +381,7 @@ function CheckoutForm({ user, wallets }: { user: User; wallets: Wallet[] }) {
           </p>
         )}
         <FormError message={submitError && !reviewOpen ? submitError : null} />
-        <Button type="submit" size="lg" className="h-12 w-full max-md:h-15 max-md:rounded-full" disabled={Boolean(inFlightId) || !quote.data}>
+        <Button type="submit" size="lg" className="h-12 w-full max-md:h-15 max-md:rounded-full max-md:bg-linear-to-br max-md:from-primary max-md:to-primary/80" disabled={Boolean(inFlightId) || !quote.data}>
           Confirmar compra
         </Button>
       </aside>
