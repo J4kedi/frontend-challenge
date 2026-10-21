@@ -30,18 +30,26 @@ mocks, painel de mocks e tempo real da demo publicada são carregados.
 Ambiente:
 - ferramentas: Lighthouse 13.5.0, Chrome 155, Node 24.14;
 - máquina: Windows 11, Intel Core Ultra 7 155H, 32 GB;
-- data: 2026-10-20.
+- data: 2026-10-21, na versão entregue (v1.0.6).
 
 | Página | Perfil | Performance | Acessibilidade | Boas práticas | SEO | LCP | CLS | TBT |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Início | mobile | **82** | 100 | 100 | 100 | 3 932 ms | 0 | 175 ms |
-| Início | desktop | 99 | 100 | 100 | 100 | 970 ms | 0,002 | 10 ms |
-| Detalhe | mobile | **86** | 100 | 100 | 100 | 3 542 ms | 0 | 171 ms |
-| Detalhe | desktop | 99 | 100 | 100 | 100 | 845 ms | 0 | 0 ms |
+| Início | mobile | **77** | 100 | 100 | 100 | 4 049 ms | 0 | 291 ms |
+| Início | desktop | 99 | 100 | 100 | 100 | 966 ms | 0,002 | 15 ms |
+| Detalhe | mobile | **77** | 100 | 100 | 100 | 3 896 ms | 0 | 336 ms |
+| Detalhe | desktop | 99 | 100 | 100 | 100 | 877 ms | 0 | 0 ms |
 
 Metas: Performance ≥ 90, Acessibilidade ≥ 95, Boas práticas ≥ 95, SEO ≥ 90.
 As metas são atingidas em todas as categorias e perfis, **exceto Performance
-no mobile** (82 e 86).
+no mobile**.
+
+**Variação entre medições.** A medição anterior (2026-10-20, commit
+`4d0ccd4`) deu medianas de 82 e 86. Execuções isoladas, nas duas datas, foram
+de 77 a 88. O LCP mobile fica estável em ~3,9 s; o que oscila é o TBT (170 a
+410 ms), sensível à CPU disponível. Esta máquina rodava outras sessões ao
+mesmo tempo. Os avaliadores sem contexto mediram 78–88 na URL publicada. A
+causa de fundo é a mesma (seção abaixo): o primeiro card só pinta depois do
+boot do MSW e da primeira resposta da API.
 
 ## Antes e depois
 

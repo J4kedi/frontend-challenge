@@ -122,7 +122,7 @@ Também saíram duas dependências sem uso (`cn` e `next-themes`), e cinco
 histórico de valores com um evento sentinela e a contagem regressiva.
 
 Ficaram de fora, com registro:
-- **Performance mobile:** 78–88 nas medições, abaixo da meta; a causa está em [`lighthouse.md`](quality/lighthouse.md).
+- **Performance mobile:** 77–88 nas medições, abaixo da meta; a causa está em [`lighthouse.md`](quality/lighthouse.md).
 - **Duas abas escrevendo ao mesmo tempo:** ainda vale "a última vence", um limite de um servidor que roda no navegador.
 
 ## Contrato para os próximos agentes

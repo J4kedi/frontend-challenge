@@ -1,6 +1,6 @@
 {
   "environment": {
-    "date": "2026-10-20T14:50:10.544Z",
+    "date": "2026-10-21T04:17:10.046Z",
     "lighthouse": "13.5.0",
     "chrome": "Chrome/155.0.0.0",
     "node": "v24.14.0",
@@ -16,14 +16,14 @@
       "profile": "mobile",
       "runs": 3,
       "median": {
-        "performance": 82,
+        "performance": 77,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 3932,
+        "lcpMs": 4049,
         "cls": 0,
-        "tbtMs": 175,
-        "fcpMs": 2478
+        "tbtMs": 291,
+        "fcpMs": 2486
       }
     },
     {
@@ -35,10 +35,10 @@
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 970,
+        "lcpMs": 966,
         "cls": 0.002,
-        "tbtMs": 10,
-        "fcpMs": 612
+        "tbtMs": 15,
+        "fcpMs": 653
       }
     },
     {
@@ -46,14 +46,14 @@
       "profile": "mobile",
       "runs": 3,
       "median": {
-        "performance": 86,
+        "performance": 77,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 3542,
+        "lcpMs": 3896,
         "cls": 0,
-        "tbtMs": 171,
-        "fcpMs": 2281
+        "tbtMs": 336,
+        "fcpMs": 2388
       }
     },
     {
@@ -65,10 +65,10 @@
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 845,
+        "lcpMs": 877,
         "cls": 0,
         "tbtMs": 0,
-        "fcpMs": 561
+        "fcpMs": 607
       }
     }
   ],
@@ -78,60 +78,60 @@
       "profile": "mobile",
       "run": 1,
       "scores": {
-        "performance": 78,
+        "performance": 74,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 4134,
+      "lcpMs": 4682,
       "cls": 0,
-      "tbtMs": 269,
-      "fcpMs": 2492
+      "tbtMs": 263,
+      "fcpMs": 2604
     },
     {
       "page": "inicio",
       "profile": "mobile",
       "run": 2,
       "scores": {
-        "performance": 82,
+        "performance": 78,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 3932,
+      "lcpMs": 3935,
       "cls": 0,
-      "tbtMs": 173,
-      "fcpMs": 2478
+      "tbtMs": 291,
+      "fcpMs": 2486
     },
     {
       "page": "inicio",
       "profile": "mobile",
       "run": 3,
       "scores": {
-        "performance": 82,
+        "performance": 77,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 3927,
+      "lcpMs": 4049,
       "cls": 0,
-      "tbtMs": 175,
-      "fcpMs": 2472
+      "tbtMs": 300,
+      "fcpMs": 2481
     },
     {
       "page": "inicio",
       "profile": "desktop",
       "run": 1,
       "scores": {
-        "performance": 99,
+        "performance": 98,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 951,
+      "lcpMs": 975,
       "cls": 0.002,
-      "tbtMs": 10,
-      "fcpMs": 612
+      "tbtMs": 15,
+      "fcpMs": 655
     },
     {
       "page": "inicio",
@@ -143,10 +143,10 @@
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 970,
+      "lcpMs": 956,
       "cls": 0.002,
-      "tbtMs": 22,
-      "fcpMs": 574
+      "tbtMs": 17,
+      "fcpMs": 641
     },
     {
       "page": "inicio",
@@ -158,25 +158,25 @@
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 971,
+      "lcpMs": 966,
       "cls": 0.002,
-      "tbtMs": 10,
-      "fcpMs": 627
+      "tbtMs": 7,
+      "fcpMs": 653
     },
     {
       "page": "detalhe",
       "profile": "mobile",
       "run": 1,
       "scores": {
-        "performance": 86,
+        "performance": 81,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 3542,
+      "lcpMs": 3754,
       "cls": 0,
-      "tbtMs": 171,
-      "fcpMs": 2281
+      "tbtMs": 267,
+      "fcpMs": 2323
     },
     {
       "page": "detalhe",
@@ -188,25 +188,25 @@
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 3728,
+      "lcpMs": 3901,
       "cls": 0,
-      "tbtMs": 408,
-      "fcpMs": 2290
+      "tbtMs": 336,
+      "fcpMs": 2388
     },
     {
       "page": "detalhe",
       "profile": "mobile",
       "run": 3,
       "scores": {
-        "performance": 88,
+        "performance": 73,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 3527,
+      "lcpMs": 3896,
       "cls": 0,
-      "tbtMs": 110,
-      "fcpMs": 2277
+      "tbtMs": 461,
+      "fcpMs": 2431
     },
     {
       "page": "detalhe",
@@ -218,10 +218,10 @@
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 845,
+      "lcpMs": 877,
       "cls": 0,
       "tbtMs": 0,
-      "fcpMs": 559
+      "fcpMs": 607
     },
     {
       "page": "detalhe",
@@ -233,10 +233,10 @@
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 845,
+      "lcpMs": 869,
       "cls": 0,
       "tbtMs": 0,
-      "fcpMs": 561
+      "fcpMs": 579
     },
     {
       "page": "detalhe",
@@ -248,10 +248,10 @@
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 845,
+      "lcpMs": 893,
       "cls": 0,
       "tbtMs": 0,
-      "fcpMs": 561
+      "fcpMs": 620
     }
   ]
 }
