@@ -162,7 +162,7 @@ function ReceiptContent({ order }: { order: Order }) {
           Detalhes da transação
         </h2>
         {/* In the desktop modal the lines scroll, so the totals and the explorer link always fit the window. */}
-        <div className="mt-3 min-h-24 overflow-y-auto" role="region" aria-label="NFTs do pedido" tabIndex={desktop ? 0 : undefined}>
+        <div className="mt-3 min-h-16 overflow-y-auto" role="region" aria-label="NFTs do pedido" tabIndex={desktop ? 0 : undefined}>
           <table className="w-full text-left text-body-sm">
             <thead className="sticky top-0 bg-surface">
               <tr className="border-b border-border text-body-lg font-bold">
