@@ -110,7 +110,10 @@ test.describe('03 · conta e sessão', () => {
     await page.getByRole('radio', { name: /Coinbase/ }).check()
 
     await mockControl(page, '/session/expire')
-    await page.getByRole('button', { name: 'Conectar carteira' }).click()
+    // Any private request now meets the expired session (a background refetch may get
+    // there first); reloading makes one for sure.
+    await page.reload()
+    await waitForMocks(page)
     await expect(page).toHaveURL(/\/login\?redirect=.*checkout.*reason=expired/)
     await submitLogin(page)
     await expect(page).toHaveURL(/\/checkout$/)
