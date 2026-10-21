@@ -131,4 +131,25 @@ test.describe('07 · falhas de pagamento', () => {
     expect(page.url()).not.toBe(declinedUrl)
     expect((await ordersOf(page)).map((o) => o.status).sort()).toEqual(['confirmed', 'declined'])
   })
+
+  test('503 no pedido: o app repete com a mesma chave e cria um único pedido', async ({ page }) => {
+    await openApp(page, '/')
+    await addToCartFromDetail(page, 'emerald-ape-042')
+    const review = await goToReview(page)
+    const posts: { status: number; key: string | null }[] = []
+    page.on('response', (response) => {
+      if (response.request().method() === 'POST' && response.url().endsWith('/api/orders')) {
+        posts.push({ status: response.status(), key: response.request().headers()['idempotency-key'] ?? null })
+      }
+    })
+    // From here the API answers 503 to the first try of each order.
+    await mockControl(page, '/scenario', { name: 'http-5xx' }, 'PUT')
+    await review.getByTestId('confirm-purchase').click()
+    await expect.poll(() => posts.map((p) => p.status)).toEqual([503, 201])
+    expect(posts[1]!.key).toBe(posts[0]!.key)
+
+    await mockControl(page, '/scenario', { name: 'default' }, 'PUT')
+    await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 15_000 })
+    expect(await ordersOf(page)).toHaveLength(1)
+  })
 })

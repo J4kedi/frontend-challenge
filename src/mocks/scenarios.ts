@@ -14,7 +14,8 @@ export const SCENARIOS = {
   offline: { label: 'Sem conexão', description: 'Toda chamada à API falha como erro de rede.' },
   'http-5xx': {
     label: 'Falha 503',
-    description: 'Cada GET falha com 503 nas 3 primeiras tentativas e funciona na seguinte (testa o "Tentar novamente").',
+    description:
+      'Cada GET falha com 503 nas 3 primeiras tentativas e funciona na seguinte (testa o "Tentar novamente"). O pedido falha na primeira tentativa, e o app repete com a mesma chave.',
   },
   'mutation-error': {
     label: 'Falha em mutation',
