@@ -19,7 +19,7 @@ export function QuoteTotals({ quote, className }: { quote: Quote | undefined; cl
       </div>
     )
   }
-  const row = 'flex items-baseline justify-between gap-4'
+  const row = 'flex items-baseline justify-between gap-4 [&>dd]:shrink-0 [&>dd]:whitespace-nowrap'
   return (
     <dl className={cn('space-y-3 text-body-lg text-foreground', className)} data-testid="quote-totals">
       <div className={row}>

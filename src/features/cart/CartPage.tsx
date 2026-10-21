@@ -31,7 +31,7 @@ export function CartPage() {
     <div className="mx-auto max-w-page px-4 pt-6 md:px-6 md:pt-8 xl:px-0">
       <Breadcrumb items={[{ label: 'Início', to: '/' }, { label: 'Mercado', to: '/', hash: 'mercado' }, { label: 'Carrinho' }]} />
       <div className="flex items-center gap-4 md:hidden">
-        <button type="button" onClick={() => router.history.back()} aria-label="Voltar" className="grid size-9 place-items-center rounded-full bg-surface-raised">
+        <button type="button" onClick={() => (router.history.canGoBack() ? router.history.back() : void router.navigate({ to: '/', hash: 'mercado' }))} aria-label="Voltar" className="grid size-9 place-items-center rounded-full bg-surface-raised">
           <ArrowLeftIcon className="size-5" />
         </button>
         <h1 className="text-title font-bold">Carrinho de NFTs</h1>
@@ -47,7 +47,7 @@ export function CartPage() {
       ) : lines.length === 0 ? (
         <EmptyCart />
       ) : (
-        <div className="mt-4 grid gap-10 lg:grid-cols-[minmax(0,782px)_332px] lg:justify-between">
+        <div className="mt-4 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,782px)_332px] lg:justify-between">
           <section aria-label="Itens do carrinho" className="space-y-4">
             <QuoteNotice quote={quote.data} />
             <CartTable lines={lines} quote={quote.data} />
@@ -264,7 +264,7 @@ function EmptyCart() {
 
 function CartSkeleton() {
   return (
-    <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,782px)_332px] lg:justify-between" aria-busy="true" data-testid="cart-skeleton">
+    <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,782px)_332px] lg:justify-between" aria-busy="true" data-testid="cart-skeleton">
       <p role="status" className="sr-only">
         Carregando carrinho…
       </p>

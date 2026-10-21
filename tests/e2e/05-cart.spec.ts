@@ -1,4 +1,4 @@
-import { addToCartFromDetail, expect, openApp, submitLogin, test, visibleTestId, waitForMocks } from './support/app'
+import { addToCartFromDetail, expect, isMobile, mockControl, openApp, submitLogin, test, visibleTestId, waitForMocks } from './support/app'
 
 test.describe('05 · carrinho', () => {
   test('quantidades, remoção, cupom e persistência após refresh e login', async ({ page }) => {
@@ -40,5 +40,37 @@ test.describe('05 · carrinho', () => {
     await submitLogin(page)
     await expect(page).toHaveURL(/\/checkout$/)
     await expect(page.getByTestId('quote-total')).toHaveText('2.15 ETH')
+  })
+
+  test('quantidade acima do estoque restante pode ser reduzida passo a passo', async ({ page }) => {
+    await openApp(page, '/nft/emerald-ape-042')
+    const stepper = page.getByRole('group', { name: 'Quantidade de Emerald Ape #042' }).filter({ visible: true })
+    await stepper.getByRole('button', { name: 'Aumentar quantidade' }).click()
+    await stepper.getByRole('button', { name: 'Aumentar quantidade' }).click()
+    await expect(stepper.locator('output')).toHaveText('3')
+    await page.getByRole('button', { name: isMobile(page) ? 'Comprar NFT' : 'Comprar', exact: true }).click()
+    await expect(page).toHaveURL(/\/cart$/)
+
+    // Stock drops to 1 while the collector holds 3: stepping down must work.
+    await mockControl(page, '/nfts/emerald-ape-042', { available: 1 })
+    const line = visibleTestId(page, 'cart-line')
+    await expect(line.getByTestId('line-status')).toHaveText('Só resta 1')
+    const quantity = line.getByRole('group').locator('output')
+    await line.getByRole('button', { name: 'Diminuir quantidade' }).click()
+    await expect(quantity).toHaveText('2')
+    await line.getByRole('button', { name: 'Diminuir quantidade' }).click()
+    await expect(quantity).toHaveText('1')
+    await expect(line.getByTestId('line-status')).toHaveCount(0)
+    await expect(page.getByRole('link', { name: 'Conectar e finalizar' })).toBeVisible()
+  })
+
+  test('carrinho cabe em 320 px, sem rolagem lateral', async ({ page }) => {
+    test.skip(!isMobile(page), 'Celular pequeno a partir do projeto mobile')
+    await openApp(page, '/')
+    await addToCartFromDetail(page, 'emerald-ape-042')
+    await page.setViewportSize({ width: 320, height: 720 })
+    await expect(visibleTestId(page, 'cart-line')).toHaveCount(1)
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+    expect(overflow).toBeLessThanOrEqual(0)
   })
 })
