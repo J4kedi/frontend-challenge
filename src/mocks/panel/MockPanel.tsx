@@ -57,7 +57,7 @@ export default function MockPanel() {
     // On phones a dialog's own actions sit where the trigger is: it steps aside while one is open.
     <div
       data-mock-panel
-      className="pointer-events-auto fixed bottom-20 left-2 z-60 flex flex-col items-start gap-2 max-md:[body:has([role=dialog])_&]:hidden md:bottom-4 md:left-3"
+      className="pointer-events-auto fixed bottom-28 left-2 z-60 flex flex-col items-start gap-2 max-md:[body:has([role=dialog])_&]:hidden max-md:[body:has([data-buy-bar])_&]:bottom-46 md:bottom-4 md:left-3"
     >
       {open && (
         <PanelContent

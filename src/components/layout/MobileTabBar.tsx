@@ -5,15 +5,16 @@ import { useCartCount } from '@/features/cart/queries'
 import { cn } from '@/shared/lib/cn'
 import { focusCatalogSearch } from './focus-search'
 
-/** Figma: the cart, payment and sign-in frames have no tab bar (their own back button or bottom action instead). */
+/** Figma: the detail, cart, payment and sign-in frames have no tab bar (their own back button or bottom action instead). */
 const WITHOUT_TAB_BAR = ['/cart', '/checkout', '/login', '/signup']
+const hasTabBar = (pathname: string) => !WITHOUT_TAB_BAR.includes(pathname) && !pathname.startsWith('/nft/')
 
 /** Bottom navigation of the mobile frames ("Tab Bar"). */
 export function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const count = useCartCount()
   const navigate = useNavigate()
-  if (WITHOUT_TAB_BAR.includes(pathname)) return null
+  if (!hasTabBar(pathname)) return null
   const item = (active: boolean) =>
     cn('grid size-12 place-items-center rounded-full', active ? 'text-accent' : 'text-muted-foreground')
 
