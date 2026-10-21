@@ -101,6 +101,23 @@ test.describe('03 · conta e sessão', () => {
     await expect(page).not.toHaveURL(/\/login/)
   })
 
+  test('sessão expira no pagamento: depois do login, volta ao pagamento com o que estava preenchido', async ({ page }) => {
+    await openApp(page, '/')
+    await addToCartFromDetail(page, 'emerald-ape-042')
+    await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
+    await submitLogin(page)
+    await expect(page).toHaveURL(/\/checkout$/)
+    await page.getByRole('radio', { name: /Coinbase/ }).check()
+
+    await mockControl(page, '/session/expire')
+    await page.getByRole('button', { name: 'Conectar carteira' }).click()
+    await expect(page).toHaveURL(/\/login\?redirect=.*checkout.*reason=expired/)
+    await submitLogin(page)
+    await expect(page).toHaveURL(/\/checkout$/)
+    // The draft brought back what was chosen before the session expired.
+    await expect(page.getByRole('radio', { name: /Coinbase/ })).toBeChecked()
+  })
+
   test('sair apaga o rascunho do pagamento deste navegador', async ({ page }) => {
     await openApp(page, '/')
     await addToCartFromDetail(page, 'emerald-ape-042')
