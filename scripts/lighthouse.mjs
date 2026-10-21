@@ -10,6 +10,7 @@
  *         reports/lighthouse/summary.{json,md} (medians, LCP/CLS/TBT, environment).
  * Usage: pnpm lighthouse            (builds first unless --no-build)
  *        LH_RUNS=1 pnpm lighthouse  (quick check)
+ *        LH_PAGES=inicio LH_PROFILES=mobile pnpm lighthouse  (one page or profile)
  */
 import { execSync, spawn } from 'node:child_process'
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -22,14 +23,21 @@ const PORT = 4173
 const ORIGIN = `http://localhost:${PORT}`
 const OUT = 'reports/lighthouse'
 const RUNS = Number(process.env.LH_RUNS ?? 3)
-const PAGES = [
-  { name: 'inicio', path: '/' },
-  { name: 'detalhe', path: '/nft/emerald-ape-042' },
-]
-const PROFILES = [
-  { name: 'mobile', config: undefined },
-  { name: 'desktop', config: desktopConfig },
-]
+const only = (list, env) => list.filter((item) => !env || env.split(',').includes(item.name))
+const PAGES = only(
+  [
+    { name: 'inicio', path: '/' },
+    { name: 'detalhe', path: '/nft/emerald-ape-042' },
+  ],
+  process.env.LH_PAGES,
+)
+const PROFILES = only(
+  [
+    { name: 'mobile', config: undefined },
+    { name: 'desktop', config: desktopConfig },
+  ],
+  process.env.LH_PROFILES,
+)
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo']
 
 const median = (values) => {

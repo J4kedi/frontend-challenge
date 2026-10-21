@@ -63,3 +63,25 @@ jobs:
         with:
           name: visual-baselines
           path: tests/e2e/__screenshots__
+
+  lighthouse:
+    name: Lighthouse (demo build, 3 runs per page and profile)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Builds, serves with vite preview and audits; the runner's Chrome is used.
+      - run: pnpm lighthouse
+      - run: cat reports/lighthouse/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse
+          path: reports/lighthouse
+          retention-days: 14

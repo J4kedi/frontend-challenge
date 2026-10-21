@@ -16,6 +16,8 @@ export function HomePage() {
   const facets = list.data?.facets
   // One search box in the DOM (ids and labels stay unique): top bar on mobile, toolbar from md up.
   const desktop = useMediaQuery(DESKTOP_QUERY)
+  // The sidebar only exists from lg up: below it, its filters and featured NFT would render hidden.
+  const sidebar = useMediaQuery('(min-width: 1024px)')
 
   return (
     <>
@@ -33,12 +35,14 @@ export function HomePage() {
           Mercado de NFTs
         </h2>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[310px_minmax(0,1fr)]">
-          <aside aria-label="Filtros do catálogo" className="hidden space-y-12 lg:block">
-            <div className="rounded-lg bg-surface p-5">
-              <CatalogFilters facets={facets} search={search} onChange={setFilters} />
-            </div>
-            <FeaturedNft />
-          </aside>
+          {sidebar && (
+            <aside aria-label="Filtros do catálogo" className="space-y-12">
+              <div className="rounded-lg bg-surface p-5">
+                <CatalogFilters facets={facets} search={search} onChange={setFilters} />
+              </div>
+              <FeaturedNft />
+            </aside>
+          )}
 
           <div>
             {desktop && (
