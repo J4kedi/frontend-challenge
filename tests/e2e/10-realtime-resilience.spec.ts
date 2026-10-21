@@ -5,17 +5,28 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     await openApp(page, '/nft/emerald-ape-042', 'events-chaos')
     const price = page.getByTestId('detail-price')
     await expect(price).toContainText('1.19 ETH')
+    // Every price the page shows from here on: a regression must not appear even for a frame.
+    await page.evaluate(() => {
+      const read = () => document.querySelector('[data-testid="detail-price"]')?.textContent?.match(/[\d.]+ ETH/)?.[0] ?? ''
+      const shown = [read()]
+      ;(window as unknown as { shownPrices: string[] }).shownPrices = shown
+      new MutationObserver(() => read() !== shown.at(-1) && shown.push(read())).observe(document.body, {
+        subtree: true,
+        childList: true,
+        characterData: true,
+      })
+    })
 
-    // events-chaos: the event arrives twice and is followed by an older version.
+    // events-chaos: each event arrives twice and is followed by an older version.
     await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.49' })
     await expect(price).toContainText('1.49 ETH')
-    await page.waitForTimeout(500)
-    await expect(price).toContainText('1.49 ETH')
-
     await mockControl(page, '/events/replay', { mode: 'stale' })
     await mockControl(page, '/events/replay', { mode: 'duplicate' })
-    await page.waitForTimeout(500)
-    await expect(price).toContainText('1.49 ETH')
+    // Events go out in order: once this newer one shows, everything before it was handled.
+    await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.69' })
+    await expect(price).toContainText('1.69 ETH')
+    const shown = await page.evaluate(() => (window as unknown as { shownPrices: string[] }).shownPrices)
+    expect(shown).toEqual(['1.19 ETH', '1.49 ETH', '1.69 ETH'])
   })
 
   test('reconexão reconcilia com a API o que mudou enquanto estava offline', async ({ page }) => {
@@ -28,7 +39,6 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     await mockControl(page, '/socket/drop', { seconds: 3 })
     await expect(offline).toBeVisible()
     await mockControl(page, '/nfts/emerald-ape-042', { priceEth: '1.59' })
-    await page.waitForTimeout(1000)
     await expect(offline).toBeVisible()
     await expect(price).toContainText('1.19 ETH')
 
