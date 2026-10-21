@@ -134,7 +134,7 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 
 ### AuthDialog · LoginPrompt
 - **Arquivo:** `src/features/auth/AuthScreen.tsx` · **Figma:** "Desktop / Login", "Desktop / Cadastro" (modal com abas "Entrar | Criar conta" e borda inferior laranja)
-- **Uso:** o mesmo modal serve às rotas `/login` e `/signup` (sobre o marketplace, como no Figma) e ao `LoginPrompt`, que abre sobre a página atual quando uma ação pede login (favoritar como visitante). No prompt, as abas trocam o formulário no lugar, sem navegar.
+- **Uso:** o mesmo modal serve às rotas `/login` e `/signup` (sobre o marketplace, como no Figma) e ao `LoginPrompt`, que abre sobre a página atual quando o visitante pede login a partir dela: favoritar, "Conectar e finalizar" no carrinho ou "Entrar" no header. No prompt, as abas trocam o formulário no lugar, sem navegar.
 - **Estados:** sessão expirada (aviso âmbar), erro de credencial (`role="alert"`), enviando (`aria-busy`). Na demo, uma dica de conta de teste com **Preencher**.
 - **Guidelines:** fechar volta para a página anterior; o sucesso segue para o `redirect` (rotas) ou retoma a ação interrompida (prompt).
 

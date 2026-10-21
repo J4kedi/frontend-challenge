@@ -63,6 +63,7 @@ relato virou causa raiz, correção e um teste que fixa o comportamento:
 | O X do login aberto pelo carrinho não fecha | fechar navegava para o `redirect` (`/checkout`), rota privada que devolve ao login | fechar volta pela pilha do histórico (`03-auth.spec.ts`) |
 | "Derrubar a conexão" some em 1 s | a reconexão automática do Socket.IO volta em ~0,5 s | servidor fora do ar pelo tempo escolhido; o teste prova evento perdido e recuperação pelo REST (`10`, `15`) |
 | O painel de mocks precisa de mais UI/UX e de detalhe por ação | rótulos genéricos ("1º item do carrinho") | seções, rótulos com o dado real, descrição do efeito, login rápido e axe no painel (`15-mock-panel.spec.ts`) |
+| No carrinho, "Conectar e finalizar" abre o login sobre a home | a correção do favoritar tratou o sintoma: o carrinho e o "Entrar" do header ainda levavam à rota `/login`, que no desktop mostra a home atrás | todo link que pede sessão abre o login sobre a página atual (`promptVisitor`); a busca pela causa passou a cobrir todos os caminhos até `/login` (`03`, `06`) |
 
 ## Contrato para os próximos agentes
 

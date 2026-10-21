@@ -84,7 +84,12 @@ totais do Figma). Nada monetário passa por `Number`.
 - Login ou cadastro devolvem `{ token, expiresAt, user }`. O token, opaco e válido por 30 min, fica no `localStorage`; o usuário é estado de servidor (`GET /auth/session`). Um refresh restaura a sessão.
 - **Por que não cookie HttpOnly:** o "servidor" roda na página (MSW), então um cookie seria escrito pelo próprio JavaScript e não teria proteção real. O token opaco é a opção honesta para a simulação. Com uma API real, o caminho é cookie HttpOnly + SameSite + CSRF; o interceptor do Axios é o único ponto a mudar.
 - **Expiração:** o 401 `SESSION_EXPIRED` cai no interceptor, que só reage se o token da requisição é o token atual (resposta atrasada de outra sessão não derruba a nova). Ele limpa os dados privados e leva para `/login?redirect=<onde estava>&reason=expired`. No pagamento, o rascunho fica no sessionStorage do usuário, então quem entra de novo volta ao formulário preenchido.
-- **Login no meio de uma ação:** favoritar como visitante abre o login sobre a própria página (`loginPrompt`, em `src/features/auth/login-prompt.ts`), sem navegar. Ao entrar, o diálogo fecha e a ação continua: o favorito é **adicionado**, nunca alternado, porque a conta pode já tê-lo. As rotas `/login` e `/signup` seguem o Figma (modal sobre o marketplace) e atendem acesso direto e rotas privadas.
+- **Login sobre a página atual:** quando o visitante pede login a partir de uma página, o login abre sobre ela (`loginPrompt`, em `src/features/auth/login-prompt.ts`), sem navegar. Isso vale para favoritar, para "Conectar e finalizar" no carrinho e para o "Entrar" do header. Ao entrar, o diálogo fecha e a ação continua:
+  - o favorito é **adicionado**, nunca alternado, porque a conta pode já tê-lo;
+  - o carrinho passa para a conta e o app segue para o pagamento;
+  - o "Entrar" do header mantém o visitante na mesma página.
+
+  Os links continuam apontando para `/checkout` e `/login`, e só o clique simples do visitante é interceptado (`promptVisitor`). Abrir em nova aba ainda passa pela rota. As rotas `/login` e `/signup` seguem o Figma (modal sobre o marketplace) e atendem acesso direto, as rotas privadas e a sessão expirada.
 - **Fechar o login volta para a página anterior** (`history.back`), não para o `redirect`: o redirect de uma rota privada (`/checkout`) mandaria de volta ao login. Pelo mesmo motivo, a expiração numa rota privada substitui a entrada do histórico em vez de empilhar.
 - **Logout e troca de usuário:** removem `['user', id]` e `['session']`, fecham o socket (o provider recria com o novo token) e iniciam um carrinho de visitante novo.
 - Rotas privadas (`/_auth`): `beforeLoad` confirma a sessão pelo Query e redireciona com `redirect`. Só destinos internos são aceitos (`safeRedirect`), sem open redirect.
@@ -163,7 +168,7 @@ ordem de inicialização do transporte.
 
 ## Decisões de UX
 
-- Login e cadastro são **rotas** (`/login`, `/signup`) que viram modal no desktop, como no Figma. Assim têm URL, `redirect` e funcionam com refresh.
+- Login e cadastro são **rotas** (`/login`, `/signup`) que viram modal no desktop, como no Figma. Assim têm URL, `redirect` e funcionam com refresh. Quando o pedido de login parte de uma página (Entrar, favoritar, finalizar a compra), o mesmo modal abre sobre essa página, não sobre a home.
 - A edição escolhida fica na URL (`?edition=1-10`): o link compartilhado abre na mesma edição.
 - "Comprar" no detalhe adiciona e leva ao carrinho; no mobile, o botão do carrinho adiciona sem sair da página.
 - A cotação é refeita na revisão, e o botão final fica desabilitado enquanto ela atualiza ("Atualizando valores…").
