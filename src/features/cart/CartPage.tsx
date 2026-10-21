@@ -303,7 +303,7 @@ function RelatedProducts() {
   return (
     <section aria-labelledby="cart-related" className="mt-20">
       <h2 id="cart-related" className="border-b border-border pb-2 text-title-sm font-bold text-accent">
-        Você também pode gostar
+        Colecionadores também viram
       </h2>
       <ul className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
         {isPending

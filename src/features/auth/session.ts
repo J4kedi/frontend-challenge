@@ -2,6 +2,8 @@ import { queryOptions, useMutation, useQuery, useQueryClient, type QueryClient }
 import { useMemo } from 'react'
 import type { Session } from '@/contracts/account'
 import { cartApi } from '@/features/cart/api'
+import { clearDraft } from '@/features/checkout/draft'
+import { clearAttempt } from '@/features/checkout/purchase-attempt'
 import { announce } from '@/shared/a11y/announcer'
 import { isApiError } from '@/shared/api/errors'
 import { queryKeys, type CartOwner } from '@/shared/api/query-keys'
@@ -82,6 +84,13 @@ export function useLogout() {
   return useMutation({
     mutationFn: () => authApi.logout().catch(() => undefined),
     onSettled: () => {
+      // Leaving on purpose drops what checkout kept in this browser (name, e-mail,
+      // ENS). An expired session keeps it, so signing in again resumes the form.
+      const userId = sessionStore.userId()
+      if (userId) {
+        clearDraft(userId)
+        clearAttempt(userId)
+      }
       signOutLocally(queryClient)
       announce('Você saiu da sua conta.')
     },

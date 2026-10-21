@@ -26,6 +26,7 @@ export const handlers = [
 export async function startMocks(params: MockParams) {
   restoreScenario()
   if (params.scenario) setScenario(params.scenario)
+  else if (params.reset) setScenario('default')
   if (params.reset) resetDb()
   else loadDb()
 

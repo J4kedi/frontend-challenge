@@ -25,12 +25,19 @@ test.describe('08 · perfil e carteiras', () => {
     await page.locator('input[type="file"]').setInputFiles({ name: 'avatar.png', mimeType: 'image/png', buffer: PNG })
     await expect(page.getByRole('img', { name: 'Avatar de Ana C.' })).toBeVisible()
 
+    await page.getByLabel('Nome de exibição').fill('Ana Errada')
     await page.getByLabel('Senha atual').fill('errada123')
     await page.getByLabel('Nova senha', { exact: true }).fill('novaSenha1')
     await page.getByLabel('Confirmar nova senha').fill('novaSenha1')
     await page.getByRole('button', { name: 'Salvar', exact: true }).click()
     await expect(page.getByLabel('Senha atual')).toHaveAttribute('aria-invalid', 'true')
     await expect(page.getByText('Senha atual incorreta')).toBeVisible()
+    // The password is checked first: nothing of the form was saved.
+    const savedName = await page.evaluate(async () => {
+      const { token } = JSON.parse(localStorage.getItem('kurio:session') ?? '{}') as { token?: string }
+      return ((await fetch('/api/me/profile', { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json())) as { displayName: string }).displayName
+    })
+    expect(savedName).toBe('Ana C.')
 
     await page.getByLabel('Senha atual').fill('kurio2026')
     await page.getByRole('button', { name: 'Salvar', exact: true }).click()

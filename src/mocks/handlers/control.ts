@@ -34,6 +34,7 @@ export const controlHandlers = [
 
   http.post(api('/__mock/reset'), () => {
     resetDb()
+    setScenario('default')
     dropConnections()
     return HttpResponse.json({ ok: true })
   }),
