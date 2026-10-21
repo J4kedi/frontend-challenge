@@ -29,7 +29,7 @@ Nenhuma simplificação é exclusiva da auditoria: as mesmas imagens, fontes, mo
 
 ## Resultado (mediana de 3)
 
-Medido no runner Linux do GitHub Actions, uma máquina limpa que não roda mais nada durante a auditoria. Ferramentas: Lighthouse 13.5.0, Chrome 155, Node 22. Versão auditada: v1.0.8, em 2026-10-21.
+Medido no runner Linux do GitHub Actions, uma máquina limpa que não roda mais nada durante a auditoria. Ferramentas: Lighthouse 13.5.0, Chrome 155, Node 22. Versão auditada: v1.0.9, em 2026-10-21.
 
 ### Demo publicada (Vercel)
 
@@ -37,14 +37,14 @@ Os relatórios versionados em `reports/lighthouse/` são desta medição.
 
 | Página | Perfil | Performance | Acessibilidade | Boas práticas | SEO | LCP | CLS | TBT |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Início | mobile | **92** | 100 | 100 | 100 | 2 861 ms | 0 | 177 ms |
-| Início | desktop | **100** | 100 | 100 | 100 | 566 ms | 0 | 3 ms |
-| Detalhe | mobile | **95** | 100 | 100 | 100 | 2 572 ms | 0 | 126 ms |
-| Detalhe | desktop | **100** | 100 | 100 | 100 | 568 ms | 0 | 0 ms |
+| Início | mobile | **93** | 100 | 100 | 100 | 2 803 ms | 0 | 154 ms |
+| Início | desktop | **100** | 100 | 100 | 100 | 590 ms | 0 | 4 ms |
+| Detalhe | mobile | **94** | 100 | 100 | 100 | 2 582 ms | 0 | 145 ms |
+| Detalhe | desktop | **100** | 100 | 100 | 100 | 581 ms | 0 | 0 ms |
 
 Metas: Performance ≥ 90, Acessibilidade ≥ 95, Boas práticas ≥ 95, SEO ≥ 90. **Todas atingidas, nos dois perfis e nas duas páginas.**
 
-A primeira execução de cada sequência é a mais lenta (início mobile: 70, com TBT de 1 s): o runner ainda está frio. As duas seguintes deram 92 e 93, e a mediana descarta a fria.
+A primeira execução de cada sequência é a mais lenta (início mobile: 74, com TBT de 737 ms): o runner ainda está frio. As duas seguintes deram 93 e 93, e a mediana descarta a fria. Na v1.0.8, o mesmo job deu 92 e 95 no mobile.
 
 ### Build servido pelo `vite preview`
 
@@ -57,7 +57,7 @@ A primeira execução de cada sequência é a mais lenta (início mobile: 70, co
 
 **Por que o mesmo build tira menos no `vite preview`.** O preview serve em HTTP/1.1, que limita o navegador a 6 conexões por origem, e o primeiro carregamento tem cerca de 25 arquivos JS. A Vercel serve em HTTP/2: uma conexão, tudo em paralelo. Na simulação de 4G lento, a fila de conexões soma cerca de 1 s ao LCP. O TBT, que depende só do main thread, é parecido nos dois.
 
-Numa máquina de desenvolvimento ocupada com outras coisas, os números caem: a simulação multiplica por 4 o tempo de CPU observado, e o TBT é o mais sensível. Por isso a medição de referência é a do CI. Os avaliadores sem contexto mediram na própria máquina, com outras sessões rodando: 69 a 86 no início mobile na versão anterior.
+Numa máquina de desenvolvimento ocupada com outras coisas, os números caem: a simulação multiplica por 4 o tempo de CPU observado, e o TBT é o mais sensível. Por isso a medição de referência é a do CI. Os avaliadores sem contexto mediram na própria máquina, com outras sessões rodando: 69 a 86 no início mobile na v1.0.7 e, na v1.0.9, medianas de 82 no início e 88 no detalhe (CPU com média de 28% e picos de 67% durante a medição). O LCP deles bate com o do CI (2,6 a 2,9 s); o que muda é o TBT, 3 a 4 vezes maior.
 
 ## Antes e depois
 

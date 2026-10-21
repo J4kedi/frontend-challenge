@@ -220,6 +220,40 @@ O processo também mudou. Por decisão humana, a próxima avaliação roda em **
 - **Funcional:** eliminatórios, fluxos, estado, tempo real e mocks.
 - **Qualidade:** visual, testes, acessibilidade, performance e documentação. Ele mede o Lighthouse primeiro, antes que o outro comece a compilar e rodar testes na mesma máquina.
 
+### Sexta rodada
+
+Dois avaliadores sem contexto rodaram em paralelo sobre a v1.0.9:
+
+- o **funcional** deu 50/55 (fluxos 18, estado 14, tempo real 9, mocks 9);
+- o de **qualidade** deu 40/45 (visual 18, testes 9, acessibilidade 4,5, performance 4, documentação 4,5).
+
+Somados, **90/100**, com os eliminatórios passando. A rodada levou 33 minutos, contra 70 da quinta com um avaliador só.
+
+Corrigido:
+
+- **Recibo.** O `sm:max-w-lg` do diálogo vencia o `max-w-[578px]`, e o recibo tinha 512 px de largura, com "ID da / transação" quebrado. Além disso, "Taxa de rede" e o valor ficavam colados, e o título estava laranja, quando no Figma é claro.
+- **Teste instável da sessão expirada no pagamento** (2 de 5 no mobile). Eram três corridas:
+  - o mock apagava a sessão vencida na primeira requisição, e a seguinte recebia "inválida" em vez de "expirada";
+  - a checagem de sessão da rota privada lia o token na hora do envio, quando outra requisição já podia tê-lo apagado;
+  - um reload logo depois da expiração perdia o motivo.
+  Agora o mock responde "expirada" a todas, a checagem envia o token que está checando, e a aba guarda o motivo no `sessionStorage`. O teste passou 12 de 12 no mobile.
+- **Sessão expirada numa página pública.** O login abria sobre a home; agora abre sobre a própria página, como para visitantes (`03`).
+- **Detalhe em 768 px.** O preço quebrava em "1.19 / ETH".
+- **Foco dos campos.** Os campos de texto marcavam o foco só com a borda de 1 px; agora usam o anel de 2 px dos outros elementos.
+- **axe `landmark-unique`.** O menu da conta e o rodapé tinham uma `nav` com o mesmo nome.
+- **Painel de mocks** cortado no topo da tela do celular, no detalhe.
+- **Duas abas liquidando o mesmo pedido.** Cada aba roda o backend simulado. As duas podiam liquidar o pedido e descontar o carrinho duas vezes. Agora elas se revezam por Web Locks e releem o estado salvo antes de liquidar.
+- **Teste de skeleton** que prometia "dimensões do conteúdo" e só checava visibilidade: agora compara a posição e o tamanho do primeiro card com os do skeleton (`12`).
+- **Docs.** O ARCHITECTURE dizia que só o `main.tsx` importava os mocks; o desvio 22 registra "Mais desta coleção" sem os pontos do carrossel; o `lighthouse.md` passou à v1.0.9.
+
+Ficou como estava:
+
+- **Listas na URL em JSON** (`collections=%5B…%5D`). Trocar o formato muda links e testes no último dia.
+- **Ordem entre `storage` e `BroadcastChannel`** na sincronização entre abas.
+- **Performance numa máquina ocupada.** No CI, a demo publicada da v1.0.9 dá 93 e 94 no mobile.
+- **Arquivos grandes:** `CheckoutPage.tsx` tem 539 linhas e `NftDetailPage.tsx` tem 512.
+- **Instabilidade do "Pular para o conteúdo" nesta máquina.** Às vezes o primeiro Tab sai da página: falhou 3 de 6 na v1.0.9 aqui. No CI e contra a demo publicada, passou em todas as execuções.
+
 ## Contrato para os próximos agentes
 
 O [`AGENTS.md`](../AGENTS.md) (carregado pelo `CLAUDE.md`) é o contrato curto
