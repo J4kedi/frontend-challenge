@@ -1,4 +1,8 @@
 @import 'tailwindcss';
+/* Generated reports (Lighthouse HTML, Playwright) are not app source: their classes must not reach the CSS. */
+@source not '../../reports';
+@source not '../../playwright-report';
+@source not '../../test-results';
 @import 'tw-animate-css';
 @import '@fontsource-variable/roboto-mono';
 
