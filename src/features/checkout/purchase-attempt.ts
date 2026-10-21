@@ -1,6 +1,7 @@
 import type { CreateOrderBody, Order } from '@/contracts/commerce'
 import { ordersApi } from '@/features/orders/api'
 import { isApiError } from '@/shared/api/errors'
+import { markOwnPurchase } from '@/shared/realtime/apply-event'
 
 /**
  * One purchase attempt = one idempotency key, persisted BEFORE the first POST.
@@ -46,6 +47,15 @@ const transient = (error: unknown) =>
   isApiError(error) && (error.code === 'TIMEOUT' || error.code === 'NETWORK_ERROR' || error.status >= 500)
 
 export async function submitPurchase(userId: string, body: CreateOrderBody, wait = (ms: number) => new Promise((r) => setTimeout(r, ms))): Promise<Order> {
+  markOwnPurchase(true)
+  try {
+    return await sendAttempt(userId, body, wait)
+  } finally {
+    markOwnPurchase(false)
+  }
+}
+
+async function sendAttempt(userId: string, body: CreateOrderBody, wait: (ms: number) => Promise<unknown>): Promise<Order> {
   const stored = readAttempt(userId)
   const attempt: Attempt = stored && sameBody(stored.body, body) ? stored : { key: crypto.randomUUID(), body }
   writeAttempt(userId, attempt)
@@ -56,7 +66,7 @@ export async function submitPurchase(userId: string, body: CreateOrderBody, wait
       // Replaying the key of a declined order would only return that order again.
       if (attempt.orderId === order.id && order.status === 'declined') {
         writeAttempt(userId, null)
-        return submitPurchase(userId, body, wait)
+        return sendAttempt(userId, body, wait)
       }
       writeAttempt(userId, { ...attempt, orderId: order.id })
       return order

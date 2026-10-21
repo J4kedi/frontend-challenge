@@ -12,6 +12,17 @@ import { compareEth, formatEth } from '@/shared/lib/money'
  * cart totals are never computed here — the cart and its quote are refetched,
  * because the REST quote is the source of truth for what the collector pays.
  */
+/**
+ * The collector's own order reserves stock, and the server publishes that like
+ * any other change, sometimes before the order response. Selling out the last
+ * unit to oneself is not news: while a purchase is being sent (and a few
+ * seconds after) the sold-out of a cart line is not announced.
+ */
+let ownPurchaseUntil = 0
+export function markOwnPurchase(sending: boolean) {
+  ownPurchaseUntil = sending ? Number.POSITIVE_INFINITY : Date.now() + 5_000
+}
+
 export function applyEvent(queryClient: QueryClient, event: RealtimeEvent, currentUserId: string | null) {
   if (event.type === 'nft.updated') applyNftUpdated(queryClient, event)
   else if (currentUserId && event.userId === currentUserId) applyOrderUpdated(queryClient, event, currentUserId)
@@ -59,7 +70,7 @@ function applyNftUpdated(queryClient: QueryClient, event: NftUpdatedEvent) {
     if (!line) continue
     const edition = event.data.editions.find((e) => e.id === line.editionId)
     if (edition && edition.available === 0) {
-      announce(`${line.name}: a edição ${line.editionLabel} esgotou. O resumo do carrinho foi atualizado.`)
+      if (Date.now() >= ownPurchaseUntil) announce(`${line.name}: a edição ${line.editionLabel} esgotou. O resumo do carrinho foi atualizado.`)
     } else if (edition && compareEth(edition.priceEth, line.unitPriceEth) !== 0) {
       announce(
         `${line.name}: o preço mudou de ${formatEth(line.unitPriceEth)} para ${formatEth(edition.priceEth)}. O resumo do carrinho foi atualizado.`,
