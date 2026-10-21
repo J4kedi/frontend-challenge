@@ -87,4 +87,20 @@ test.describe('03 · conta e sessão', () => {
     const cached = await page.evaluate(() => localStorage.getItem('kurio:session'))
     expect(cached).toContain('usr_bruno')
   })
+
+  test('sair apaga o rascunho do pagamento deste navegador', async ({ page }) => {
+    await openApp(page, '/')
+    await addToCartFromDetail(page, 'emerald-ape-042')
+    await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
+    await submitLogin(page)
+    await expect(page).toHaveURL(/\/checkout$/)
+    await page.getByRole('radio', { name: /Coinbase/ }).check()
+    const drafts = () => page.evaluate(() => Object.keys(sessionStorage).filter((key) => key.startsWith('kurio:checkout-draft')))
+    await expect.poll(drafts).toHaveLength(1)
+
+    await page.goto('/profile')
+    await page.getByRole('button', { name: 'Sair' }).click()
+    await expect(page).toHaveURL(/\/$/)
+    expect(await drafts()).toEqual([])
+  })
 })

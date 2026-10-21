@@ -115,7 +115,11 @@ function CheckoutForm({ user, wallets }: { user: User; wallets: Wallet[] }) {
 
   const form = useForm<CheckoutForm>({
     resolver: zodResolver(checkoutForm),
-    defaultValues: draft ? { buyer: draft.buyer, network: draft.network, provider: draft.provider } : defaultsFrom(wallet, user),
+    // A draft from before the wallet changed (e.g. to Solana) must not bring back a network it cannot use.
+    defaultValues:
+      draft && networksFor(wallet).includes(draft.network)
+        ? { buyer: draft.buyer, network: draft.network, provider: draft.provider }
+        : defaultsFrom(wallet, user),
   })
   const { errors } = form.formState
   const network = useWatch({ control: form.control, name: 'network' })
@@ -178,7 +182,11 @@ function CheckoutForm({ user, wallets }: { user: User; wallets: Wallet[] }) {
         return
       }
       // Revalidate price, stock, coupon and fees before showing the review.
-      await quote.refetch()
+      const fresh = await quote.refetch()
+      if (fresh.isError) {
+        setSubmitError('Não foi possível confirmar os valores agora. Verifique a conexão e tente de novo.')
+        return
+      }
       setReviewOpen(true)
     },
     () => {
@@ -354,7 +362,12 @@ function CheckoutForm({ user, wallets }: { user: User; wallets: Wallet[] }) {
             network={network}
             busy={connect.isPending || disconnect.isPending}
             onConnect={connectWallet}
-            onDisconnect={() => disconnect.mutate(wallet.id, { onSuccess: () => announce('Carteira desconectada.') })}
+            onDisconnect={() =>
+              disconnect.mutate(wallet.id, {
+                onSuccess: () => announce('Carteira desconectada.'),
+                onError: (error) => setConnectError(isApiError(error) ? error.message : 'Não foi possível desconectar a carteira.'),
+              })
+            }
             error={connectError}
           />
         </fieldset>
@@ -480,11 +493,13 @@ export function OrderItems({ quote }: { quote: Quote | undefined }) {
             <NftImage artwork={line.artwork} alt="" sizes="64px" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-body-lg font-bold">{line.name}</p>
+            <p className="text-body font-bold wrap-anywhere sm:text-body-lg">{line.name}</p>
             <p className="text-body-sm text-muted-foreground">ID do token: {line.tokenId}</p>
           </div>
-          <span className="text-body-sm text-muted-foreground">(x {line.quantity})</span>
-          <span className="text-title-sm font-bold text-accent">{formatEth(line.lineTotalEth)}</span>
+          <div className="flex shrink-0 flex-col items-end sm:flex-row sm:items-center sm:gap-3">
+            <span className="text-body-sm text-muted-foreground">(x {line.quantity})</span>
+            <span className="text-title-sm font-bold text-accent">{formatEth(line.lineTotalEth)}</span>
+          </div>
         </li>
       ))}
     </ul>

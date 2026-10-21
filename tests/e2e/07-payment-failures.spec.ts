@@ -56,6 +56,25 @@ test.describe('07 · falhas de pagamento', () => {
     expect(statuses).toEqual([201, 200, 409])
   })
 
+  test('a carteira só conecta numa rede do seu tipo de endereço', async ({ page }) => {
+    await openApp(page, '/')
+    const result = await page.evaluate(async () => {
+      const login = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'ana@kurio.test', password: 'kurio2026' }),
+      }).then((r) => r.json() as Promise<{ token: string }>)
+      // Ana's primary wallet has an EVM (0x…) address.
+      const response = await fetch('/api/me/wallets/wal_ana_primary/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${login.token}` },
+        body: JSON.stringify({ provider: 'metamask', network: 'solana' }),
+      })
+      return [response.status, ((await response.json()) as { error?: { code: string } }).error?.code]
+    })
+    expect(result).toEqual([422, 'VALIDATION_ERROR'])
+  })
+
   test('com um pedido em processamento, outra compra do mesmo carrinho é recusada', async ({ page }) => {
     await openApp(page, '/')
     const result = await page.evaluate(async () => {

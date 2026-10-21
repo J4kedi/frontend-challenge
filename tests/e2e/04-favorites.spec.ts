@@ -122,4 +122,20 @@ test.describe('04 · favoritos', () => {
     await expect(heart).toHaveAttribute('aria-pressed', 'true')
     await expect(page.getByRole('dialog', { name: 'Entrar' })).toHaveCount(0)
   })
+
+  test('dois cliques com falha nas duas escritas terminam como o servidor', async ({ page }) => {
+    await openApp(page, '/')
+    const favoritesLoaded = page.waitForResponse((response) => response.url().endsWith('/api/me/favorites'))
+    await loginAs(page, USERS.bruno, '/nft/emerald-ape-042')
+    await favoritesLoaded
+    const heart = page.getByRole('button', { name: /lista de interesse/ }).filter({ visible: true }).first()
+    const before = await heart.getAttribute('aria-pressed')
+    await mockControl(page, '/scenario', { name: 'mutation-error' }, 'PUT')
+
+    await heart.click()
+    await heart.click()
+    // Both writes fail: once they settle, the heart shows the server's list again.
+    await expect(heart).not.toHaveAttribute('aria-busy', 'true', { timeout: 15_000 })
+    await expect(heart).toHaveAttribute('aria-pressed', before!)
+  })
 })

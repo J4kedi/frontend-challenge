@@ -2,6 +2,8 @@ import { queryOptions, useMutation, useQuery, useQueryClient, type QueryClient }
 import { useMemo } from 'react'
 import type { Session } from '@/contracts/account'
 import { cartApi } from '@/features/cart/api'
+import { clearDraft } from '@/features/checkout/draft'
+import { clearAttempt } from '@/features/checkout/purchase-attempt'
 import { announce } from '@/shared/a11y/announcer'
 import { isApiError } from '@/shared/api/errors'
 import { queryKeys, type CartOwner } from '@/shared/api/query-keys'
@@ -51,7 +53,12 @@ export async function signIn(queryClient: QueryClient, next: Session) {
   try {
     const merged = await cartApi.merge(guestId)
     rotateGuestCartId()
-    queryClient.setQueryData(queryKeys.cart(['user', next.user.id]), merged)
+    // The account cart (and its quote) started loading when the session switched,
+    // before the merge: an answer read before it must not overwrite the merged cart.
+    const owner: CartOwner = ['user', next.user.id]
+    await queryClient.cancelQueries({ queryKey: queryKeys.cart(owner) })
+    queryClient.setQueryData(queryKeys.cart(owner), merged)
+    void queryClient.invalidateQueries({ queryKey: [...queryKeys.cart(owner), 'quote'] })
   } catch {
     // The visitor cart stays where it was; the account cart loads normally.
   }
@@ -82,6 +89,13 @@ export function useLogout() {
   return useMutation({
     mutationFn: () => authApi.logout().catch(() => undefined),
     onSettled: () => {
+      // Leaving on purpose drops what checkout kept in this browser (name, e-mail,
+      // ENS). An expired session keeps it, so signing in again resumes the form.
+      const userId = sessionStore.userId()
+      if (userId) {
+        clearDraft(userId)
+        clearAttempt(userId)
+      }
       signOutLocally(queryClient)
       announce('Você saiu da sua conta.')
     },

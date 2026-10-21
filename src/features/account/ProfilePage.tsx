@@ -75,9 +75,10 @@ function ProfileEditor({ user }: { user: User }) {
   const onSubmit = form.handleSubmit(async ({ currentPassword, newPassword, confirmPassword, ...data }) => {
     setFormError(null)
     try {
-      const saved = await updateProfile.mutateAsync(data)
       const passwordChanged = Boolean(currentPassword)
+      // Password first: a wrong current password must not leave the profile half saved.
       if (passwordChanged) await changePassword.mutateAsync({ currentPassword, newPassword, confirmPassword })
+      const saved = await updateProfile.mutateAsync(data)
       form.reset({ ...saved, currentPassword: '', newPassword: '', confirmPassword: '' })
       const message = passwordChanged ? 'Perfil e senha atualizados.' : 'Perfil atualizado.'
       toast.success(message)
@@ -144,11 +145,18 @@ function AvatarField({ user }: { user: User }) {
     if (!(AVATAR_TYPES as readonly string[]).includes(file.type)) return setError('Envie uma imagem PNG, JPG ou WebP.')
     if (file.size > MAX_AVATAR_BYTES) return setError('A imagem precisa ter até 1 MB.')
     const reader = new FileReader()
-    reader.onload = () =>
-      set.mutate(String(reader.result), {
-        onSuccess: () => announce('Avatar atualizado.'),
-        onError: (e) => setError(isApiError(e) ? (e.fields.avatar ?? e.message) : 'Não foi possível enviar a imagem.'),
-      })
+    reader.onload = () => {
+      const dataUrl = String(reader.result)
+      // The type comes from the extension: decode it to be sure it is an image.
+      const image = new Image()
+      image.onerror = () => setError('O arquivo não é uma imagem válida.')
+      image.onload = () =>
+        set.mutate(dataUrl, {
+          onSuccess: () => announce('Avatar atualizado.'),
+          onError: (e) => setError(isApiError(e) ? (e.fields.avatar ?? e.message) : 'Não foi possível enviar a imagem.'),
+        })
+      image.src = dataUrl
+    }
     reader.readAsDataURL(file)
   }
 
@@ -170,7 +178,12 @@ function AvatarField({ user }: { user: User }) {
           type="button"
           variant="ghost"
           disabled={busy || !user.avatarUrl}
-          onClick={() => remove.mutate(undefined, { onSuccess: () => announce('Avatar removido.') })}
+          onClick={() =>
+            remove.mutate(undefined, {
+              onSuccess: () => announce('Avatar removido.'),
+              onError: (e) => setError(isApiError(e) ? e.message : 'Não foi possível remover o avatar.'),
+            })
+          }
         >
           Remover
         </Button>

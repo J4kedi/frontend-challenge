@@ -121,9 +121,38 @@ Também saíram duas dependências sem uso (`cn` e `next-themes`), e cinco
 `waitForTimeout` viraram esperas por condição: respostas pendentes,
 histórico de valores com um evento sentinela e a contagem regressiva.
 
+### Terceira rodada
+
+Mesmos papéis, agora sobre a v1.0.6:
+
+- **Avaliador:** 87/100, com os eliminatórios passando. As rodadas anteriores deram 81 e 82.
+- **Caçador de bugs:** 14 itens.
+
+Foram corrigidos:
+
+- **Pedido na rede errada.** O rascunho do pagamento podia restaurar Ethereum para uma carteira que virou Solana, e o pedido saía confirmado. Agora o rascunho só volta se a rede servir à carteira, e o mock recusa conectar ou comprar numa rede de outro tipo de endereço (`07`).
+- **Revisão com valores velhos.** Sem rede, a revisão abria com valores não conferidos e "Confirmar e pagar" habilitado. Agora ela só abre com a cotação revalidada (`12`).
+- **Favoritos em fila.** Escritas que falhavam em fila terminavam diferentes do servidor. Depois da última, a lista é lida de novo (`04`).
+- **Foco invisível.** O campo inválido, o painel de abas e o cupom em pílula não mostravam foco (WCAG 2.4.7).
+- **Botão "Mocks".** O nome acessível não continha o texto visível (2.5.3), e no mobile o botão cobria as ações dos diálogos.
+- **Perfil.** Senha atual errada deixava o nome salvo pela metade (`08`). Arquivo que não é imagem virava avatar quebrado. A remoção que falhava não dava retorno.
+- **Logout.** Deixava o rascunho do pagamento, com dados pessoais, no navegador (`03`).
+- **Reset dos mocks.** Não voltava o cenário ao padrão (`15`), e o `http-5xx` não falhava de novo depois da primeira vez.
+- **Carrinho vazio depois do login (achado pelo CI).** Uma vez em 248 execuções, a junção do carrinho do visitante perdeu para a leitura do carrinho da conta que começou junto. A leitura feita antes da junção sobrescrevia o carrinho já juntado. Agora as leituras em andamento são canceladas antes de gravar a junção.
+- **Ajustes menores:**
+  - abas do catálogo em 320 px;
+  - busca acima do limite da URL;
+  - tamanho do avatar contando o padding do base64;
+  - textos longos na revisão;
+  - título "Colecionadores também viram".
+
 Ficaram de fora, com registro:
 - **Performance mobile:** 77–88 nas medições, abaixo da meta; a causa está em [`lighthouse.md`](quality/lighthouse.md).
 - **Duas abas escrevendo ao mesmo tempo:** ainda vale "a última vence", um limite de um servidor que roda no navegador.
+- **Cota do `localStorage`:** avatares grandes em várias contas podem encher o banco simulado; está em [Limitações](../ARCHITECTURE.md).
+- **Menores:**
+  - o merge do carrinho corta no limite por pedido sem avisar;
+  - a sessão que expira no perfil perde edições não salvas (o pagamento tem rascunho, o perfil não).
 
 ## Contrato para os próximos agentes
 

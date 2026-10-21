@@ -1,4 +1,5 @@
 import { useId, useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Quote } from '@/contracts/commerce'
@@ -80,7 +81,12 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
           size="sm"
           className="h-auto px-0"
           disabled={remove.isPending}
-          onClick={() => remove.mutate(undefined, { onSuccess: () => announce('Cupom removido. O total foi atualizado.') })}
+          onClick={() =>
+            remove.mutate(undefined, {
+              onSuccess: () => announce('Cupom removido. O total foi atualizado.'),
+              onError: () => toast.error('Não foi possível remover o cupom. Tente novamente.'),
+            })
+          }
         >
           Remover
         </Button>
@@ -114,7 +120,7 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
           autoComplete="off"
           className={cn(
             'h-10 min-w-0 flex-1 bg-transparent px-3 text-body-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none',
-            pill ? 'rounded-full' : 'rounded-l-sm border border-primary focus-visible:border-accent',
+            pill ? 'rounded-full focus-visible:ring-2 focus-visible:ring-primary' : 'rounded-l-sm border border-primary focus-visible:border-accent',
           )}
         />
         <Button type="button" onClick={() => void submit()} className={cn('h-10', pill ? 'rounded-full px-5' : 'rounded-l-none')} disabled={apply.isPending} aria-busy={apply.isPending}>

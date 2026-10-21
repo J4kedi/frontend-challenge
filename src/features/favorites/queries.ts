@@ -63,6 +63,13 @@ export function useToggleFavorite() {
       toast.error(`Não foi possível atualizar ${name} na sua lista. Tente novamente.`)
       announce(`Falha ao atualizar ${name} na lista de interesse. O estado anterior foi restaurado.`)
     },
+    onSettled: (_data, _error, _variables, context) => {
+      // Rollbacks of queued writes restore each other's optimistic state: after the
+      // last write, re-read the list so the screen ends where the server is.
+      if (context && queryClient.isMutating({ mutationKey: FAVORITE_WRITE }) === 1) {
+        void queryClient.invalidateQueries({ queryKey: context.key })
+      }
+    },
     onSuccess: async (data, { favorite, name }, context) => {
       // A list fetched before this write (e.g. right after sign-in) must not overwrite it.
       await queryClient.cancelQueries({ queryKey: context.key })

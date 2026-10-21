@@ -77,3 +77,6 @@ enunciado, a acessibilidade ou a coerência do fluxo pedem.
 | 17 | Paginação | 1 2 3 4 > | janela de 4 páginas ao redor da atual, ‹ › | o catálogo inteiro tem 27 páginas |
 | 18 | Card, mobile | selo "RARO" num card ilustrativo | selo nos NFTs cujo atributo de raridade é "Raro" | o selo precisa de um dado por trás, não de uma posição fixa |
 | 19 | Pagamento, "Confirmar compra" | botão sempre ativo | desabilitado com pedido pendente, com link "Acompanhar pedido" | evita cobrar o mesmo carrinho duas vezes |
+| 20 | Login e cadastro, desktop | modal sobre o marketplace inteiro | modal sobre o hero e os cards de lançamento | a rota `/login` não carrega o catálogo só para o fundo; o login pedido de uma página abre sobre ela |
+| 21 | Tab bar, mobile | recorte curvo em volta do botão central | barra reta com o botão central elevado | mesmo papel e mesma posição; o recorte é só decorativo |
+| 22 | Hero, mobile | segunda arte sobreposta à principal | uma arte | o carrossel troca a arte; a sobreposta não muda de conteúdo |

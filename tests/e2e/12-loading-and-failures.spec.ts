@@ -1,4 +1,4 @@
-import { expect, loginAs, mockControl, openApp, test, USERS } from './support/app'
+import { addToCartFromDetail, expect, loginAs, mockControl, openApp, submitLogin, test, USERS } from './support/app'
 
 test.describe('12 · carregamento e falhas', () => {
   test('rede lenta mostra skeletons com as dimensões do conteúdo', async ({ page }) => {
@@ -68,5 +68,20 @@ test.describe('12 · carregamento e falhas', () => {
     await page.getByTestId('nft-card').first().click()
     await expect(page.locator('#nft-title')).toBeVisible()
     expect(passedThrough).toEqual([])
+  })
+
+  test('sem rede, a revisão não abre com valores que não puderam ser conferidos', async ({ page }) => {
+    await openApp(page, '/')
+    await addToCartFromDetail(page, 'emerald-ape-042')
+    await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
+    await submitLogin(page)
+    await expect(page).toHaveURL(/\/checkout$/)
+    await page.getByRole('button', { name: 'Conectar carteira' }).click()
+    await expect(page.getByTestId('wallet-connection')).toContainText('conectada')
+
+    await mockControl(page, '/scenario', { name: 'offline' }, 'PUT')
+    await page.getByRole('button', { name: 'Confirmar compra' }).click()
+    await expect(page.getByText('Não foi possível confirmar os valores agora.')).toBeVisible({ timeout: 20_000 })
+    await expect(page.getByRole('dialog', { name: 'Revise sua compra' })).toHaveCount(0)
   })
 })

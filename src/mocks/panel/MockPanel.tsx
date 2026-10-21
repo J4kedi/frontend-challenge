@@ -54,7 +54,11 @@ export default function MockPanel() {
   }
 
   return (
-    <div data-mock-panel className="pointer-events-auto fixed bottom-20 left-2 z-60 flex flex-col items-start gap-2 md:bottom-4 md:left-3">
+    // On phones a dialog's own actions sit where the trigger is: it steps aside while one is open.
+    <div
+      data-mock-panel
+      className="pointer-events-auto fixed bottom-20 left-2 z-60 flex flex-col items-start gap-2 max-md:[body:has([role=dialog])_&]:hidden md:bottom-4 md:left-3"
+    >
       {open && (
         <PanelContent
           id={panelId}
@@ -70,14 +74,13 @@ export default function MockPanel() {
         type="button"
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
-        aria-label={`Painel de mocks, cenário ${SCENARIOS[active].label}`}
         onClick={() => setOpen((value) => !value)}
         className="flex items-center gap-2 rounded-full border border-primary bg-surface-raised px-3 py-1.5 text-caption font-bold text-accent shadow-raised hover:bg-surface md:px-4 md:py-2"
       >
         <FlaskConicalIcon className="size-4" aria-hidden="true" />
-        Mocks
+        <span className="sr-only md:not-sr-only">Mocks</span>
         <StatusDot status={status} />
-        <span className="hidden font-medium text-foreground md:inline">· {SCENARIOS[active].label}</span>
+        <span className="sr-only font-medium text-foreground md:not-sr-only">· {SCENARIOS[active].label}</span>
       </button>
     </div>
   )

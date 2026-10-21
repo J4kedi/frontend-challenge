@@ -53,7 +53,7 @@ boot do MSW e da primeira resposta da API.
 
 ## Antes e depois
 
-"Antes" é a primeira medição (1 execução, mesmo ambiente). "Depois" é a mediana acima.
+"Antes" é a primeira medição (1 execução, mesmo ambiente). "Depois" é a mediana de 2026-10-20 (commit `4d0ccd4`), logo depois das otimizações abaixo; a medição atual, na versão entregue, está na tabela de cima.
 
 | Página (mobile) | Performance | LCP | TBT | Acessibilidade | SEO |
 | --- | --- | --- | --- | --- | --- |

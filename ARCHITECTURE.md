@@ -155,6 +155,7 @@ a mesma mensagem que o MSW envia no início (`mocksReady`, em
 - **API de controle** (`/api/__mock/*`): muda o banco **e** publica o evento, do mesmo jeito que um servidor real faria. Os testes e o painel usam só ela.
 - **Limitações:**
   - cada aba roda a própria cópia do servidor simulado sobre o mesmo `localStorage`; elas se mantêm iguais porque cada uma adota o que as outras gravam (evento `storage`) e os eventos publicados são repassados às outras abas por `BroadcastChannel`. Duas escritas simultâneas em abas diferentes ainda seguem "a última vence";
+  - o banco simulado vive no `localStorage` (cerca de 5 MB): avatares grandes em várias contas podem enchê-lo, e a partir daí as mudanças valem só até o reload. "Restaurar os dados iniciais" (painel) libera o espaço;
   - o binding 0.2.0 não pinga, não faz broadcast e ignora a auth do CONNECT (contornados no servidor simulado);
   - o `request` fixture do Playwright não passa pelo MSW, por isso os testes chamam a API de controle de dentro da página.
 

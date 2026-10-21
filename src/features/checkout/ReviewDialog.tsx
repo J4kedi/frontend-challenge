@@ -46,7 +46,7 @@ export function ReviewDialog({
         <DialogDescription className="text-center text-body-sm text-muted-foreground">
           Confira itens, valores e carteira. O pedido só é enviado quando você confirmar.
         </DialogDescription>
-        <dl className="grid grid-cols-2 gap-3 border-y border-primary py-4 text-body-sm">
+        <dl className="grid grid-cols-2 gap-3 border-y border-primary py-4 text-body-sm wrap-anywhere">
           <div>
             <dt className="font-bold">Colecionador</dt>
             <dd className="text-muted-foreground">{buyerName}</dd>
