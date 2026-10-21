@@ -109,7 +109,7 @@ function Receipt({ order }: { order: Order }) {
   return (
     <div className="mx-auto max-w-page px-6 py-16 xl:px-0" data-testid="order-confirmed">
       <Dialog open onOpenChange={(open) => !open && void navigate({ to: '/' })}>
-        <DialogContent showCloseButton={false} className="flex max-h-[92dvh] max-w-[578px] flex-col overflow-y-auto rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0">
+        <DialogContent showCloseButton={false} className="flex max-h-[92dvh] flex-col sm:max-w-[578px] overflow-y-auto rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0">
           <button
             type="button"
             onClick={() => void navigate({ to: '/' })}
@@ -169,10 +169,10 @@ function ReceiptContent({ order }: { order: Order }) {
                 <th scope="col" className="pb-2">
                   NFTs
                 </th>
-                <th scope="col" className="pb-2 text-center">
+                <th scope="col" className="px-3 pb-2 text-center">
                   Edições
                 </th>
-                <th scope="col" className="pb-2 text-right">
+                <th scope="col" className="pb-2 pl-3 text-right">
                   Subtotal
                 </th>
               </tr>
@@ -193,25 +193,25 @@ function ReceiptContent({ order }: { order: Order }) {
                       </div>
                     </div>
                   </td>
-                  <td className="text-center text-muted-foreground">(x {line.quantity})</td>
-                  <td className="text-right text-title-sm font-bold text-accent">{formatEth(line.lineTotalEth)}</td>
+                  <td className="px-3 text-center text-muted-foreground">(x {line.quantity})</td>
+                  <td className="pl-3 text-right text-title-sm font-bold text-accent">{formatEth(line.lineTotalEth)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <dl className="mt-4 ml-auto max-w-xs space-y-2 text-body-lg">
+        <dl className="mt-4 ml-auto w-full max-w-xs space-y-2 text-body-lg">
           {order.discountEth !== '0' && (
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-4">
               <dt>Desconto{order.couponCode ? ` (${order.couponCode})` : ''}</dt>
               <dd>(-) {formatEth(order.discountEth)}</dd>
             </div>
           )}
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-4">
             <dt>Taxa de rede</dt>
             <dd>{formatEth(order.networkFeeEth)}</dd>
           </div>
-          <div className="flex justify-between font-bold">
+          <div className="flex justify-between gap-4 font-bold">
             <dt>Total</dt>
             <dd className="text-accent">{formatEth(order.totalEth)}</dd>
           </div>
@@ -241,11 +241,11 @@ function DialogTitleOrHeading({ children }: { children: string }) {
   const desktop = useMediaQuery(DESKTOP_QUERY)
   return desktop ? (
     <>
-      <DialogTitle className="text-title-sm font-bold text-accent">{children}</DialogTitle>
+      <DialogTitle className="text-title-sm font-bold text-foreground">{children}</DialogTitle>
       <DialogDescription className="sr-only">Recibo do pedido confirmado</DialogDescription>
     </>
   ) : (
-    <h1 id="receipt-title" className="text-title-sm font-bold text-accent">
+    <h1 id="receipt-title" className="text-title-sm font-bold text-foreground">
       {children}
     </h1>
   )

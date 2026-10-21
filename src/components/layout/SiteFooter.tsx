@@ -144,7 +144,7 @@ export function SiteFooter() {
                   <span
                     aria-disabled="true"
                     title={`${social.label} (em breve)`}
-                    className="grid size-8 cursor-not-allowed place-items-center rounded-sm border border-border text-muted-foreground"
+                    className="grid size-8 cursor-not-allowed place-items-center rounded-sm border border-primary text-primary"
                   >
                     <BrandIcon brand={social.brand} className="size-4" />
                     <span className="sr-only">{social.label}</span>

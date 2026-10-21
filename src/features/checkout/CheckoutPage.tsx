@@ -305,7 +305,7 @@ function CheckoutForm({ user, wallets }: { user: User; wallets: Wallet[] }) {
             </label>
           )}
           <FormField label="Observação do colecionador (opcional)" error={errors.buyer?.note?.message} className="md:max-w-sm">
-            {(f) => <textarea {...f} {...form.register('buyer.note')} rows={5} className="rounded-sm border border-border bg-transparent p-3 text-body-sm text-foreground focus-visible:border-primary focus-visible:outline-none" />}
+            {(f) => <textarea {...f} {...form.register('buyer.note')} rows={5} className="rounded-sm border border-border bg-transparent p-3 text-body-sm text-foreground focus-visible:border-primary" />}
           </FormField>
         </div>
       </section>

@@ -40,7 +40,7 @@ export function SearchField({ value, onSearch, className }: { value: string | un
           clearTimeout(timer.current)
           timer.current = setTimeout(() => onSearch(next || undefined), 300)
         }}
-        className="h-11 w-full rounded-lg border border-border bg-surface pr-3 pl-10 text-body-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none"
+        className="h-11 w-full rounded-lg border border-border bg-surface pr-3 pl-10 text-body-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary"
       />
     </div>
   )
