@@ -1,4 +1,4 @@
-import { addToCartFromDetail, expect, isMobile, mockControl, openApp, submitLogin, test, USERS, waitForMocks } from './support/app'
+import { addToCartFromDetail, expect, isMobile, loginAs, mockControl, openApp, submitLogin, test, USERS, waitForMocks } from './support/app'
 
 test.describe('03 · conta e sessão', () => {
   test('cadastro com conflito e sucesso', async ({ page }) => {
@@ -86,6 +86,19 @@ test.describe('03 · conta e sessão', () => {
     if (!isMobile(page)) await expect(page.getByRole('link', { name: /^Carrinho, 1 item$/ })).toBeVisible()
     const cached = await page.evaluate(() => localStorage.getItem('kurio:session'))
     expect(cached).toContain('usr_bruno')
+  })
+
+  test('a sessão expira sozinha depois de 30 minutos', async ({ page }) => {
+    await page.clock.install()
+    await openApp(page, '/')
+    await loginAs(page, USERS.ana, '/profile')
+    await expect(page.getByLabel('Nome de exibição')).toHaveValue(USERS.ana.name)
+    // The mock server's sessions last 30 minutes; the fake clock gets there without waiting.
+    await page.clock.fastForward('30:05')
+    await page.getByRole('link', { name: 'Carteiras' }).click()
+    await expect(page).toHaveURL(/\/login\?redirect=.*reason=expired/)
+    await submitLogin(page, USERS.ana)
+    await expect(page).not.toHaveURL(/\/login/)
   })
 
   test('sair apaga o rascunho do pagamento deste navegador', async ({ page }) => {

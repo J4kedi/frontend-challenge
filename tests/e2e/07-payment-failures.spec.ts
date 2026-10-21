@@ -23,13 +23,17 @@ test.describe('07 · falhas de pagamento', () => {
   })
 
   test('timeout depois da criação recupera o mesmo pedido pela chave de idempotência', async ({ page }) => {
-    test.setTimeout(90_000)
+    await page.clock.install()
     await openApp(page, '/', 'order-timeout')
     await addToCartFromDetail(page, 'emerald-ape-042')
     const review = await goToReview(page)
+    const firstPost = page.waitForRequest((request) => request.method() === 'POST' && request.url().endsWith('/api/orders'))
     await review.getByTestId('confirm-purchase').click()
-    // The first POST answers after the client's 8 s timeout; the retry reuses the key.
-    await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 30_000 })
+    await firstPost
+    // The server holds the first answer for 10 s; the client gives up at 8 s (fake clock,
+    // no real wait) and retries with the same key, which returns the order already created.
+    await page.clock.fastForward(8_000)
+    await expect(page.getByTestId('order-confirmed')).toBeVisible()
     const orders = await ordersOf(page)
     expect(orders).toHaveLength(1)
     expect(orders[0]!.status).toBe('confirmed')
