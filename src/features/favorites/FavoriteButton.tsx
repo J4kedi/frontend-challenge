@@ -10,14 +10,17 @@ export function FavoriteButton({
   nftId,
   name,
   variant = 'overlay',
+  hoverReveal = false,
   className,
 }: {
   nftId: string
   name: string
   variant?: 'overlay' | 'outline'
+  /** Card heart: with a mouse, shows on hover or focus (Figma card hover) and stays once favorited. */
+  hoverReveal?: boolean
   className?: string
 }) {
-  const isFavorite = useIsFavorite(nftId)
+  const { isFavorite, loading } = useIsFavorite(nftId)
   const { toggle, isPending } = useToggleFavorite()
 
   return (
@@ -37,8 +40,11 @@ export function FavoriteButton({
         event.stopPropagation()
         void toggle(nftId, name, isFavorite)
       }}
-      aria-busy={isPending || undefined}
+      disabled={loading}
+      aria-busy={loading || isPending || undefined}
       className={cn(
+        'disabled:cursor-progress disabled:opacity-60',
+        hoverReveal && !isFavorite && 'md:pointer-fine:opacity-0 md:pointer-fine:group-hover:opacity-100 md:pointer-fine:focus-visible:opacity-100',
         variant === 'overlay'
           ? 'grid size-8 place-items-center rounded-full bg-surface/80 text-primary backdrop-blur hover:bg-surface'
           : 'inline-flex h-10 items-center gap-2 rounded-sm border border-foreground px-4 text-body-lg font-medium text-foreground hover:border-primary hover:text-accent',

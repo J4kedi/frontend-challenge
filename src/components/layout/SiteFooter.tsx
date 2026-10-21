@@ -22,7 +22,7 @@ const SOCIALS: { brand: Brand; label: string }[] = [
 /** Links outside the challenge scope stay visible (Figma) but are not interactive. */
 function Soon({ children }: { children: string }) {
   return (
-    <span aria-disabled="true" title="Em breve" className="cursor-not-allowed">
+    <span aria-disabled="true" title="Em breve" className="cursor-not-allowed text-muted-foreground">
       {children}
     </span>
   )
@@ -144,7 +144,7 @@ export function SiteFooter() {
                   <span
                     aria-disabled="true"
                     title={`${social.label} (em breve)`}
-                    className="grid size-8 place-items-center rounded-sm border border-primary text-primary"
+                    className="grid size-8 cursor-not-allowed place-items-center rounded-sm border border-border text-muted-foreground"
                   >
                     <BrandIcon brand={social.brand} className="size-4" />
                     <span className="sr-only">{social.label}</span>

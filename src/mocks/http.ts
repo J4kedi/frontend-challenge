@@ -78,17 +78,24 @@ export function withNetwork<P extends PathParams, B extends DefaultBodyType>(
     const active = scenario()
     if (active === 'offline') return HttpResponse.error()
     await delay(latencyFor(info.request))
-    // Turning a scenario on again starts its failures over (the 3 first tries of each GET).
+    // Turning a scenario on again starts its failures over.
     if (active !== attemptsScenario) {
       attempts.clear()
       attemptsScenario = active
     }
-    if (active === 'http-5xx' && info.request.method === 'GET') {
-      const key = new URL(info.request.url).pathname + new URL(info.request.url).search
-      const count = (attempts.get(key) ?? 0) + 1
-      attempts.set(key, count)
-      if (count <= 3) {
-        return fail(503, 'UNAVAILABLE', 'Serviço temporariamente indisponível. Tente novamente.', { retryable: true })
+    if (active === 'http-5xx') {
+      // Reads fail their 3 first tries. A write fails its first try only when
+      // retrying it is safe: the order, with its idempotency key.
+      const url = new URL(info.request.url)
+      const read = info.request.method === 'GET'
+      const idempotencyKey = info.request.headers.get('Idempotency-Key')
+      const key = read ? url.pathname + url.search : idempotencyKey && `${info.request.method} ${url.pathname} ${idempotencyKey}`
+      if (key) {
+        const count = (attempts.get(key) ?? 0) + 1
+        attempts.set(key, count)
+        if (count <= (read ? 3 : 1)) {
+          return fail(503, 'UNAVAILABLE', 'Serviço temporariamente indisponível. Tente novamente.', { retryable: true })
+        }
       }
     }
     return resolver(info)

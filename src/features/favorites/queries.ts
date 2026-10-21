@@ -25,9 +25,11 @@ export function useFavorites() {
   return useQuery({ ...favoritesOptions(user?.id ?? 'anonymous'), enabled: Boolean(user) })
 }
 
+/** `loading` while a signed-in collector's list is on its way: the state is unknown, not "not a favorite". */
 export function useIsFavorite(nftId: string) {
-  const { data } = useFavorites()
-  return data?.nftIds.includes(nftId) ?? false
+  const { isChecking } = useSession()
+  const { data, isPending, fetchStatus } = useFavorites()
+  return { isFavorite: data?.nftIds.includes(nftId) ?? false, loading: isChecking || (isPending && fetchStatus !== 'idle') }
 }
 
 /**

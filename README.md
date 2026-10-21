@@ -101,7 +101,7 @@ Escolha um cenário pela URL, com `?scenario=<nome>` (ele fica salvo), ou pelo
 | `slow` | toda resposta leva 1,8–2,6 s (skeletons e carregamentos) |
 | `jitter` | 30 ms a 1,5 s por requisição: respostas fora de ordem |
 | `offline` | toda chamada falha como erro de rede |
-| `http-5xx` | cada GET falha com 503 nas 3 primeiras tentativas |
+| `http-5xx` | cada GET falha com 503 nas 3 primeiras tentativas; o pedido falha na primeira, e o app repete com a mesma chave |
 | `mutation-error` | favoritar responde 500 (rollback da atualização otimista) |
 | `empty` | o catálogo não retorna nada |
 | `order-timeout` | o primeiro POST do pedido responde depois do timeout do cliente |
@@ -166,7 +166,7 @@ ignorados. Regere com `pnpm test:visual:update`, que usa Docker.
 
 ## Deploy
 
-Publicado na Vercel: **https://kurio-nft-marketplace-vert.vercel.app**. O deploy sai do commit da `main` marcado com a tag `v1.0.8`, e a suíte E2E roda também contra a URL publicada:
+Publicado na Vercel: **https://kurio-nft-marketplace-vert.vercel.app**. O deploy sai do commit da `main` marcado com a tag `v1.0.9`, e a suíte E2E roda também contra a URL publicada:
 
 ```bash
 E2E_BASE_URL=https://kurio-nft-marketplace-vert.vercel.app pnpm exec playwright test --grep-invert @visual

@@ -62,4 +62,22 @@ test.describe('06 · compra completa', () => {
     expect(said.some((text) => text.includes('Pagamento confirmado'))).toBe(true)
     expect(said.filter((text) => text.includes('esgotou'))).toEqual([])
   })
+
+  test('o recibo de dois NFTs cabe numa janela de 1280×720', async ({ page }) => {
+    test.skip(isMobile(page), 'o recibo é um modal a partir de 768 px')
+    await openApp(page, '/')
+    await addToCartFromDetail(page, 'emerald-ape-042')
+    await addToCartFromDetail(page, 'sage-nomad-009')
+    const review = await goToReview(page)
+    await review.getByTestId('confirm-purchase').click()
+    await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 15_000 })
+
+    await page.setViewportSize({ width: 1280, height: 720 })
+    const receipt = page.getByRole('dialog', { name: 'Seus NFTs agora estão na sua carteira' })
+    // The lines scroll inside the modal; the totals and the explorer link stay in view.
+    await expect(receipt.getByRole('button', { name: 'Ver no Etherscan' })).toBeInViewport({ ratio: 1 })
+    await expect(receipt.getByText('Taxa de rede')).toBeInViewport({ ratio: 1 })
+    // At most 1 px from rounding (92dvh is fractional), never a cut-off line.
+    expect(await receipt.evaluate((el) => el.scrollHeight - el.clientHeight)).toBeLessThanOrEqual(1)
+  })
 })
