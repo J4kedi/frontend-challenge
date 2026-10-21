@@ -21,7 +21,7 @@ export function SiteHeader() {
   const onHome = pathname === '/'
   // On the home page the active item follows the section on screen (scroll-spy).
   const marketInView = useSectionInView('mercado', onHome)
-  const marketActive = MARKET_PATHS.some((p) => pathname.startsWith(p)) || marketInView
+  const marketActive = MARKET_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`)) || marketInView
   const homeActive = onHome && !marketInView
 
   // On the home page these items scroll to their section; elsewhere they navigate there.

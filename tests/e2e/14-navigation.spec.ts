@@ -103,4 +103,11 @@ test.describe('14 · navegação do header', () => {
       expect(await overflow(), `/profile at ${width}`).toBeLessThanOrEqual(0)
     }
   })
+
+  test('rota inexistente parecida com uma do mercado não marca Mercado', async ({ page }) => {
+    test.skip(isMobile(page), 'O header é desktop')
+    await openApp(page, '/nftx')
+    await expect(page.getByRole('heading', { name: /não encontrada/i }).first()).toBeVisible()
+    await expect(page.getByRole('navigation', { name: 'Principal' }).locator('[aria-current="page"]')).toHaveCount(0)
+  })
 })
