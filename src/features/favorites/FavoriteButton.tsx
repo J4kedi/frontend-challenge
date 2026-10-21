@@ -28,7 +28,7 @@ export function FavoriteButton({
       onClick={(event) => {
         event.preventDefault()
         event.stopPropagation()
-        toggle(nftId, name, isFavorite)
+        void toggle(nftId, name, isFavorite)
       }}
       aria-busy={isPending || undefined}
       className={cn(
