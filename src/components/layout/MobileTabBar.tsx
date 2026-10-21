@@ -25,7 +25,7 @@ export function MobileTabBar() {
           its shape at any width; the sides stretch. */}
       <div aria-hidden="true" className="absolute inset-0 flex drop-shadow-tab-bar">
         <div className="flex-1 rounded-tl-[30px] bg-surface" />
-        <svg viewBox="0 0 126 95" preserveAspectRatio="none" className="h-full w-31.5 shrink-0 text-surface">
+        <svg viewBox="0 0 126 95" preserveAspectRatio="none" className="-mx-px h-full w-31.5 shrink-0 text-surface">
           <path
             fill="currentColor"
             d="M0 0H6.25A14 14 0 0 1 19.95 11.1A44 44 0 0 0 106.05 11.1A14 14 0 0 1 119.75 0H126V95H0Z"

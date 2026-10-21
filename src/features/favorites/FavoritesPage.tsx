@@ -44,7 +44,23 @@ export function FavoritesPage() {
       ) : (
         <ul className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
           {details.map((detail, index) => (
-            <li key={ids[index]}>{detail.data ? <NftCard nft={detail.data} /> : <NftCardSkeleton />}</li>
+            <li key={ids[index]}>
+              {detail.data ? (
+                <NftCard nft={detail.data} />
+              ) : detail.isError ? (
+                <div
+                  role="alert"
+                  className="flex aspect-[175/200] flex-col items-center justify-center gap-3 rounded-[20px] bg-surface p-4 text-center text-body-sm text-muted-foreground md:aspect-[258/300] md:rounded-none"
+                >
+                  Não foi possível carregar este NFT.
+                  <Button size="sm" variant="outline" onClick={() => void detail.refetch()}>
+                    Tentar novamente
+                  </Button>
+                </div>
+              ) : (
+                <NftCardSkeleton />
+              )}
+            </li>
           ))}
         </ul>
       )}

@@ -47,7 +47,7 @@ export function NftCard({ nft, priority = false }: { nft: NftSummary; priority?:
           {soldOut && <span className="text-caption font-bold text-coral uppercase">Esgotado</span>}
         </p>
       </Link>
-      <FavoriteButton nftId={nft.id} name={nft.name} className="absolute top-3 right-3 md:hidden" />
+      <FavoriteButton nftId={nft.id} name={nft.name} hoverReveal className="absolute top-3 right-3" />
     </article>
   )
 }

@@ -109,7 +109,7 @@ function Receipt({ order }: { order: Order }) {
   return (
     <div className="mx-auto max-w-page px-6 py-16 xl:px-0" data-testid="order-confirmed">
       <Dialog open onOpenChange={(open) => !open && void navigate({ to: '/' })}>
-        <DialogContent showCloseButton={false} className="max-h-[92dvh] max-w-[578px] overflow-y-auto rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0">
+        <DialogContent showCloseButton={false} className="flex max-h-[92dvh] max-w-[578px] flex-col overflow-y-auto rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0">
           <button
             type="button"
             onClick={() => void navigate({ to: '/' })}
@@ -127,9 +127,10 @@ function Receipt({ order }: { order: Order }) {
 
 function ReceiptContent({ order }: { order: Order }) {
   const [explorerOpen, setExplorerOpen] = useState(false)
+  const desktop = useMediaQuery(DESKTOP_QUERY)
   const explorer = EXPLORER_NAME[order.network]
   return (
-    <div className="text-foreground">
+    <div className="flex min-h-0 flex-col text-foreground">
       <header className="flex flex-col items-center gap-4 px-4 pt-8 pb-6 text-center sm:px-8">
         <ThankYouIllustration className="size-20 text-primary" />
         <DialogTitleOrHeading>Seus NFTs agora estão na sua carteira</DialogTitleOrHeading>
@@ -156,46 +157,49 @@ function ReceiptContent({ order }: { order: Order }) {
           <dd className="text-muted-foreground">{WALLET_PROVIDER_LABEL[order.wallet.provider]}</dd>
         </div>
       </dl>
-      <section className="px-4 py-6 sm:px-8" aria-labelledby="receipt-details">
+      <section className="flex min-h-0 flex-col px-4 py-6 sm:px-8" aria-labelledby="receipt-details">
         <h2 id="receipt-details" className="text-body-lg font-bold">
           Detalhes da transação
         </h2>
-        <table className="mt-3 w-full text-left text-body-sm">
-          <thead>
-            <tr className="border-b border-border text-body-lg font-bold">
-              <th scope="col" className="pb-2">
-                NFTs
-              </th>
-              <th scope="col" className="pb-2 text-center">
-                Edições
-              </th>
-              <th scope="col" className="pb-2 text-right">
-                Subtotal
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.lines.map((line) => (
-              <tr key={line.editionId}>
-                <td className="py-2">
-                  <div className="flex items-center gap-3">
-                    <div className="hidden w-16 shrink-0 overflow-hidden rounded-sm min-[360px]:block">
-                      <NftImage artwork={line.artwork} alt="" sizes="64px" />
-                    </div>
-                    <div>
-                      <p className="text-body-lg font-bold">{line.name}</p>
-                      <p className="text-caption text-muted-foreground">
-                        ID do token: {line.tokenId} · {line.editionLabel}
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td className="text-center text-muted-foreground">(x {line.quantity})</td>
-                <td className="text-right text-title-sm font-bold text-accent">{formatEth(line.lineTotalEth)}</td>
+        {/* In the desktop modal the lines scroll, so the totals and the explorer link always fit the window. */}
+        <div className="mt-3 min-h-24 overflow-y-auto" role="region" aria-label="NFTs do pedido" tabIndex={desktop ? 0 : undefined}>
+          <table className="w-full text-left text-body-sm">
+            <thead className="sticky top-0 bg-surface">
+              <tr className="border-b border-border text-body-lg font-bold">
+                <th scope="col" className="pb-2">
+                  NFTs
+                </th>
+                <th scope="col" className="pb-2 text-center">
+                  Edições
+                </th>
+                <th scope="col" className="pb-2 text-right">
+                  Subtotal
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {order.lines.map((line) => (
+                <tr key={line.editionId}>
+                  <td className="py-2">
+                    <div className="flex items-center gap-3">
+                      <div className="hidden w-16 shrink-0 overflow-hidden rounded-sm min-[360px]:block">
+                        <NftImage artwork={line.artwork} alt="" sizes="64px" />
+                      </div>
+                      <div>
+                        <p className="text-body-lg font-bold">{line.name}</p>
+                        <p className="text-caption text-muted-foreground">
+                          ID do token: {line.tokenId} · {line.editionLabel}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="text-center text-muted-foreground">(x {line.quantity})</td>
+                  <td className="text-right text-title-sm font-bold text-accent">{formatEth(line.lineTotalEth)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <dl className="mt-4 ml-auto max-w-xs space-y-2 text-body-lg">
           {order.discountEth !== '0' && (
             <div className="flex justify-between">
