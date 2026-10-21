@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useDeferredValue } from 'react'
 import { DESKTOP_QUERY, useMediaQuery } from '@/shared/hooks/use-media-query'
 import { CatalogFilters } from './components/CatalogFilters'
 import { CatalogResults } from './components/CatalogResults'
@@ -14,6 +15,9 @@ export function HomePage() {
   const { search, setFilters, clearFilters } = useCatalogSearch()
   const list = useQuery(nftListOptions(toListQuery(search)))
   const facets = list.data?.facets
+  // The card grid is the heaviest render of the page. Deferred, React renders it
+  // as a transition, in small slices, instead of one long task when data arrives.
+  const results = useDeferredValue(list.data)
   // One search box in the DOM (ids and labels stay unique): top bar on mobile, toolbar from md up.
   const desktop = useMediaQuery(DESKTOP_QUERY)
   // The sidebar only exists from lg up: below it, its filters and featured NFT would render hidden.
@@ -60,9 +64,9 @@ export function HomePage() {
               </div>
             </div>
             <CatalogResults
-              data={list.data}
-              isPending={list.isPending}
-              isFetching={list.isFetching}
+              data={results}
+              isPending={results === undefined && list.error === null}
+              isFetching={list.isFetching || results !== list.data}
               error={list.error}
               onRetry={() => void list.refetch()}
               onClear={clearFilters}
