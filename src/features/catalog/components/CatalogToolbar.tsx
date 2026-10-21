@@ -31,6 +31,7 @@ export function SearchField({ value, onSearch, className }: { value: string | un
         ref={input}
         id="catalog-search"
         type="search"
+        maxLength={80}
         defaultValue={value}
         placeholder="Explorar coleções"
         autoComplete="off"
@@ -48,7 +49,7 @@ export function SearchField({ value, onSearch, className }: { value: string | un
 export function TabsFilter({ value, onChange }: { value: CatalogSearch['tab']; onChange: (patch: Patch) => void }) {
   const current = value ?? 'all'
   return (
-    <div role="group" aria-label="Listagem" className="flex max-w-full min-w-0 gap-5 overflow-x-auto">
+    <div role="group" aria-label="Listagem" className="flex max-w-full min-w-0 flex-wrap gap-x-5 gap-y-2">
       {TABS.map((tab) => (
         <button
           key={tab}

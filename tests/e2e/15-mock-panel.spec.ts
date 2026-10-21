@@ -5,7 +5,7 @@ test.describe('15 · painel de mocks', () => {
   test('cada ação diz o que vai fazer, com os dados atuais', async ({ page }) => {
     await openApp(page, '/')
     await addToCartFromDetail(page, 'emerald-ape-042')
-    const trigger = page.getByRole('button', { name: /^Painel de mocks/ })
+    const trigger = page.getByRole('button', { name: /^Mocks · / })
     await trigger.click()
     const panel = page.getByRole('region', { name: 'Painel de mocks' })
     await expect(panel).toBeFocused()
@@ -32,7 +32,7 @@ test.describe('15 · painel de mocks', () => {
 
   test('queda com duração escolhida e login rápido', async ({ page }) => {
     await openApp(page, '/')
-    await page.getByRole('button', { name: /^Painel de mocks/ }).click()
+    await page.getByRole('button', { name: /^Mocks · / }).click()
     const panel = page.getByRole('region', { name: 'Painel de mocks' })
 
     // The outage lasts what was chosen, not the ~0.5 s of an automatic reconnection.
@@ -49,5 +49,13 @@ test.describe('15 · painel de mocks', () => {
     await panel.getByRole('button', { name: new RegExp(`^Entrar como ${USERS.bruno.name}`) }).click()
     await expect(panel.getByText(`${USERS.bruno.name} · ${USERS.bruno.email}`)).toBeVisible()
     await expect(panel.getByRole('button', { name: new RegExp(`^Entrar como ${USERS.ana.name}`) })).toBeVisible()
+  })
+
+  test('reset volta também ao cenário padrão', async ({ page }) => {
+    await openApp(page, '/', 'slow')
+    await page.goto('/?mock-reset')
+    await expect(page.locator('html[data-mocks="ready"]')).toBeAttached()
+    const state = await page.evaluate(() => fetch('/api/__mock/state').then((r) => r.json() as Promise<{ scenario: string }>))
+    expect(state.scenario).toBe('default')
   })
 })
