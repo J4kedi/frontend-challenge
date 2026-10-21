@@ -79,4 +79,15 @@ test.describe('01 · catálogo', () => {
     await page.getByRole('button', { name: 'Limpar filtros' }).click()
     await expect(page.getByTestId('catalog-status')).toHaveText('239 NFTs encontrados')
   })
+
+  test('página além da última avisa e leva à última página', async ({ page }) => {
+    await openApp(page, '/?page=99')
+    const outOfRange = page.getByTestId('catalog-out-of-range')
+    await expect(outOfRange).toContainText('Esta página não existe')
+    await expect(page.getByTestId('catalog-empty')).toHaveCount(0)
+    await outOfRange.getByRole('link', { name: 'Ir para a página 27' }).click()
+    await expect(page).toHaveURL(/page=27/)
+    await expect(page.getByTestId('nft-card').first()).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Página 27' })).toHaveAttribute('aria-current', 'page')
+  })
 })
