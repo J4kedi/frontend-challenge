@@ -76,7 +76,7 @@ totais do Figma). Nada monetário passa por `Number`.
 
 - **Mutations não repetem sozinhas.** A única exceção é o pedido, que repete com a mesma chave (ver "Pedido").
 - **Respostas obsoletas são descartadas.** A chave é a query inteira, então uma resposta lenta de uma busca antiga cai na entrada dela, nunca na da tela atual. O `signal` do Query chega ao Axios, e o Query aborta o pedido de uma chave sem observadores.
-- **Atualização otimista com rollback:** favoritos (`src/features/favorites/queries.ts`). O coração muda antes da resposta; se der erro, volta ao estado anterior, com toast e anúncio.
+- **Atualização otimista com rollback:** favoritos (`src/features/favorites/queries.ts`). O coração muda antes da resposta; se der erro, volta ao estado anterior, com toast e anúncio. As escritas saem em fila, na ordem dos cliques (`scope` do TanStack Query), e só a última grava a lista no cache. Assim, dois cliques rápidos com rede lenta não chegam invertidos à API.
 - **Isolamento por usuário:** tudo que é privado fica sob `['user', id]`, e o carrinho do visitante sob `['guest', cartId]`. Logout e troca de usuário removem o prefixo inteiro.
 
 ## Sessão
@@ -92,7 +92,7 @@ totais do Figma). Nada monetário passa por `Number`.
   Os links continuam apontando para `/checkout` e `/login`, e só o clique simples do visitante é interceptado (`promptVisitor`). Abrir em nova aba ainda passa pela rota. As rotas `/login` e `/signup` seguem o Figma (modal sobre o marketplace) e atendem acesso direto, as rotas privadas e a sessão expirada.
 - **Fechar o login volta para a página anterior** (`history.back`), não para o `redirect`: o redirect de uma rota privada (`/checkout`) mandaria de volta ao login. Pelo mesmo motivo, a expiração numa rota privada substitui a entrada do histórico em vez de empilhar.
 - **Logout e troca de usuário:** removem `['user', id]` e `['session']`, fecham o socket (o provider recria com o novo token) e iniciam um carrinho de visitante novo.
-- Rotas privadas (`/_auth`): `beforeLoad` confirma a sessão pelo Query e redireciona com `redirect`. Só destinos internos são aceitos (`safeRedirect`), sem open redirect.
+- Rotas privadas (`/_auth`): `beforeLoad` confirma a sessão pelo Query e redireciona com `redirect`. Só destinos internos são aceitos (`safeRedirect`), sem open redirect. Só um 401 manda para o login. Falha de rede ou 5xx mostra a página de erro com "Tentar novamente": com um token guardado, `/login` devolveria para a rota privada, num loop.
 
 ## Carrinho
 
@@ -107,8 +107,9 @@ totais do Figma). Nada monetário passa por `Number`.
 3. `POST /orders` com `Idempotency-Key`. Clique repetido é bloqueado pelo estado de envio e, mesmo assim, reusaria a chave.
 4. Timeout, rede ou 5xx: até 2 novas tentativas **com a mesma chave**. O servidor devolve o mesmo pedido (200), sem criar outro.
 5. `409 QUOTE_STALE`: o servidor recalculou e algo mudou. A tela mostra a cotação nova (`details.quote`) e pede confirmação de novo. A tentativa antiga é descartada (a chave muda com o conteúdo).
-6. Pedido criado e **pendente**: a rota `/orders/$id` mostra o status. `order.updated` ou o polling levam a `confirmed` ou `declined`, que são terminais. Reload, queda de conexão ou nova aba: `GET /orders/:id` liquida o que venceu, e a página de pagamento bloqueia uma segunda compra enquanto houver pedido pendente.
-7. O recibo só aparece para `confirmed` e reproduz o snapshot gravado no pedido.
+6. Pagamento **recusado** encerra a tentativa. Se o colecionador tentar de novo com o mesmo carrinho e a mesma cotação, o reenvio da chave antiga devolveria o mesmo pedido recusado; por isso `submitPurchase` descarta essa tentativa e cria outra, com chave nova.
+7. Pedido criado e **pendente**: a rota `/orders/$id` mostra o status. `order.updated` ou o polling levam a `confirmed` ou `declined`, que são terminais. Reload, queda de conexão ou nova aba: `GET /orders/:id` liquida o que venceu, e a página de pagamento bloqueia uma segunda compra enquanto houver pedido pendente.
+8. O recibo só aparece para `confirmed` e reproduz o snapshot gravado no pedido.
 
 ## Tempo real
 

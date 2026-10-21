@@ -39,6 +39,8 @@ Todos seguem os tokens e a composição das telas vizinhas.
 | Vazio | catálogo, carrinho, lista de interesse | mensagem + ação ("Limpar filtros", "Explorar o mercado") |
 | Erro | listas, detalhe, cotação, pedido | `ErrorState` com mensagem da API e "Tentar novamente" |
 | 404 | rota, NFT, pedido de outra conta | `NotFoundPage` |
+| Página além da última | catálogo (`?page=99`) | "Esta página não existe" e link para a última página, em vez do vazio com "Limpar filtros" |
+| Sem rede numa rota privada | `/favorites`, `/profile`, `/checkout`… | página de erro com "Tentar novamente", sem mandar para o login |
 | Preço mudou ou edição esgotou | carrinho, pagamento, revisão | aviso âmbar com "Aceitar novos preços"; badge na linha |
 | Revisão antes do envio | pagamento | diálogo no padrão do modal de confirmação |
 | Conexão da carteira | pagamento | desconectada, aguardando aprovação, conectada e recusada |
@@ -47,7 +49,7 @@ Todos seguem os tokens e a composição das telas vizinhas.
 | Login pedido a partir de uma página | qualquer página (favoritar, "Conectar e finalizar", "Entrar" no header) | o modal de Login abre sobre a própria página, com o motivo como descrição |
 | Conta de teste | login (só na demo) | dica com e-mail e senha fictícios e botão "Preencher" |
 | Tempo real offline | todas | faixa "Conexão em tempo real perdida. Reconectando…", fixa sob o header; toast quando volta |
-| Tablet (768–1023 px) | todas | header desktop; filtros no Sheet; grid em 3 colunas |
+| Tablet (768–1023 px) | todas | header desktop com espaçamento menor; filtros no Sheet; grid em 3 colunas; newsletter do rodapé numa linha própria |
 
 ## Desvios do Figma
 
