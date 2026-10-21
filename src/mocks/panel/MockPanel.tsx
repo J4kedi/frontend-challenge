@@ -55,9 +55,10 @@ export default function MockPanel() {
 
   return (
     // On phones a dialog's own actions sit where the trigger is: it steps aside while one is open.
+    // Closed on the default scenario it is a small round button, so it covers as little as possible.
     <div
       data-mock-panel
-      className="pointer-events-auto fixed bottom-28 left-2 z-60 flex flex-col items-start gap-2 max-md:[body:has([role=dialog])_&]:hidden max-md:[body:has([data-buy-bar])_&]:bottom-46 md:bottom-4 md:left-3"
+      className="pointer-events-auto fixed bottom-28 left-2 z-60 flex flex-col items-start gap-2 max-md:[body:has([role=dialog])_&]:hidden max-md:[body:has([data-buy-bar])_&]:bottom-46 md:bottom-4 md:left-1 lg:left-3"
     >
       {open && (
         <PanelContent
@@ -75,12 +76,16 @@ export default function MockPanel() {
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
         onClick={() => setOpen((value) => !value)}
-        className="flex items-center gap-2 rounded-full border border-primary bg-surface-raised px-3 py-1.5 text-caption font-bold text-accent shadow-raised hover:bg-surface md:px-4 md:py-2"
+        className={cn(
+          'relative flex items-center gap-2 rounded-full border border-primary bg-surface-raised text-caption font-bold text-accent shadow-raised hover:bg-surface',
+          active === 'default' ? 'size-9 justify-center' : 'px-3 py-1.5',
+        )}
       >
         <FlaskConicalIcon className="size-4" aria-hidden="true" />
-        <span className="sr-only md:not-sr-only">Mocks</span>
-        <StatusDot status={status} />
-        <span className="sr-only font-medium text-foreground md:not-sr-only">· {SCENARIOS[active].label}</span>
+        <span className="sr-only">Mocks</span>
+        <StatusDot status={status} className={active === 'default' ? 'absolute top-0.5 right-0.5 ring-2 ring-surface-raised' : undefined} />
+        {/* A scenario other than the default is shown, so nobody forgets it is on. */}
+        <span className={active === 'default' ? 'sr-only' : 'font-medium text-foreground'}>· {SCENARIOS[active].label}</span>
       </button>
     </div>
   )
@@ -396,13 +401,14 @@ function Action({
   )
 }
 
-function StatusDot({ status }: { status: ReturnType<typeof useRealtimeStatus> }) {
+function StatusDot({ status, className }: { status: ReturnType<typeof useRealtimeStatus>; className?: string }) {
   return (
     <span
       aria-hidden="true"
       className={cn(
         'inline-block size-2 shrink-0 rounded-full',
         status === 'online' ? 'bg-success' : status === 'connecting' ? 'bg-amber' : 'animate-pulse bg-danger',
+        className,
       )}
     />
   )
