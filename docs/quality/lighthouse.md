@@ -17,7 +17,7 @@ Configuração versionada em [`scripts/lighthouse.mjs`](../../scripts/lighthouse
 - **Páginas:** início (`/`) e detalhe (`/nft/emerald-ape-042`).
 - **Perfil mobile:** padrão do Lighthouse, com 4G lento simulado e CPU 4×.
 - **Perfil desktop:** `desktop-config` do Lighthouse.
-- **Execuções:** 3 por página e perfil, cada uma num Chrome novo (cache, storage e service worker vazios, como numa primeira visita). O valor reportado é a mediana de cada categoria. Um Chrome headless que cai é relançado uma vez.
+- **Execuções:** 3 por página e perfil, cada uma num Chrome novo (cache, storage e service worker vazios, como numa primeira visita). O valor reportado é a mediana de cada categoria. Um Chrome headless que cai, ou que nem chega a abrir, é relançado uma vez.
 - **Saída:**
   - relatórios HTML e JSON de cada execução em [`reports/lighthouse/`](../../reports/lighthouse/);
   - medianas em [`summary.md`](../../reports/lighthouse/summary.md) e [`summary.json`](../../reports/lighthouse/summary.json), com ambiente e versões.

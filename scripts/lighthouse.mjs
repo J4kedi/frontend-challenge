@@ -49,15 +49,17 @@ const median = (values) => {
 
 /** One run in a fresh browser. A crashed headless Chrome is retried once; a second crash fails the run. */
 async function audit(url, config, attempt = 1) {
-  const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless=new', '--no-sandbox'] })
+  let chrome
   try {
+    chrome = await chromeLauncher.launch({ chromeFlags: ['--headless=new', '--no-sandbox'] })
     return await lighthouse(url, { port: chrome.port, output: ['html', 'json'], logLevel: 'error' }, config)
   } catch (error) {
-    if (attempt > 1 || !/crash|Connection closed/i.test(String(error))) throw error
-    console.warn(`Chrome crashed on ${url}; retrying once`)
+    // A headless Chrome that crashes, or never opens its debugging port, gets one more try.
+    if (attempt > 1 || !/crash|Connection closed|debugging port/i.test(String(error))) throw error
+    console.warn(`Chrome failed on ${url}; retrying once`)
     return audit(url, config, attempt + 1)
   } finally {
-    await chrome.kill()
+    await chrome?.kill()
   }
 }
 
