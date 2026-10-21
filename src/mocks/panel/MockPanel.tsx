@@ -179,7 +179,7 @@ function PanelContent({
       tabIndex={-1}
       aria-labelledby={`${id}-title`}
       aria-busy={busy}
-      className="flex max-h-[calc(100dvh-9rem)] w-[min(24rem,calc(100vw-1rem))] flex-col overflow-hidden rounded-lg border border-border-soft bg-surface-raised text-caption shadow-overlay outline-none"
+      className="flex max-h-[calc(100dvh-11rem)] w-[min(24rem,calc(100vw-1rem))] max-md:[body:has([data-buy-bar])_&]:max-h-[calc(100dvh-15.5rem)] md:max-h-[calc(100dvh-5rem)] flex-col overflow-hidden rounded-lg border border-border-soft bg-surface-raised text-caption shadow-overlay outline-none"
     >
       <header className="flex items-start justify-between gap-3 border-b border-border-soft px-4 py-3">
         <div>
