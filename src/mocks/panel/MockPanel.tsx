@@ -3,6 +3,7 @@ import { useRouter, useRouterState } from '@tanstack/react-router'
 import { FlaskConicalIcon, XIcon } from 'lucide-react'
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
+import { mocksReady } from '@/app/transport'
 import { safeRedirect, useLogin, useSession } from '@/features/auth/session'
 import { useCart } from '@/features/cart/queries'
 import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/shared/config'
@@ -28,6 +29,7 @@ interface LastEvent {
 }
 
 async function control<T = unknown>(path: string, body?: unknown, method = 'POST') {
+  await mocksReady()
   const response = await fetch(`${API}/__mock${path}`, {
     method,
     headers: { 'Content-Type': 'application/json' },
