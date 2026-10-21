@@ -32,7 +32,7 @@ test.describe('08 · perfil e carteiras', () => {
     await page.getByRole('button', { name: 'Salvar', exact: true }).click()
     await expect(page.getByLabel('Senha atual')).toHaveAttribute('aria-invalid', 'true')
     await expect(page.getByText('Senha atual incorreta')).toBeVisible()
-    // The password is checked first: nothing of the form was saved.
+    // Profile and password are saved together: nothing of the form was saved.
     const savedName = await page.evaluate(async () => {
       const { token } = JSON.parse(localStorage.getItem('kurio:session') ?? '{}') as { token?: string }
       return ((await fetch('/api/me/profile', { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json())) as { displayName: string }).displayName
@@ -40,6 +40,35 @@ test.describe('08 · perfil e carteiras', () => {
     expect(savedName).toBe('Ana C.')
 
     await page.getByLabel('Senha atual').fill('kurio2026')
+    await page.getByRole('button', { name: 'Salvar', exact: true }).click()
+    await expect(page.getByText('Perfil e senha atualizados.').first()).toBeVisible()
+  })
+
+  test('nome de usuário em uso com troca de senha não grava nada', async ({ page }) => {
+    await openApp(page, '/login?redirect=%2Fprofile')
+    await submitLogin(page)
+    await expect(page).toHaveURL(/\/profile$/)
+
+    await page.getByLabel('Nome de usuário').fill('bruno.arte')
+    await page.getByLabel('Senha atual').fill('kurio2026')
+    await page.getByLabel('Nova senha', { exact: true }).fill('novaSenha1')
+    await page.getByLabel('Confirmar nova senha').fill('novaSenha1')
+    await page.getByRole('button', { name: 'Salvar', exact: true }).click()
+    await expect(page.getByText('Nome de usuário já em uso')).toBeVisible()
+
+    // The password did not change: the old one still signs in, the new one does not.
+    const statuses = await page.evaluate(async () => {
+      const login = (password: string) =>
+        fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: 'ana@kurio.test', password }),
+        }).then((r) => r.status)
+      return [await login('kurio2026'), await login('novaSenha1')]
+    })
+    expect(statuses).toEqual([200, 401])
+
+    await page.getByLabel('Nome de usuário').fill('ana.nova')
     await page.getByRole('button', { name: 'Salvar', exact: true }).click()
     await expect(page.getByText('Perfil e senha atualizados.').first()).toBeVisible()
   })

@@ -16,7 +16,7 @@ import { announce } from '@/shared/a11y/announcer'
 import { isApiError } from '@/shared/api/errors'
 import { AccountLayout } from './AccountLayout'
 import { EnsInput } from './EnsField'
-import { useAvatar, useChangePassword, useProfile, useUpdateProfile } from './queries'
+import { useAvatar, useProfile, useUpdateProfile } from './queries'
 
 /** Password fields are optional: filling any of them validates the whole group. */
 const profileForm = profileBody
@@ -54,7 +54,6 @@ export function ProfilePage() {
 
 function ProfileEditor({ user }: { user: User }) {
   const updateProfile = useUpdateProfile()
-  const changePassword = useChangePassword()
   const [formError, setFormError] = useState<string | null>(null)
   const form = useForm<ProfileForm>({
     resolver: zodResolver(profileForm),
@@ -70,15 +69,18 @@ function ProfileEditor({ user }: { user: User }) {
     },
   })
   const { errors } = form.formState
-  const saving = updateProfile.isPending || changePassword.isPending
+  const saving = updateProfile.isPending
 
   const onSubmit = form.handleSubmit(async ({ currentPassword, newPassword, confirmPassword, ...data }) => {
     setFormError(null)
     try {
       const passwordChanged = Boolean(currentPassword)
-      // Password first: a wrong current password must not leave the profile half saved.
-      if (passwordChanged) await changePassword.mutateAsync({ currentPassword, newPassword, confirmPassword })
-      const saved = await updateProfile.mutateAsync(data)
+      // One request: the server checks the profile and the current password before
+      // writing anything, so a refused field never leaves half of the form saved.
+      const saved = await updateProfile.mutateAsync({
+        ...data,
+        password: passwordChanged ? { currentPassword, newPassword, confirmPassword } : undefined,
+      })
       form.reset({ ...saved, currentPassword: '', newPassword: '', confirmPassword: '' })
       const message = passwordChanged ? 'Perfil e senha atualizados.' : 'Perfil atualizado.'
       toast.success(message)

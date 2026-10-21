@@ -5,7 +5,7 @@ import {
   connectWalletBody,
   MAX_AVATAR_BYTES,
   passwordBody,
-  profileBody,
+  profileUpdateBody,
   walletFields,
   walletSlot,
 } from '@/contracts/account'
@@ -73,17 +73,23 @@ export const accountHandlers = [
     withNetwork(async ({ request }) => {
       const auth = authenticate(request)
       if ('error' in auth) return auth.error
-      const body = await readBody(request, profileBody)
+      const body = await readBody(request, profileUpdateBody)
       if (body.error) return body.error
+      const { password, ...profile } = body.data
       const others = db().users.filter((u) => u.id !== auth.user.id)
-      const email = body.data.email.toLowerCase()
+      const email = profile.email.toLowerCase()
       if (others.some((u) => u.email === email)) {
         return fail(409, 'EMAIL_TAKEN', 'Este e-mail já pertence a outra conta', { fields: { email: 'E-mail já em uso' } })
       }
-      if (others.some((u) => u.username === body.data.username)) {
+      if (others.some((u) => u.username === profile.username)) {
         return fail(409, 'USERNAME_TAKEN', 'Este nome de usuário já está em uso', { fields: { username: 'Nome de usuário já em uso' } })
       }
-      Object.assign(auth.user, body.data, { email, updatedAt: now() })
+      // Everything is checked before anything is written: profile and password change together or not at all.
+      if (password && !(await verifyPassword(password.currentPassword, auth.user.passwordSalt, auth.user.passwordHash))) {
+        return fail(422, 'VALIDATION_ERROR', 'Senha atual incorreta', { fields: { currentPassword: 'Senha atual incorreta' } })
+      }
+      if (password) Object.assign(auth.user, await hashPassword(password.newPassword).then(({ salt, hash }) => ({ passwordSalt: salt, passwordHash: hash })))
+      Object.assign(auth.user, profile, { email, updatedAt: now() })
       persist()
       return HttpResponse.json(toUser(auth.user))
     }),
