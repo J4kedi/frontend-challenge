@@ -69,6 +69,7 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 - **Variantes:** `default` (laranja, texto ink), `outline` (borda laranja), `secondary`, `ghost`, `destructive`, `link`.
 - **Tamanhos:** `default` 40 px · `sm` 32 · `lg` 48 · `pill` 60 (CTAs mobile) · `icon` · `icon-lg`.
 - **Estados:** hover em `accent`, `disabled` com 50% de opacidade e `aria-busy` com cursor de progresso. Em ação assíncrona, o rótulo muda ("Enviando pedido…").
+- **Tipo:** `button` por padrão. Num formulário, só o botão declarado com `type="submit"` envia; "Remover" (cupom) e "Aceitar novos preços", que ficam dentro do formulário de pagamento, não enviam.
 
 ### Input · PasswordInput · FormField · FormError
 - **Arquivos:** `src/components/ui/input.tsx`, `src/components/form/*`
@@ -123,6 +124,8 @@ some. O teste do axe pegou exatamente isso (ver `cn.test.ts`).
 ### FavoriteButton
 - **Arquivo:** `src/features/favorites/FavoriteButton.tsx` · **Figma:** "Favoritar", coração
 - **Estados:** coração preenchido (forma) e `aria-pressed`. A troca é otimista, com rollback e toast se a API falhar. Visitante: abre o login sobre a página (ver AuthDialog) e o favorito é salvo logo depois de entrar.
+- **Carregando:** logado, enquanto a lista ainda chega, fica desabilitado com `aria-busy`: o estado é desconhecido, não "fora da lista".
+- **No card:** no celular e em telas de toque, sempre visível. No desktop com mouse, aparece no hover e no foco (o hover do card no Figma) e fica visível depois de favoritado, o que dá o "remover" da lista de interesse.
 
 ### EditionPicker · PurchasePanel · Gallery
 - **Arquivo:** `src/features/nft/NftDetailPage.tsx` · **Figma:** "Edição: 1/1 · 1/10 · 1/50 · ABERTA", galeria com zoom; no mobile, "Hero", "Details Sheet" e "Buy Bar"

@@ -192,6 +192,34 @@ Corrigido a partir da revisão do agente principal:
   - Os números, com o antes e o depois, estão em [`lighthouse.md`](quality/lighthouse.md).
 - **Corrida achada pela suíte.** Um `nft.updated` que chegava enquanto a cotação ainda fazia a primeira busca era engolido: o TanStack Query reaproveitava a requisição em andamento, cuja resposta podia ser anterior à mudança. Agora carrinho e cotação são cancelados antes de buscar de novo.
 
+### Quinta rodada
+
+O avaliador sem contexto rodou sobre a v1.0.8 e deu **89/100** de novo, com os eliminatórios passando. Os defeitos da rodada anterior não voltaram; a nota parou porque ele achou outros.
+
+Corrigido:
+
+- **Botões que enviavam o pagamento.** "Aceitar novos preços" e "Remover" (cupom) ficam dentro do formulário de pagamento, e o `Button` não tinha `type`. O clique enviava o formulário: sem carteira, aparecia o erro de carteira; com carteira, abria a revisão. Agora o `Button` é `type="button"` por padrão, e só o envio declarado envia. O teste novo do `09` falha sem a correção.
+- **Recibo cortado em 1280×720.** O total ficava sob a borda do modal. Agora só a lista de NFTs rola, e os totais e "Ver no Etherscan" ficam à vista (`06`).
+- **Lista de interesse sem "remover" no desktop.** O coração do card só existia no celular. Agora aparece no hover e no foco, e fica visível depois de favoritado.
+- **Favorito sem estado de carregamento.** Logado, o botão começava como "Favoritar" e virava "Favoritado" meio segundo depois. Agora fica desabilitado, com `aria-busy`, até a lista chegar.
+- **Item da lista de interesse com erro.** Ficava em skeleton para sempre; agora mostra o erro e "Tentar novamente".
+- **Links "em breve" iguais aos ativos.** A tabela de desvios dizia que eram esmaecidos, e não eram.
+- **5xx só nas leituras.** O cenário `http-5xx` agora também falha a primeira tentativa do pedido. O teste confere que o app repete com a mesma chave e que só um pedido é criado (`07`).
+- **Tab bar com emendas de 1 px** entre as peças do recorte.
+- **Docs.** O `testing.md` citava 4 workers sem dizer que vinham da linha de comando (o padrão do config é 2).
+
+Ficou como estava, e por quê:
+
+- **Lista de interesse com uma busca por NFT.** Trocar por resumos muda o contrato de `/me/favorites`; a lista tem poucos itens e cada busca já fica no cache do detalhe.
+- **Rodapé a 1440 px** com colunas de 20 a 56 px fora do frame.
+- **Carrinho em rede lenta** empurrando a vitrine para baixo (CLS 0,053, abaixo de 0,1).
+- **Hover do card com carrinho e zoom.** Virou o desvio 20 de `screens.md`.
+
+O processo também mudou. Por decisão humana, a próxima avaliação roda em **dois avaliadores sem contexto em paralelo**, para caber no tempo que sobrava:
+
+- **Funcional:** eliminatórios, fluxos, estado, tempo real e mocks.
+- **Qualidade:** visual, testes, acessibilidade, performance e documentação. Ele mede o Lighthouse primeiro, antes que o outro comece a compilar e rodar testes na mesma máquina.
+
 ## Contrato para os próximos agentes
 
 O [`AGENTS.md`](../AGENTS.md) (carregado pelo `CLAUDE.md`) é o contrato curto

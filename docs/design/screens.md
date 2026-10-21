@@ -77,3 +77,5 @@ enunciado, a acessibilidade ou a coerência do fluxo pedem.
 | 17 | Paginação | 1 2 3 4 > | janela de 4 páginas ao redor da atual, ‹ › | o catálogo inteiro tem 27 páginas |
 | 18 | Card, mobile | selo "RARO" num card ilustrativo | selo nos NFTs cujo atributo de raridade é "Raro" | o selo precisa de um dado por trás, não de uma posição fixa |
 | 19 | Pagamento, "Confirmar compra" | botão sempre ativo | desabilitado com pedido pendente, com link "Acompanhar pedido" | evita cobrar o mesmo carrinho duas vezes |
+| 20 | Card, desktop | hover com carrinho, favoritar e zoom | só o favoritar, que aparece no hover e no foco e fica visível depois de favoritado | pôr no carrinho pelo card pularia a escolha da edição, e o zoom já está no detalhe |
+| 21 | Confirmação, desktop | modal da altura do conteúdo | em janela baixa, só a lista de NFTs rola dentro do modal; os totais e "Ver no Etherscan" ficam à vista | em 1280×720 o modal cortava o total |

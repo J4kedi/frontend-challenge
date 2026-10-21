@@ -101,7 +101,7 @@ Escolha um cenário pela URL, com `?scenario=<nome>` (ele fica salvo), ou pelo
 | `slow` | toda resposta leva 1,8–2,6 s (skeletons e carregamentos) |
 | `jitter` | 30 ms a 1,5 s por requisição: respostas fora de ordem |
 | `offline` | toda chamada falha como erro de rede |
-| `http-5xx` | cada GET falha com 503 nas 3 primeiras tentativas |
+| `http-5xx` | cada GET falha com 503 nas 3 primeiras tentativas; o pedido falha na primeira, e o app repete com a mesma chave |
 | `mutation-error` | favoritar responde 500 (rollback da atualização otimista) |
 | `empty` | o catálogo não retorna nada |
 | `order-timeout` | o primeiro POST do pedido responde depois do timeout do cliente |
