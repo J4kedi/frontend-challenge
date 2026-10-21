@@ -102,8 +102,6 @@ export function LoginPrompt({ request }: { request: LoginPromptRequest }) {
   const [mode, setMode] = useState<Mode>('login')
   const href = useRouterState({ select: (s) => s.location.href })
   const [openedOn] = useState(href)
-  // Radix returns focus to a Dialog.Trigger; the prompt has none, so it remembers its opener.
-  const [opener] = useState(() => document.activeElement)
   // The prompt belongs to the page it was opened on.
   useEffect(() => {
     if (href !== openedOn) loginPrompt.close()
@@ -114,13 +112,7 @@ export function LoginPrompt({ request }: { request: LoginPromptRequest }) {
     request.onSignedIn?.()
   }
   return (
-    <AuthDialog
-      mode={mode}
-      onSelectMode={setMode}
-      description={request.reason ?? COPY[mode].intro}
-      onClose={loginPrompt.close}
-      returnFocusTo={opener instanceof HTMLElement ? opener : null}
-    >
+    <AuthDialog mode={mode} onSelectMode={setMode} description={request.reason ?? COPY[mode].intro} onClose={loginPrompt.close}>
       {mode === 'login' ? <LoginForm onSuccess={done} /> : <SignupForm onSuccess={done} />}
       <SocialLogin />
     </AuthDialog>
@@ -133,7 +125,6 @@ function AuthDialog({
   onSelectMode,
   description,
   onClose,
-  returnFocusTo,
   children,
 }: {
   mode: Mode
@@ -141,22 +132,11 @@ function AuthDialog({
   onSelectMode?: (mode: Mode) => void
   description: string
   onClose: () => void
-  returnFocusTo?: HTMLElement | null
   children: ReactNode
 }) {
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent
-        className="max-w-[500px] gap-0 overflow-hidden rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0 shadow-overlay"
-        onCloseAutoFocus={
-          returnFocusTo
-            ? (event) => {
-                event.preventDefault()
-                if (returnFocusTo.isConnected) returnFocusTo.focus()
-              }
-            : undefined
-        }
-      >
+      <DialogContent className="max-w-[500px] gap-0 overflow-hidden rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0 shadow-overlay">
         <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto px-6 pt-10 pb-8 sm:px-16">
           <AuthTabs mode={mode} redirect={redirect} onSelectMode={onSelectMode} />
           <DialogTitle className="sr-only">{COPY[mode].title}</DialogTitle>

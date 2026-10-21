@@ -34,24 +34,50 @@ function DialogOverlay({ className, ...props }: React.ComponentProps<typeof Dial
   )
 }
 
+/** The demo's mock panel stays usable over a dialog: interacting with it is not "outside". */
+const fromMockPanel = (event: Event) => event.target instanceof Element && event.target.closest('[data-mock-panel]') !== null
+
 function DialogContent({
   className,
   children,
   showCloseButton = true,
+  onOpenAutoFocus,
+  onCloseAutoFocus,
+  onInteractOutside,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
 }) {
+  // Radix returns focus to a Dialog.Trigger on close. Dialogs opened from code
+  // (review, login prompt, receipt) have none and would leave focus on <body>,
+  // so the element focused when the dialog opened gets it back.
+  const opener = React.useRef<Element | null>(null)
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg',
+          'fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] grid-cols-1 translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg',
           className,
         )}
         {...props}
+        onOpenAutoFocus={(event) => {
+          // Runs before focus moves into the dialog.
+          opener.current = document.activeElement
+          onOpenAutoFocus?.(event)
+        }}
+        onCloseAutoFocus={(event) => {
+          onCloseAutoFocus?.(event)
+          const element = opener.current
+          if (event.defaultPrevented || !(element instanceof HTMLElement) || element === document.body || !element.isConnected) return
+          event.preventDefault()
+          element.focus()
+        }}
+        onInteractOutside={(event) => {
+          if (fromMockPanel(event)) event.preventDefault()
+          onInteractOutside?.(event)
+        }}
       >
         {children}
         {showCloseButton && (

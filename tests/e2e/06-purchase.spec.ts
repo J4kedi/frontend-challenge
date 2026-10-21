@@ -1,4 +1,4 @@
-import { addToCartFromDetail, expect, openApp, submitLogin, test } from './support/app'
+import { addToCartFromDetail, expect, isMobile, openApp, submitLogin, test } from './support/app'
 
 test.describe('06 · compra completa', () => {
   test('do catálogo ao recibo confirmado, como visitante que entra no meio do caminho', async ({ page }) => {
@@ -21,6 +21,11 @@ test.describe('06 · compra completa', () => {
     await page.getByRole('button', { name: 'Confirmar compra' }).click()
     const review = page.getByRole('dialog', { name: 'Revise sua compra' })
     await expect(review).toBeVisible()
+    if (isMobile(page)) {
+      // The smallest phones: the review must fit, with the total and the button in view.
+      await page.setViewportSize({ width: 320, height: 720 })
+      expect(await review.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0)
+    }
     await expect(review.getByTestId('quote-total')).toHaveText('1.198 ETH')
     await review.getByTestId('confirm-purchase').click()
 
@@ -29,6 +34,9 @@ test.describe('06 · compra completa', () => {
     await expect(page.getByText('Seus NFTs agora estão na sua carteira')).toBeVisible()
     await expect(page.getByTestId('receipt-total')).toHaveText('1.198 ETH')
     await expect(page.getByTestId('receipt-tx')).toHaveText(/^0x[0-9a-f]{4}…[0-9a-f]{4}$/)
+    if (isMobile(page)) {
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0)
+    }
 
     // Only the purchased quantities leave the cart.
     await page.goto('/cart')

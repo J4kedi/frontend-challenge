@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright'
-import { addToCartFromDetail, expect, isMobile, openApp, test } from './support/app'
+import { addToCartFromDetail, expect, goToReview, isMobile, openApp, test } from './support/app'
 
 async function expectNoSeriousViolations(page: import('@playwright/test').Page) {
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).exclude('[data-mock-panel]').analyze()
@@ -65,5 +65,14 @@ test.describe('11 · acessibilidade', () => {
     await page.keyboard.press('Escape')
     await expect(page.getByRole('dialog', { name: 'Entrar' })).toBeHidden()
     await expect(entrar).toBeFocused()
+  })
+
+  test('fechar a revisão devolve o foco ao Confirmar compra', async ({ page }) => {
+    await openApp(page, '/')
+    await addToCartFromDetail(page, 'emerald-ape-042')
+    const review = await goToReview(page)
+    await page.keyboard.press('Escape')
+    await expect(review).toBeHidden()
+    await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeFocused()
   })
 })
