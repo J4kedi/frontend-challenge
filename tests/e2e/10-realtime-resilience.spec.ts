@@ -74,13 +74,16 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     await expect(page.getByTestId('detail-price')).toContainText('1.29 ETH')
     await expect(other.getByTestId('detail-price')).toContainText('1.29 ETH')
 
-    // Signing out in one tab signs out the other.
+    // Signing out in one tab signs out the other (it reloads as a visitor).
+    const otherReloaded = other.waitForEvent('load')
     if (isMobile(page)) {
       await page.evaluate(() => localStorage.removeItem('kurio:session'))
     } else {
       await page.goto('/profile')
       await page.getByRole('button', { name: 'Sair' }).click()
     }
+    await otherReloaded
+    await waitForMocks(other)
     await expect(other.getByRole('button', { name: /^Adicionar Emerald Ape #042/ }).filter({ visible: true }).first()).toBeVisible()
     await other.getByRole('button', { name: /^Adicionar Emerald Ape #042/ }).filter({ visible: true }).first().click()
     await expect(other.getByRole('dialog', { name: 'Entrar' })).toBeVisible()
