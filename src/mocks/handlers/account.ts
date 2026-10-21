@@ -12,7 +12,7 @@ import {
 import { hashPassword, verifyPassword } from '../db/password'
 import { db, nextId, persist } from '../db/store'
 import type { WalletRecord } from '../db/types'
-import { api, authenticate, fail, now, readBody, withNetwork } from '../http'
+import { api, authenticate, fail, now, readBody, sameChainFamily, withNetwork } from '../http'
 import { scenario } from '../scenarios'
 import { findNft, toUser, toWallet } from '../views'
 
@@ -96,7 +96,8 @@ export const accountHandlers = [
       if ('error' in auth) return auth.error
       const body = await readBody(request, avatarBody)
       if (body.error) return body.error
-      const bytes = Math.ceil((body.data.dataUrl.length - body.data.dataUrl.indexOf(',') - 1) * 0.75)
+      const base64 = body.data.dataUrl.slice(body.data.dataUrl.indexOf(',') + 1)
+      const bytes = (base64.length * 3) / 4 - (base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0)
       if (bytes > MAX_AVATAR_BYTES) {
         return fail(422, 'VALIDATION_ERROR', 'Imagem muito grande', { fields: { avatar: 'Use uma imagem de até 1 MB' } })
       }
@@ -205,6 +206,11 @@ export const accountHandlers = [
       if (wallet.userId !== auth.user.id) return fail(403, 'FORBIDDEN', 'Esta carteira pertence a outra conta')
       const body = await readBody(request, connectWalletBody)
       if (body.error) return body.error
+      if (!sameChainFamily(wallet.network, body.data.network)) {
+        return fail(422, 'VALIDATION_ERROR', 'Esta carteira não opera nessa rede', {
+          fields: { network: 'Rede incompatível com o endereço da carteira' },
+        })
+      }
       await delay(400) // the extension "asks" the collector
       if (scenario() === 'wallet-rejected') {
         return fail(403, 'WALLET_REJECTED', 'A conexão foi recusada na carteira. Aprove a solicitação para continuar.')

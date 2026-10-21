@@ -54,6 +54,10 @@ export function authenticate(request: Request): { user: UserRecord } | { error: 
 }
 
 const attempts = new Map<string, number>()
+let attemptsScenario: string | null = null
+
+/** An address works on its own chain family: Solana, or the EVM networks (Ethereum, Polygon). */
+export const sameChainFamily = (a: string, b: string) => (a === 'solana') === (b === 'solana')
 
 function latencyFor(request: Request) {
   const active = scenario()
@@ -74,6 +78,11 @@ export function withNetwork<P extends PathParams, B extends DefaultBodyType>(
     const active = scenario()
     if (active === 'offline') return HttpResponse.error()
     await delay(latencyFor(info.request))
+    // Turning a scenario on again starts its failures over (the 3 first tries of each GET).
+    if (active !== attemptsScenario) {
+      attempts.clear()
+      attemptsScenario = active
+    }
     if (active === 'http-5xx' && info.request.method === 'GET') {
       const key = new URL(info.request.url).pathname + new URL(info.request.url).search
       const count = (attempts.get(key) ?? 0) + 1

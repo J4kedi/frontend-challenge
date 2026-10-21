@@ -3,7 +3,7 @@ import { network as networkSchema, type Edition } from '@/contracts/nft'
 import { addCartItemBody, couponBody, createOrderBody, mergeCartBody, updateCartItemBody } from '@/contracts/commerce'
 import { db, nextId, persist, stableHash } from '../db/store'
 import type { CartRecord, NftRecord, OrderRecord, UserRecord } from '../db/types'
-import { api, authenticate, fail, now, readBody, withNetwork } from '../http'
+import { api, authenticate, fail, now, readBody, sameChainFamily, withNetwork } from '../http'
 import { nftUpdated, orderUpdated, publish } from '../realtime/server'
 import { scenario } from '../scenarios'
 import { computeQuote, findNft, toCart, toOrder } from '../views'
@@ -304,6 +304,11 @@ export const commerceHandlers = [
       const wallet = db().wallets.find((w) => w.id === body.data.walletId && w.userId === user.id)
       if (!wallet) {
         return fail(422, 'VALIDATION_ERROR', 'Selecione uma carteira cadastrada', { fields: { walletId: 'Carteira inválida' } })
+      }
+      if (!sameChainFamily(wallet.network, body.data.network)) {
+        return fail(422, 'VALIDATION_ERROR', 'Esta carteira não opera nessa rede', {
+          fields: { network: 'Rede incompatível com o endereço da carteira' },
+        })
       }
       const connection = db().connections[wallet.id]
       if (
