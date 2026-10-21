@@ -94,7 +94,7 @@ export function AuthScreen({ mode, redirect, reason }: { mode: Mode; redirect?: 
 }
 
 /**
- * Sign-in asked for in the middle of an action (see login-prompt.ts): the same
+ * Sign-in asked for from the current page (see login-prompt.ts): the same
  * modal, over the page the collector is on. Nothing navigates; on success the
  * dialog closes and the interrupted action resumes.
  */
@@ -112,7 +112,7 @@ export function LoginPrompt({ request }: { request: LoginPromptRequest }) {
     request.onSignedIn?.()
   }
   return (
-    <AuthDialog mode={mode} onSelectMode={setMode} description={request.reason} onClose={loginPrompt.close}>
+    <AuthDialog mode={mode} onSelectMode={setMode} description={request.reason ?? COPY[mode].intro} onClose={loginPrompt.close}>
       {mode === 'login' ? <LoginForm onSuccess={done} /> : <SignupForm onSuccess={done} />}
       <SocialLogin />
     </AuthDialog>

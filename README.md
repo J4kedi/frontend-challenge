@@ -135,6 +135,7 @@ que atualiza o REST **e** publica o evento.
 | Falha e nova tentativa | `/?scenario=http-5xx`: depois de 3 falhas aparece "Não foi possível carregar o catálogo"; "Tentar novamente" carrega. |
 | Sem conexão | `/?scenario=offline`: mensagem de rede em cada bloco. |
 | Favorito como visitante | sem login, toque no coração de um NFT. O login abre sobre a própria página; ao entrar, o favorito é salvo e você continua onde estava. |
+| Finalizar a compra como visitante | sem login, adicione um NFT e clique em "Conectar e finalizar" no carrinho. O login abre sobre o carrinho; ao entrar, os itens vão para a conta e você segue para o pagamento. |
 | Favorito com rollback | entre como Ana; no painel, escolha "Falha em mutation" e favorite um NFT. O coração volta e um toast explica. |
 | Cupom inválido ou expirado | no carrinho, use `EXPIRADO5` ou `ABC123`. |
 | Preço muda durante o pagamento | com um item no carrinho, abra o pagamento e use "Subir o preço de …" no painel. O aviso aparece, o total muda, e a revisão exige "Aceitar novos preços". |

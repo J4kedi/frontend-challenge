@@ -30,10 +30,10 @@ pnpm test:visual:update   # regera as baselines visuais
 | --- | --- | --- | :---: | :---: |
 | 1 | Busca, filtros combinados, ordenação, paginação e restauração pelo histórico (+ respostas fora de ordem, vazio) | `01-catalog.spec.ts` | ✅ | ✅ |
 | 2 | Acesso direto ao detalhe, edição indisponível, limite de quantidade, recurso inexistente, rota inexistente | `02-detail.spec.ts` | ✅ | ✅ |
-| 3 | Cadastro (conflito e sucesso), validação e erro de login, expiração de sessão, logout e troca de usuário sem vazamento; fechar o login aberto pelo carrinho volta ao carrinho | `03-auth.spec.ts` | ✅ | ✅³ |
+| 3 | Cadastro (conflito e sucesso), validação e erro de login, expiração de sessão, logout e troca de usuário sem vazamento; o login pedido pelo carrinho e pelo "Entrar" do header abre sobre a página atual | `03-auth.spec.ts` | ✅ | ✅³ |
 | 4 | Favoritos persistidos, falha de mutation com rollback; visitante entra sem sair do detalhe e o favorito é salvo | `04-favorites.spec.ts` | ✅ | ✅ |
 | 5 | Carrinho: quantidades, remoção, cupom expirado, inválido e válido, persistência após refresh e login (merge) | `05-cart.spec.ts` | ✅ | ✅ |
-| 6 | Compra completa, do catálogo ao recibo confirmado | `06-purchase.spec.ts` | ✅ | ✅ |
+| 6 | Compra completa, do catálogo ao recibo confirmado, com o login sobre o carrinho | `06-purchase.spec.ts` | ✅ | ✅ |
 | 7 | Pagamento recusado, clique repetido, timeout com recuperação do mesmo pedido, mesma chave com corpo diferente → 409 | `07-payment-failures.spec.ts` | ✅ | ✅ |
 | 8 | Perfil (dados, validação, avatar, senha errada e certa) e carteiras (endereço inválido, principal, secundária) | `08-profile-wallets.spec.ts` | ✅ | ✅ |
 | 9 | Preço muda via Socket.IO durante o checkout (aviso, total, bloqueio, aceitar, comprar); edição esgota durante o checkout | `09-realtime-checkout.spec.ts` | ✅ | ✅ |
@@ -44,13 +44,13 @@ pnpm test:visual:update   # regera as baselines visuais
 | — | Header fixo, item ativo por seção (scroll-spy), itens fora do escopo avisam, Mercado a partir de outra página | `14-navigation.spec.ts` | ✅ | —² |
 | — | Painel de mocks: rótulos com os dados atuais, ação desabilitada com motivo, axe no painel aberto, Esc, queda com duração escolhida, login rápido | `15-mock-panel.spec.ts` | ✅ | ✅ |
 
-¹ O teste de foco preso no diálogo de login roda só no desktop: no mobile o
-login é tela cheia (Figma), sem diálogo.
+¹ O teste de foco preso no diálogo de login roda só no desktop: no mobile a
+rota `/login` é tela cheia (Figma), sem diálogo.
 
 ² O header de navegação é desktop; no mobile a navegação é a tab bar.
 
-³ Fechar o login pelo X é desktop: no mobile o login é tela cheia, sem X, e
-o voltar do navegador faz o mesmo caminho.
+³ O "Entrar" do header é desktop: no mobile não há header, e a aba Perfil
+leva à tela cheia de login.
 
 ## Testes unitários
 
@@ -79,8 +79,8 @@ corrigidos antes da entrega:
 | Suíte | Resultado |
 | --- | --- |
 | Vitest | 17/17 |
-| Playwright, desktop + mobile (Windows, asserts de pixel ignorados) | 83 passaram + 3 pulados (diálogo, header e X do login só no desktop), 43 testes por projeto, 3,4 min com 2 workers |
+| Playwright, desktop + mobile (Windows, asserts de pixel ignorados) | 85 passaram + 3 pulados (diálogo, header e "Entrar" do header só no desktop), 44 testes por projeto, 3,2 min com 2 workers |
 | Regressão visual (Docker Linux) | 8/8, conferida numa segunda execução sem atualizar |
-| **CI (GitHub Actions)** — E2E + visual dentro de `mcr.microsoft.com/playwright:v1.64.1-noble` | 83 passaram + 3 pulados (só desktop) em 3,1 min, com as 8 telas da regressão visual comparadas; `verify` (typecheck, lint, unit, build) verde. Na primeira execução o CI pegou uma baseline visual desatualizada (pontos do carrossel), regerada no mesmo commit do CI |
+| **CI (GitHub Actions)** — E2E + visual dentro de `mcr.microsoft.com/playwright:v1.64.1-noble` | 85 passaram + 3 pulados (só desktop) em 3,1 min, com as 8 telas da regressão visual comparadas; `verify` (typecheck, lint, unit, build) verde. Na primeira execução o CI pegou uma baseline visual desatualizada (pontos do carrossel), regerada no mesmo commit do CI |
 | Playwright contra a **URL publicada** (`E2E_BASE_URL`, sem visual) | 69 passaram + 1 pulado, 2,7 min |
 | Checkout limpo (`git clone` + `pnpm install --frozen-lockfile`) | typecheck, lint, unit (17/17), build e E2E 06 + 09 (6/6) |
