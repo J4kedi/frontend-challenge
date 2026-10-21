@@ -46,4 +46,24 @@ test.describe('12 · carregamento e falhas', () => {
     await expect(page).toHaveURL(/\/favorites$/)
     await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
   })
+
+  test('aba parada continua nos mocks depois que o navegador desliga o service worker', async ({ page }) => {
+    await page.clock.install()
+    await openApp(page, '/')
+    await expect(page.getByTestId('nft-card').first()).toBeVisible()
+    const passedThrough: string[] = []
+    page.on('response', (response) => {
+      if (response.url().includes('/api/') && !response.fromServiceWorker()) passedThrough.push(response.url())
+    })
+
+    // What Chrome does to the worker of an idle tab; the restarted worker forgets the tab.
+    const cdp = await page.context().newCDPSession(page)
+    await cdp.send('ServiceWorker.enable')
+    await cdp.send('ServiceWorker.stopAllWorkers')
+    await page.clock.fastForward(25_000)
+
+    await page.getByTestId('nft-card').first().click()
+    await expect(page.locator('#nft-title')).toBeVisible()
+    expect(passedThrough).toEqual([])
+  })
 })

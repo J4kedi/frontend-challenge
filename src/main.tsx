@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client'
 import { toast } from 'sonner'
 import { createQueryClient } from '@/app/query-client'
 import { createAppRouter } from '@/app/router'
-import { transportReady } from '@/app/transport'
+import { mocksReady, transportReady } from '@/app/transport'
 import { signOutLocally } from '@/features/auth/session'
 import { apiClient, setSessionExpiredHandler } from '@/shared/api/client'
 import { config } from '@/shared/config'
@@ -17,7 +17,7 @@ const router = createAppRouter(queryClient)
 
 if (config.mocksEnabled) {
   apiClient.interceptors.request.use(async (request) => {
-    await transportReady
+    await mocksReady()
     return request
   })
 }
