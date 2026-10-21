@@ -81,6 +81,6 @@ corrigidos antes da entrega:
 | Vitest | 17/17 |
 | Playwright, desktop + mobile (Windows, asserts de pixel ignorados) | 85 passaram + 3 pulados (diálogo, header e "Entrar" do header só no desktop), 44 testes por projeto, 3,2 min com 2 workers |
 | Regressão visual (Docker Linux) | 8/8, conferida numa segunda execução sem atualizar |
-| **CI (GitHub Actions)** — E2E + visual dentro de `mcr.microsoft.com/playwright:v1.64.1-noble` | 83 passaram + 3 pulados (só desktop) em 3,1 min, com as 8 telas da regressão visual comparadas; `verify` (typecheck, lint, unit, build) verde. Na primeira execução o CI pegou uma baseline visual desatualizada (pontos do carrossel), regerada no mesmo commit do CI |
+| **CI (GitHub Actions)** — E2E + visual dentro de `mcr.microsoft.com/playwright:v1.64.1-noble` | 85 passaram + 3 pulados (só desktop) em 3,1 min, com as 8 telas da regressão visual comparadas; `verify` (typecheck, lint, unit, build) verde. Na primeira execução o CI pegou uma baseline visual desatualizada (pontos do carrossel), regerada no mesmo commit do CI |
 | Playwright contra a **URL publicada** (`E2E_BASE_URL`, sem visual) | 69 passaram + 1 pulado, 2,7 min |
 | Checkout limpo (`git clone` + `pnpm install --frozen-lockfile`) | typecheck, lint, unit (17/17), build e E2E 06 + 09 (6/6) |
