@@ -10,13 +10,23 @@ export function useSectionInView(id: string, enabled: boolean) {
 
   useEffect(() => {
     if (!enabled) return
-    const element = document.getElementById(id)
-    if (!element) return
     const observer = new IntersectionObserver(([entry]) => setInView(Boolean(entry?.isIntersecting)), {
       rootMargin: '-45% 0px -55% 0px',
     })
-    observer.observe(element)
-    return () => observer.disconnect()
+    const watch = () => {
+      const element = document.getElementById(id)
+      if (element) observer.observe(element)
+      return Boolean(element)
+    }
+    // After a client-side navigation the header updates before the page renders
+    // the section: wait for it instead of giving up (that left a stale state).
+    const waiting = watch() ? null : new MutationObserver(() => watch() && waiting?.disconnect())
+    waiting?.observe(document.body, { childList: true, subtree: true })
+    return () => {
+      waiting?.disconnect()
+      observer.disconnect()
+      setInView(false)
+    }
   }, [id, enabled])
 
   return enabled && inView

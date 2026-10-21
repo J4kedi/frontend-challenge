@@ -1,4 +1,4 @@
-import { expect, isMobile, loginAs, openApp, test, USERS } from './support/app'
+import { expect, goToReview, isMobile, loginAs, openApp, test, USERS } from './support/app'
 
 test.describe('14 · navegação do header', () => {
   test('header fixo, item ativo acompanha a seção e itens fora do escopo avisam', async ({ page }) => {
@@ -59,5 +59,31 @@ test.describe('14 · navegação do header', () => {
     await page.getByRole('button', { name: 'Voltar' }).first().click()
     await expect(page).toHaveURL(/\/#mercado$/)
     await expect(page.locator('#mercado')).toBeVisible()
+  })
+
+  test('o item ativo acompanha a home depois de entrar e de uma compra', async ({ page }) => {
+    test.skip(isMobile(page), 'O header é desktop')
+    await openApp(page, '/')
+    await loginAs(page, USERS.ana, '/')
+    const nav = page.getByRole('navigation', { name: 'Principal' })
+    const active = nav.locator('[aria-current="page"]')
+    // Arriving at the home page by client-side navigation (here, after login).
+    await nav.getByText('Mercado').click()
+    await expect(active).toHaveText('Mercado')
+
+    // Leave with the market on screen, buy, and come back from the receipt.
+    await page.getByTestId('nft-card').first().click()
+    await expect(page.locator('#nft-title')).toBeVisible()
+    await page.getByRole('button', { name: 'Comprar', exact: true }).click()
+    const review = await goToReview(page, { login: false })
+    await review.getByTestId('confirm-purchase').click()
+    await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 15_000 })
+    await page.getByRole('button', { name: 'Fechar e voltar ao início' }).click()
+    await expect(page).toHaveURL(/\/$/)
+    await expect(active).toHaveText('Início')
+    await nav.getByText('Mercado').click()
+    await expect(active).toHaveText('Mercado')
+    await nav.getByText('Início').click()
+    await expect(active).toHaveText('Início')
   })
 })
