@@ -1,8 +1,8 @@
 import AxeBuilder from '@axe-core/playwright'
-import { addToCartFromDetail, expect, goToReview, isMobile, openApp, test } from './support/app'
+import { addToCartFromDetail, expect, goToReview, isMobile, loginAs, openApp, test, waitForMocks } from './support/app'
 
 async function expectNoSeriousViolations(page: import('@playwright/test').Page) {
-  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).exclude('[data-mock-panel]').analyze()
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).exclude('[data-mock-panel]').analyze()
   const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
   expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).slice(0, 3).join(' | ')}`)).toEqual([])
 }
@@ -52,6 +52,28 @@ test.describe('11 · acessibilidade', () => {
     await openApp(page, '/')
     await addToCartFromDetail(page, 'emerald-ape-042')
     await expect(page.getByTestId('quote-total')).toBeVisible()
+    await expectNoSeriousViolations(page)
+  })
+
+  test('axe sem violações sérias nas telas da conta', async ({ page }) => {
+    await openApp(page, '/')
+    await loginAs(page, undefined, '/profile')
+    for (const path of ['/profile', '/wallets', '/favorites']) {
+      await page.goto(path)
+      await waitForMocks(page)
+      await page.waitForLoadState('networkidle')
+      await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
+      await expectNoSeriousViolations(page)
+    }
+  })
+
+  test('axe sem violações sérias no pagamento, na revisão e no recibo', async ({ page }) => {
+    await openApp(page, '/')
+    await addToCartFromDetail(page, 'emerald-ape-042')
+    const review = await goToReview(page)
+    await expectNoSeriousViolations(page)
+    await review.getByTestId('confirm-purchase').click()
+    await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 15_000 })
     await expectNoSeriousViolations(page)
   })
 

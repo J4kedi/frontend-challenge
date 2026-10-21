@@ -15,12 +15,12 @@ test.describe('15 · painel de mocks', () => {
     await expect(replay).toBeDisabled()
 
     // Labels name the item they act on; the result comes back as a toast.
-    await panel.getByRole('button', { name: 'Subir o preço de Emerald Ape #042 para 1.29 ETH' }).click()
+    await panel.getByRole('button', { name: /^Subir o preço de Emerald Ape #042 para 1\.29 ETH/ }).click()
     await expect(page.getByText('Emerald Ape #042: 1.19 → 1.29 ETH. O servidor publicou nft.updated.')).toBeVisible()
     await expect(replay).toBeEnabled()
     await expect(replay).toHaveAccessibleName(/nft\.updated · Emerald Ape #042 · v\d+/)
 
-    const results = await new AxeBuilder({ page }).include('[data-mock-panel]').withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()
+    const results = await new AxeBuilder({ page }).include('[data-mock-panel]').withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()
     const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
     expect(serious.map((v) => v.id)).toEqual([])
 
@@ -37,7 +37,7 @@ test.describe('15 · painel de mocks', () => {
 
     // The outage lasts what was chosen, not the ~0.5 s of an automatic reconnection.
     await panel.getByLabel('Duração da queda').selectOption('5')
-    await panel.getByRole('button', { name: 'Derrubar a conexão por 5 s' }).click()
+    await panel.getByRole('button', { name: /^Derrubar a conexão por 5 s/ }).click()
     const offline = page.getByText('Conexão em tempo real perdida')
     await expect(offline).toBeVisible()
     // Seconds pass on the countdown and the outage holds.

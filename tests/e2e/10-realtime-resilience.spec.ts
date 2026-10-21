@@ -84,8 +84,8 @@ test.describe('10 · eventos, desconexão e pedido pendente', () => {
     }
     await otherReloaded
     await waitForMocks(other)
-    await expect(other.getByRole('button', { name: /^Adicionar Emerald Ape #042/ }).filter({ visible: true }).first()).toBeVisible()
-    await other.getByRole('button', { name: /^Adicionar Emerald Ape #042/ }).filter({ visible: true }).first().click()
+    await expect(other.getByRole('button', { name: /adicionar Emerald Ape #042 à lista de interesse/i }).filter({ visible: true }).first()).toBeVisible()
+    await other.getByRole('button', { name: /adicionar Emerald Ape #042 à lista de interesse/i }).filter({ visible: true }).first().click()
     await expect(other.getByRole('dialog', { name: 'Entrar' })).toBeVisible()
   })
 })

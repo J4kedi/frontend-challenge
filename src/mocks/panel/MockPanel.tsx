@@ -380,23 +380,18 @@ function Action({
   disabled?: boolean
   onRun: () => void
 }) {
-  const descriptionId = useId()
+  // The name is the visible text (title, context and description), so speech
+  // input users can say what they see (WCAG 2.5.3).
   return (
     <button
       type="button"
-      aria-label={context ? `${title} (${context})` : title}
-      aria-describedby={description ? descriptionId : undefined}
       disabled={disabled}
       onClick={onRun}
       className="group w-full rounded-md border border-border-soft bg-surface px-3 py-2 text-left transition-colors hover:border-primary disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-border-soft"
     >
       <span className="block font-bold text-foreground group-enabled:group-hover:text-accent">{title}</span>
       {context && <span className="mt-0.5 block font-medium text-secondary">{context}</span>}
-      {description && (
-        <span id={descriptionId} className="mt-0.5 block text-muted-foreground">
-          {description}
-        </span>
-      )}
+      {description && <span className="mt-0.5 block text-muted-foreground">{description}</span>}
     </button>
   )
 }
