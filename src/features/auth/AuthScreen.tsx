@@ -156,7 +156,16 @@ function AuthDialog({
 }) {
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[500px] gap-0 overflow-hidden rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0 shadow-overlay">
+      <DialogContent
+        className="max-w-[500px] gap-0 overflow-hidden rounded-lg border-0 border-b-10 border-b-primary bg-surface p-0 shadow-overlay"
+        onOpenAutoFocus={(event) => {
+          // Start on the first field (e-mail or user name), so typing right away goes into the form.
+          const field = (event.currentTarget as HTMLElement | null)?.querySelector<HTMLInputElement>('form input')
+          if (!field) return
+          event.preventDefault()
+          field.focus()
+        }}
+      >
         <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto px-6 pt-10 pb-8 sm:px-16">
           <AuthTabs mode={mode} redirect={redirect} onSelectMode={onSelectMode} />
           <DialogTitle className="sr-only">{COPY[mode].title}</DialogTitle>

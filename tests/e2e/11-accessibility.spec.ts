@@ -84,6 +84,8 @@ test.describe('11 · acessibilidade', () => {
     await entrar.focus()
     await page.keyboard.press('Enter')
     await expect(page.getByRole('dialog', { name: 'Entrar' })).toBeVisible()
+    // The dialog starts on the e-mail field: what is typed right away goes into the form.
+    await expect(page.getByLabel('E-mail', { exact: true })).toBeFocused()
     await page.keyboard.press('Escape')
     await expect(page.getByRole('dialog', { name: 'Entrar' })).toBeHidden()
     await expect(entrar).toBeFocused()
