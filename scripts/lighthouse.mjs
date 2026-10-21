@@ -11,6 +11,7 @@
  * Usage: pnpm lighthouse            (builds first unless --no-build)
  *        LH_RUNS=1 pnpm lighthouse  (quick check)
  *        LH_PAGES=inicio LH_PROFILES=mobile pnpm lighthouse  (one page or profile)
+ *        LH_ORIGIN=https://kurio-nft-marketplace-vert.vercel.app pnpm lighthouse  (the published demo; no build)
  */
 import { execSync, spawn } from 'node:child_process'
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -20,7 +21,8 @@ import lighthouse from 'lighthouse'
 import desktopConfig from 'lighthouse/core/config/desktop-config.js'
 
 const PORT = 4173
-const ORIGIN = `http://localhost:${PORT}`
+const REMOTE = process.env.LH_ORIGIN || undefined
+const ORIGIN = REMOTE ?? `http://localhost:${PORT}`
 const OUT = 'reports/lighthouse'
 const RUNS = Number(process.env.LH_RUNS ?? 3)
 const only = (list, env) => list.filter((item) => !env || env.split(',').includes(item.name))
@@ -45,6 +47,20 @@ const median = (values) => {
   return sorted[Math.floor(sorted.length / 2)]
 }
 
+/** One run in a fresh browser. A crashed headless Chrome is retried once; a second crash fails the run. */
+async function audit(url, config, attempt = 1) {
+  const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless=new', '--no-sandbox'] })
+  try {
+    return await lighthouse(url, { port: chrome.port, output: ['html', 'json'], logLevel: 'error' }, config)
+  } catch (error) {
+    if (attempt > 1 || !/crash|Connection closed/i.test(String(error))) throw error
+    console.warn(`Chrome crashed on ${url}; retrying once`)
+    return audit(url, config, attempt + 1)
+  } finally {
+    await chrome.kill()
+  }
+}
+
 async function waitForServer(url, timeoutMs = 30_000) {
   const started = Date.now()
   while (Date.now() - started < timeoutMs) {
@@ -58,13 +74,15 @@ async function waitForServer(url, timeoutMs = 30_000) {
   throw new Error(`server at ${url} did not start`)
 }
 
-if (!process.argv.includes('--no-build')) execSync('pnpm build', { stdio: 'inherit' })
+if (!REMOTE && !process.argv.includes('--no-build')) execSync('pnpm build', { stdio: 'inherit' })
 await mkdir(OUT, { recursive: true })
 
 // Vite is spawned directly (no shell), so killing this pid really stops the server on every OS.
-const preview = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--port', String(PORT), '--strictPort'], {
-  stdio: 'ignore',
-})
+const preview = REMOTE
+  ? null
+  : spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--port', String(PORT), '--strictPort'], {
+      stdio: 'ignore',
+    })
 const results = []
 let chromeVersion = 'unknown'
 
@@ -74,38 +92,29 @@ try {
     for (const profile of PROFILES) {
       for (let run = 1; run <= RUNS; run++) {
         // Fresh browser per run: empty cache, storage and service worker, like a first visit.
-        const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless=new', '--no-sandbox'] })
-        try {
-          const result = await lighthouse(
-            `${ORIGIN}${page.path}`,
-            { port: chrome.port, output: ['html', 'json'], logLevel: 'error' },
-            profile.config,
-          )
-          const lhr = result.lhr
-          chromeVersion = lhr.environment.hostUserAgent.match(/Chrome\/[\d.]+/)?.[0] ?? chromeVersion
-          const base = `${OUT}/${page.name}-${profile.name}-${run}`
-          await writeFile(`${base}.report.html`, result.report[0])
-          await writeFile(`${base}.report.json`, result.report[1])
-          const entry = {
-            page: page.name,
-            profile: profile.name,
-            run,
-            scores: Object.fromEntries(CATEGORIES.map((c) => [c, Math.round((lhr.categories[c]?.score ?? 0) * 100)])),
-            lcpMs: Math.round(lhr.audits['largest-contentful-paint'].numericValue),
-            cls: Number(lhr.audits['cumulative-layout-shift'].numericValue.toFixed(3)),
-            tbtMs: Math.round(lhr.audits['total-blocking-time'].numericValue),
-            fcpMs: Math.round(lhr.audits['first-contentful-paint'].numericValue),
-          }
-          results.push(entry)
-          console.log(`${page.name} ${profile.name} #${run}`, entry.scores, `LCP ${entry.lcpMs} ms · CLS ${entry.cls} · TBT ${entry.tbtMs} ms`)
-        } finally {
-          await chrome.kill()
+        const result = await audit(`${ORIGIN}${page.path}`, profile.config)
+        const lhr = result.lhr
+        chromeVersion = lhr.environment.hostUserAgent.match(/Chrome\/[\d.]+/)?.[0] ?? chromeVersion
+        const base = `${OUT}/${page.name}-${profile.name}-${run}`
+        await writeFile(`${base}.report.html`, result.report[0])
+        await writeFile(`${base}.report.json`, result.report[1])
+        const entry = {
+          page: page.name,
+          profile: profile.name,
+          run,
+          scores: Object.fromEntries(CATEGORIES.map((c) => [c, Math.round((lhr.categories[c]?.score ?? 0) * 100)])),
+          lcpMs: Math.round(lhr.audits['largest-contentful-paint'].numericValue),
+          cls: Number(lhr.audits['cumulative-layout-shift'].numericValue.toFixed(3)),
+          tbtMs: Math.round(lhr.audits['total-blocking-time'].numericValue),
+          fcpMs: Math.round(lhr.audits['first-contentful-paint'].numericValue),
         }
+        results.push(entry)
+        console.log(`${page.name} ${profile.name} #${run}`, entry.scores, `LCP ${entry.lcpMs} ms · CLS ${entry.cls} · TBT ${entry.tbtMs} ms`)
       }
     }
   }
 } finally {
-  preview.kill()
+  preview?.kill()
 }
 
 const summary = []
@@ -137,7 +146,7 @@ const environment = {
   cpu: os.cpus()[0]?.model,
   memoryGb: Math.round(os.totalmem() / 1024 ** 3),
   throttling: 'Lighthouse defaults: mobile = simulated slow 4G + 4x CPU slowdown; desktop = desktop-config (simulated, 1x CPU)',
-  build: 'pnpm build (demo build, mocks enabled), served by vite preview',
+  build: REMOTE ? `published demo at ${REMOTE}` : 'pnpm build (demo build, mocks enabled), served by vite preview',
 }
 await writeFile(`${OUT}/summary.json`, JSON.stringify({ environment, summary, results }, null, 2) + '\n')
 

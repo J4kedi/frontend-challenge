@@ -10,6 +10,10 @@ on:
         description: Regenerate the Linux visual baselines and upload them as an artifact
         type: boolean
         default: false
+      lighthouse-origin:
+        description: Audit this URL (e.g. the published demo) instead of a local build
+        type: string
+        default: ''
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -78,6 +82,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # Builds, serves with vite preview and audits; the runner's Chrome is used.
       - run: pnpm lighthouse
+        env:
+          LH_ORIGIN: ${{ inputs.lighthouse-origin }}
       - run: cat reports/lighthouse/summary.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
