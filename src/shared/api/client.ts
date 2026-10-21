@@ -30,10 +30,14 @@ export function setSessionExpiredHandler(handler: ExpiredHandler) {
 const SENT_TOKEN = Symbol('sentToken')
 
 apiClient.interceptors.request.use((request) => {
-  const token = sessionStore.token()
-  if (token) request.headers.set('Authorization', `Bearer ${token}`)
+  // A request that names its token (the session check) keeps it; the others carry the current session's.
+  if (!request.headers.has('Authorization')) {
+    const token = sessionStore.token()
+    if (token) request.headers.set('Authorization', `Bearer ${token}`)
+  }
   request.headers.set('X-Cart-Id', guestCartId())
-  ;(request as unknown as Record<symbol, string | null>)[SENT_TOKEN] = token
+  const sent = String(request.headers.get('Authorization') ?? '').replace(/^Bearer /, '')
+  ;(request as unknown as Record<symbol, string | null>)[SENT_TOKEN] = sent || null
   return request
 })
 

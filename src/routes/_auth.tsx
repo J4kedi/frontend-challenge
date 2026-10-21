@@ -20,7 +20,8 @@ export const Route = createFileRoute('/_auth')({
     if (!session || session === 'expired') {
       throw redirect({
         to: '/login',
-        search: { redirect: location.href, reason: session === 'expired' ? 'expired' : undefined },
+        // A request that saw the session expire may have dropped the token before this check ran.
+        search: { redirect: location.href, reason: session === 'expired' || (!token && sessionStore.expired()) ? 'expired' : undefined },
       })
     }
     return { user: session.user }

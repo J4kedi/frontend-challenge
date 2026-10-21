@@ -28,13 +28,29 @@ function read(): StoredSession | null {
 
 let current = read()
 const listeners = new Set<() => void>()
+// Per tab and kept across a reload: a reload right after the expiry still says why.
+const EXPIRED_KEY = 'kurio:session-expired'
 
 export const sessionStore = {
   get: () => current,
   token: () => current?.token ?? null,
   userId: () => current?.userId ?? null,
-  set(next: StoredSession | null) {
+  /** The last session ended because it expired, not by logout: the login page says so. */
+  expired: () => {
+    try {
+      return sessionStorage.getItem(EXPIRED_KEY) === '1'
+    } catch {
+      return false
+    }
+  },
+  set(next: StoredSession | null, reason?: 'expired') {
     current = next
+    try {
+      if (!next && reason === 'expired') sessionStorage.setItem(EXPIRED_KEY, '1')
+      else sessionStorage.removeItem(EXPIRED_KEY)
+    } catch {
+      // storage blocked: the login just does not say the session expired
+    }
     try {
       if (next) localStorage.setItem(SESSION_KEY, JSON.stringify(next))
       else localStorage.removeItem(SESSION_KEY)

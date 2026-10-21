@@ -1,7 +1,7 @@
 import { delay, HttpResponse, type DefaultBodyType, type HttpResponseResolver, type PathParams } from 'msw'
 import type { z } from 'zod'
 import type { ErrorCode } from '@/contracts/common'
-import { db, persist, stableHash } from './db/store'
+import { db, stableHash } from './db/store'
 import type { UserRecord } from './db/types'
 import { scenario } from './scenarios'
 
@@ -43,9 +43,9 @@ export function authenticate(request: Request): { user: UserRecord } | { error: 
   const current = db()
   const session = current.sessions.find((s) => s.token === token)
   if (!session) return { error: fail(401, 'UNAUTHENTICATED', 'Sessão inválida. Entre novamente.') }
+  // An expired token answers "expired" to every request, not only to the first:
+  // concurrent requests (route guard, background refetch) must agree on the reason.
   if (Date.parse(session.expiresAt) <= Date.now()) {
-    current.sessions = current.sessions.filter((s) => s.token !== token)
-    persist()
     return { error: fail(401, 'SESSION_EXPIRED', 'Sua sessão expirou. Entre novamente para continuar.') }
   }
   const user = current.users.find((u) => u.id === session.userId)

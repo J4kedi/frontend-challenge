@@ -136,4 +136,20 @@ test.describe('03 · conta e sessão', () => {
     await expect(page).toHaveURL(/\/$/)
     expect(await drafts()).toEqual([])
   })
+
+  test('sessão expira numa página pública: o login abre sobre ela e a pessoa continua ali', async ({ page }) => {
+    await openApp(page, '/login?redirect=%2Fnft%2Femerald-ape-042')
+    await submitLogin(page, USERS.ana)
+    await expect(page).toHaveURL(/\/nft\/emerald-ape-042$/)
+
+    await mockControl(page, '/session/expire')
+    await page.getByRole('button', { name: /adicionar Emerald Ape #042 à lista de interesse/i }).filter({ visible: true }).click()
+    const login = page.getByRole('dialog', { name: 'Entrar' })
+    // The reason shown depends on which request met the expired session first; the page stays.
+    await expect(login).toBeVisible()
+    await expect(page).toHaveURL(/\/nft\/emerald-ape-042$/)
+    await submitLogin(page, USERS.ana)
+    await expect(login).toBeHidden()
+    await expect(page).toHaveURL(/\/nft\/emerald-ape-042$/)
+  })
 })

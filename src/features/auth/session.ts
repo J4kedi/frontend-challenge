@@ -13,7 +13,7 @@ import { authApi } from './api'
 export const sessionQueryOptions = (token: string | null) =>
   queryOptions({
     queryKey: queryKeys.session(token),
-    queryFn: ({ signal }) => (token ? authApi.session(signal) : null),
+    queryFn: ({ signal }) => (token ? authApi.session(token, signal) : null),
     staleTime: 5 * 60_000,
     retry: (count, error) => !(isApiError(error) && error.status === 401) && count < 2,
   })
@@ -67,9 +67,9 @@ export async function signIn(queryClient: QueryClient, next: Session) {
 }
 
 /** Ends the session on this device: private queries of the user go away with it. */
-export function signOutLocally(queryClient: QueryClient) {
+export function signOutLocally(queryClient: QueryClient, reason?: 'expired') {
   const userId = sessionStore.userId()
-  sessionStore.set(null)
+  sessionStore.set(null, reason)
   if (userId) queryClient.removeQueries({ queryKey: queryKeys.user(userId).all })
   queryClient.removeQueries({ queryKey: ['session'] })
 }
