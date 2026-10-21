@@ -53,7 +53,12 @@ export async function signIn(queryClient: QueryClient, next: Session) {
   try {
     const merged = await cartApi.merge(guestId)
     rotateGuestCartId()
-    queryClient.setQueryData(queryKeys.cart(['user', next.user.id]), merged)
+    // The account cart (and its quote) started loading when the session switched,
+    // before the merge: an answer read before it must not overwrite the merged cart.
+    const owner: CartOwner = ['user', next.user.id]
+    await queryClient.cancelQueries({ queryKey: queryKeys.cart(owner) })
+    queryClient.setQueryData(queryKeys.cart(owner), merged)
+    void queryClient.invalidateQueries({ queryKey: [...queryKeys.cart(owner), 'quote'] })
   } catch {
     // The visitor cart stays where it was; the account cart loads normally.
   }

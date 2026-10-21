@@ -138,6 +138,7 @@ Foram corrigidos:
 - **Perfil.** Senha atual errada deixava o nome salvo pela metade (`08`). Arquivo que não é imagem virava avatar quebrado. A remoção que falhava não dava retorno.
 - **Logout.** Deixava o rascunho do pagamento, com dados pessoais, no navegador (`03`).
 - **Reset dos mocks.** Não voltava o cenário ao padrão (`15`), e o `http-5xx` não falhava de novo depois da primeira vez.
+- **Carrinho vazio depois do login (achado pelo CI).** Uma vez em 248 execuções, a junção do carrinho do visitante perdeu para a leitura do carrinho da conta que começou junto. A leitura feita antes da junção sobrescrevia o carrinho já juntado. Agora as leituras em andamento são canceladas antes de gravar a junção.
 - **Ajustes menores:**
   - abas do catálogo em 320 px;
   - busca acima do limite da URL;
