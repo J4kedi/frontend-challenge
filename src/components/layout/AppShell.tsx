@@ -1,6 +1,6 @@
 import { HeadContent, Outlet } from '@tanstack/react-router'
 import { WifiOffIcon } from 'lucide-react'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Toaster } from '@/components/ui/sonner'
 import { useLoginPrompt } from '@/features/auth/login-prompt'
 import { LiveRegion } from '@/shared/a11y/announcer'
@@ -15,6 +15,7 @@ const LoginPrompt = lazy(() => import('@/features/auth/AuthScreen').then((m) => 
 
 export function AppShell() {
   const loginRequest = useLoginPrompt()
+  const idle = useIdle()
   return (
     <div className="flex min-h-dvh flex-col">
       <HeadContent />
@@ -39,13 +40,30 @@ export function AppShell() {
           <LoginPrompt request={loginRequest} />
         </Suspense>
       )}
-      {config.mocksEnabled && config.mockPanel && (
+      {config.mocksEnabled && config.mockPanel && idle && (
         <Suspense fallback={null}>
           <MockPanel />
         </Suspense>
       )}
     </div>
   )
+}
+
+/**
+ * True once the browser is idle after the first render: the mock panel is a demo
+ * tool, so its chunk stays out of the page load (at most 2 s later).
+ */
+function useIdle() {
+  const [idle, setIdle] = useState(false)
+  useEffect(() => {
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(() => setIdle(true), { timeout: 2000 })
+      return () => cancelIdleCallback(id)
+    }
+    const id = setTimeout(() => setIdle(true), 500)
+    return () => clearTimeout(id)
+  }, [])
+  return idle
 }
 
 /**
