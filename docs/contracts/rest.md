@@ -29,7 +29,7 @@ Todo status não-2xx tem o mesmo corpo (`apiErrorBody`):
 | 401 | `UNAUTHENTICATED` / `SESSION_EXPIRED` / `INVALID_CREDENTIALS` | sem token, token expirado, login errado |
 | 403 | `FORBIDDEN` / `WALLET_REJECTED` | recurso de outro usuário; carteira recusou a conexão |
 | 404 | `NOT_FOUND` | NFT, pedido, item ou carteira inexistente |
-| 409 | `EMAIL_TAKEN` / `USERNAME_TAKEN` / `OUT_OF_STOCK` / `QUOTE_STALE` / `IDEMPOTENCY_CONFLICT` / `WALLET_DISCONNECTED` / `WALLET_SLOT_TAKEN` | conflitos |
+| 409 | `EMAIL_TAKEN` / `USERNAME_TAKEN` / `OUT_OF_STOCK` / `QUOTE_STALE` / `IDEMPOTENCY_CONFLICT` / `ORDER_IN_PROGRESS` / `WALLET_DISCONNECTED` / `WALLET_SLOT_TAKEN` | conflitos |
 | 422 | `VALIDATION_ERROR` / `QUANTITY_LIMIT` / `COUPON_INVALID` / `COUPON_EXPIRED` | regra de campo, com `fields` |
 | 500/503 | `INTERNAL` / `UNAVAILABLE` | falha transitória (`retryable: true`) |
 
@@ -101,7 +101,7 @@ o que dá 0,016 ETH para 3 linhas, como no Figma). Cupons de demonstração:
 
 | Método e rota | Corpo | Resposta |
 | --- | --- | --- |
-| `POST /orders` + `Idempotency-Key` | `createOrderBody` = `{ quoteId, network, walletId, provider, buyer }` | `201 order` (pendente) · `200 order` (mesma chave e mesmo corpo) · `409 IDEMPOTENCY_CONFLICT` (mesma chave, corpo diferente) · `409 QUOTE_STALE` (com `details.quote`) · `409 WALLET_DISCONNECTED` |
+| `POST /orders` + `Idempotency-Key` | `createOrderBody` = `{ quoteId, network, walletId, provider, buyer }` | `201 order` (pendente) · `200 order` (mesma chave e mesmo corpo) · `409 IDEMPOTENCY_CONFLICT` (mesma chave, corpo diferente) · `409 QUOTE_STALE` (com `details.quote`) · `409 WALLET_DISCONNECTED` · `409 ORDER_IN_PROGRESS` (já há pedido pendente do usuário; `details.orderId`) |
 | `GET /orders/:id` | — | `order` · `403` (outro usuário) · `404` |
 | `GET /orders?status=pending` | — | `{ items: order[] }` |
 

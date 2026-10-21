@@ -91,6 +91,8 @@ totais do Figma). Nada monetário passa por `Number`.
 
   Os links continuam apontando para `/checkout` e `/login`, e só o clique simples do visitante é interceptado (`promptVisitor`). Abrir em nova aba ainda passa pela rota. As rotas `/login` e `/signup` seguem o Figma (modal sobre o marketplace) e atendem acesso direto, as rotas privadas e a sessão expirada.
 - **Fechar o login volta para a página anterior** (`history.back`), não para o `redirect`: o redirect de uma rota privada (`/checkout`) mandaria de volta ao login. Pelo mesmo motivo, a expiração numa rota privada substitui a entrada do histórico em vez de empilhar.
+- **Sessão sendo confirmada não é visitante:** logo depois de um reload, o token guardado ainda espera `GET /auth/session`. Nesse intervalo o header mostra um placeholder no lugar de "Entrar", e o favoritar espera a confirmação em vez de abrir o login.
+- **Outra aba:** entrar, sair ou trocar de usuário numa aba recarrega as outras (evento `storage`), para nenhuma tela continuar com os dados do usuário anterior.
 - **Logout e troca de usuário:** removem `['user', id]` e `['session']`, fecham o socket (o provider recria com o novo token) e iniciam um carrinho de visitante novo.
 - Rotas privadas (`/_auth`): `beforeLoad` confirma a sessão pelo Query e redireciona com `redirect`. Só destinos internos são aceitos (`safeRedirect`), sem open redirect. Só um 401 manda para o login. Falha de rede ou 5xx mostra a página de erro com "Tentar novamente": com um token guardado, `/login` devolveria para a rota privada, num loop.
 
@@ -109,7 +111,8 @@ totais do Figma). Nada monetário passa por `Number`.
 5. `409 QUOTE_STALE`: o servidor recalculou e algo mudou. A tela mostra a cotação nova (`details.quote`) e pede confirmação de novo. A tentativa antiga é descartada (a chave muda com o conteúdo).
 6. Pagamento **recusado** encerra a tentativa. Se o colecionador tentar de novo com o mesmo carrinho e a mesma cotação, o reenvio da chave antiga devolveria o mesmo pedido recusado; por isso `submitPurchase` descarta essa tentativa e cria outra, com chave nova.
 7. Pedido criado e **pendente**: a rota `/orders/$id` mostra o status. `order.updated` ou o polling levam a `confirmed` ou `declined`, que são terminais. Reload, queda de conexão ou nova aba: `GET /orders/:id` liquida o que venceu, e a página de pagamento bloqueia uma segunda compra enquanto houver pedido pendente.
-8. O recibo só aparece para `confirmed` e reproduz o snapshot gravado no pedido.
+8. **Uma compra por vez.** Enquanto há pedido pendente, os itens ainda estão no carrinho; um segundo pedido (voltar ao pagamento logo depois de confirmar) cobraria duas vezes. O servidor responde `409 ORDER_IN_PROGRESS`, e o pagamento atualiza a lista de pendentes logo após criar o pedido, mostrando "compra em processamento".
+9. O recibo só aparece para `confirmed` e reproduz o snapshot gravado no pedido.
 
 ## Tempo real
 
@@ -131,6 +134,13 @@ registrado no `main.tsx` só com mocks ligados, segura as requisições até
 MSW precisa ter feito o patch antes. Nada disso é caminho de negócio: é a
 ordem de inicialização do transporte.
 
+**Aba parada.** O navegador desliga um service worker sem eventos por ~30 s,
+e o worker do MSW guarda as abas atendidas só em memória: reiniciado, ele
+deixaria tudo passar para o host (404 na Vercel). Depois de 20 s sem
+requisições, a próxima espera a aba se registrar de novo com `MOCK_ACTIVATE`,
+a mesma mensagem que o MSW envia no início (`mocksReady`, em
+`src/app/transport.ts`).
+
 ## Mocks
 
 - **Transporte:** service worker do MSW 2.15 para REST, e interceptação de WebSocket do MSW com `@mswjs/socket.io-binding` 0.2.0 para o Socket.IO.
@@ -144,8 +154,7 @@ ordem de inicialização do transporte.
   - As falhas são determinísticas: por exemplo, as 3 primeiras tentativas de cada GET no `http-5xx`.
 - **API de controle** (`/api/__mock/*`): muda o banco **e** publica o evento, do mesmo jeito que um servidor real faria. Os testes e o painel usam só ela.
 - **Limitações:**
-  - cada aba tem o próprio "servidor" (estado em memória por aba, banco compartilhado pelo localStorage, último a escrever vence);
-  - eventos não cruzam abas;
+  - cada aba roda a própria cópia do servidor simulado sobre o mesmo `localStorage`; elas se mantêm iguais porque cada uma adota o que as outras gravam (evento `storage`) e os eventos publicados são repassados às outras abas por `BroadcastChannel`. Duas escritas simultâneas em abas diferentes ainda seguem "a última vence";
   - o binding 0.2.0 não pinga, não faz broadcast e ignora a auth do CONNECT (contornados no servidor simulado);
   - o `request` fixture do Playwright não passa pelo MSW, por isso os testes chamam a API de controle de dentro da página.
 
