@@ -54,4 +54,16 @@ test.describe('11 · acessibilidade', () => {
     await expect(page.getByTestId('quote-total')).toBeVisible()
     await expectNoSeriousViolations(page)
   })
+
+  test('Esc no login aberto pelo header devolve o foco ao Entrar', async ({ page }) => {
+    test.skip(isMobile(page), 'O header é desktop')
+    await openApp(page, '/nft/emerald-ape-042')
+    const entrar = page.getByRole('link', { name: 'Entrar', exact: true })
+    await entrar.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('dialog', { name: 'Entrar' })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog', { name: 'Entrar' })).toBeHidden()
+    await expect(entrar).toBeFocused()
+  })
 })

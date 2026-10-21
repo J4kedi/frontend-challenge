@@ -140,7 +140,7 @@ function Gallery({ nft }: { nft: NftDetail }) {
         />
         <button
           type="button"
-          onClick={() => router.history.back()}
+          onClick={() => (router.history.canGoBack() ? router.history.back() : void router.navigate({ to: '/', hash: 'mercado' }))}
           aria-label="Voltar"
           className="absolute top-4 left-4 grid size-9 place-items-center rounded-full bg-surface/80 text-foreground backdrop-blur md:hidden"
         >

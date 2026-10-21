@@ -65,6 +65,38 @@ relato virou causa raiz, correção e um teste que fixa o comportamento:
 | O painel de mocks precisa de mais UI/UX e de detalhe por ação | rótulos genéricos ("1º item do carrinho") | seções, rótulos com o dado real, descrição do efeito, login rápido e axe no painel (`15-mock-panel.spec.ts`) |
 | No carrinho, "Conectar e finalizar" abre o login sobre a home | a correção do favoritar tratou o sintoma: o carrinho e o "Entrar" do header ainda levavam à rota `/login`, que no desktop mostra a home atrás | todo link que pede sessão abre o login sobre a página atual (`promptVisitor`); a busca pela causa passou a cobrir todos os caminhos até `/login` (`03`, `06`) |
 
+## Varredura com agentes sem contexto
+
+Antes do envio, dois agentes sem o histórico da sessão olharam a entrega, cada
+um num clone limpo:
+
+- **Caçador de bugs:** escreveu 7 arquivos de specs exploratórios contra a
+  URL publicada, fora do que a suíte cobria. Confirmou 8 defeitos, cada um
+  reproduzido pelo menos duas vezes.
+- **Avaliador:** seguiu os critérios do enunciado. Os 6 eliminatórios
+  passaram, a nota foi 81/100, e ele confirmou mais 4 defeitos.
+
+| Achado | Causa | Correção e teste |
+| --- | --- | --- |
+| "Tentar novamente" depois da recusa devolve o mesmo pedido recusado | mesmo carrinho e mesma cotação reaproveitavam a chave de idempotência | tentativa recusada é descartada (`07`) |
+| Sem rede, rota privada fica em branco num loop `/favorites` ↔ `/login` | o guard tratava erro de rede como "sem sessão" | só 401 vai ao login; o resto mostra o erro (`12`) |
+| Item acima do estoque não diminui | o mock validava cada passo contra o estoque | diminuir sempre é aceito (`05`) |
+| Dois cliques rápidos no favorito com rede lenta terminam favoritados | PUT e DELETE em paralelo, chegando invertidos | escritas em fila (`04`) |
+| Header estoura a 768 px com usuário logado; newsletter truncada | espaçamentos de desktop no tablet | espaçamento e linha própria abaixo de `lg` (`14`) |
+| `?page=99` mostra "nenhum NFT, limpe os filtros" | sem tratamento de página além da última | aviso e link para a última página (`01`) |
+| Esc no login do header deixa o foco no `body` | o Radix devolve o foco ao `Dialog.Trigger`, e o login no lugar não tem um | o login lembra quem o abriu (`11`) |
+| "Voltar" no mobile sai do site num link direto | `history.back()` sem histórico do app | volta ao mercado quando não há histórico (`14`) |
+| Carrinho mobile sem margem direita; estouro a 320 px | grid de uma coluna sem `minmax(0, 1fr)` | `grid-cols-1` (`05`, baseline visual) |
+| Valores do resumo quebram linha | coluna de 332 px | valores sem quebra |
+| Carteira conectada junto com "Conecte a carteira" | erro gravado durante a conexão pendente | sucesso limpa o erro |
+
+O que ficou de fora, por escolha e com registro:
+- **Fidelidade fina:** placa dos cards, cor do texto do detalhe, selo "RARO" e
+  grid escalonado no mobile. Redesenhar no último dia arriscaria regressão
+  visual.
+- **CLS do detalhe:** apareceu em 2 de 3 execuções do Lighthouse do avaliador.
+- **Lighthouse:** o relatório versionado é de um commit anterior à entrega.
+
 ## Contrato para os próximos agentes
 
 O [`AGENTS.md`](../AGENTS.md) (carregado pelo `CLAUDE.md`) é o contrato curto

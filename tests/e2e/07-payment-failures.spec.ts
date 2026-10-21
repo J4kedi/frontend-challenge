@@ -1,4 +1,4 @@
-import { addToCartFromDetail, expect, goToReview, openApp, ordersOf, test, visibleTestId } from './support/app'
+import { addToCartFromDetail, expect, goToReview, mockControl, openApp, ordersOf, test, visibleTestId } from './support/app'
 
 test.describe('07 · falhas de pagamento', () => {
   test('pagamento recusado mantém os itens no carrinho', async ({ page }) => {
@@ -54,5 +54,29 @@ test.describe('07 · falhas de pagamento', () => {
       return [await send(body), await send(body), await send({ ...body, buyer: { ...buyer, profileName: 'Outra' } })]
     })
     expect(statuses).toEqual([201, 200, 409])
+  })
+
+  test('tentar de novo depois do pagamento recusado cria outro pedido', async ({ page }) => {
+    await openApp(page, '/', 'payment-declined')
+    await addToCartFromDetail(page, 'emerald-ape-042')
+    const review = await goToReview(page)
+    await review.getByTestId('confirm-purchase').click()
+    await expect(page.getByTestId('order-declined')).toBeVisible({ timeout: 15_000 })
+    const declinedUrl = page.url()
+
+    // Same cart, same quote: the declined attempt must not be replayed.
+    await mockControl(page, '/scenario', { name: 'default' }, 'PUT')
+    await page.getByRole('link', { name: 'Tentar novamente' }).click()
+    await expect(page).toHaveURL(/\/checkout$/)
+    const connection = page.getByTestId('wallet-connection')
+    if (!(await connection.textContent())?.includes('conectada')) {
+      await page.getByRole('button', { name: 'Conectar carteira' }).click()
+      await expect(connection).toContainText('conectada')
+    }
+    await page.getByRole('button', { name: 'Confirmar compra' }).click()
+    await page.getByRole('dialog', { name: 'Revise sua compra' }).getByTestId('confirm-purchase').click()
+    await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 15_000 })
+    expect(page.url()).not.toBe(declinedUrl)
+    expect((await ordersOf(page)).map((o) => o.status).sort()).toEqual(['confirmed', 'declined'])
   })
 })

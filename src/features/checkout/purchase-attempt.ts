@@ -8,7 +8,8 @@ import { isApiError } from '@/shared/api/errors'
  *   so the API returns the same order instead of creating another;
  * - a reload in the middle keeps the attempt, and confirming the same content
  *   again still reuses the key;
- * - any change in content (new quote, other wallet) starts a new attempt.
+ * - any change in content (new quote, other wallet) starts a new attempt;
+ * - an attempt whose payment was declined is over: trying again is a new purchase.
  */
 interface Attempt {
   key: string
@@ -52,6 +53,11 @@ export async function submitPurchase(userId: string, body: CreateOrderBody, wait
   for (let tryNumber = 0; ; tryNumber++) {
     try {
       const order = await ordersApi.create(attempt.key, body)
+      // Replaying the key of a declined order would only return that order again.
+      if (attempt.orderId === order.id && order.status === 'declined') {
+        writeAttempt(userId, null)
+        return submitPurchase(userId, body, wait)
+      }
       writeAttempt(userId, { ...attempt, orderId: order.id })
       return order
     } catch (error) {

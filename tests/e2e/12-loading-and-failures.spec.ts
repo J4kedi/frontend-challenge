@@ -1,4 +1,4 @@
-import { expect, openApp, test } from './support/app'
+import { expect, loginAs, mockControl, openApp, test, USERS } from './support/app'
 
 test.describe('12 · carregamento e falhas', () => {
   test('rede lenta mostra skeletons com as dimensões do conteúdo', async ({ page }) => {
@@ -23,5 +23,27 @@ test.describe('12 · carregamento e falhas', () => {
   test('sem conexão informa o problema', async ({ page }) => {
     await openApp(page, '/', 'offline')
     await expect(page.getByText('Sem conexão com o servidor. Verifique sua internet e tente novamente.').first()).toBeVisible({ timeout: 20_000 })
+  })
+
+  test('rota privada sem rede mostra o erro, sem cair em loop de login', async ({ page }) => {
+    await openApp(page, '/')
+    await loginAs(page, USERS.ana, '/')
+    await mockControl(page, '/scenario', { name: 'offline' }, 'PUT')
+    const visited: string[] = []
+    page.on('framenavigated', (frame) => frame === page.mainFrame() && visited.push(new URL(frame.url()).pathname))
+
+    await page.goto('/favorites')
+    await expect(page.getByText('Esta página encontrou um erro')).toBeVisible({ timeout: 20_000 })
+    await expect(page.getByRole('navigation', { name: 'Principal' }).or(page.getByRole('navigation', { name: 'Navegação inferior' }))).toBeVisible()
+    // A stored token is not a refused session: never bounce through /login.
+    await page.waitForTimeout(4000)
+    expect(visited).not.toContain('/login')
+    await expect(page).toHaveURL(/\/favorites$/)
+
+    await mockControl(page, '/scenario', { name: 'default' }, 'PUT')
+    await page.getByRole('button', { name: 'Tentar novamente' }).click()
+    await expect(page.getByText('Esta página encontrou um erro')).toBeHidden()
+    await expect(page).toHaveURL(/\/favorites$/)
+    await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
   })
 })

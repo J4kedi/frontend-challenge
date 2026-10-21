@@ -176,7 +176,9 @@ export const commerceHandlers = [
       if (!line) return fail(404, 'NOT_FOUND', 'Item não está mais no carrinho')
       const found = findEdition(line.nftId, line.editionId)
       if (!found) return fail(404, 'NOT_FOUND', 'NFT ou edição não encontrados')
-      const invalid = checkQuantity(found.nft, found.edition, body.data.quantity)
+      // Lowering only releases units, so it never fails on stock: a line above the
+      // stock left can be stepped down to what remains.
+      const invalid = body.data.quantity > line.quantity && checkQuantity(found.nft, found.edition, body.data.quantity)
       if (invalid) return invalid
       line.quantity = body.data.quantity
       return touch(resolved.cart)

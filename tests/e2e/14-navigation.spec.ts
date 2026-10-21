@@ -1,4 +1,4 @@
-import { expect, isMobile, openApp, test } from './support/app'
+import { expect, isMobile, loginAs, openApp, test, USERS } from './support/app'
 
 test.describe('14 · navegação do header', () => {
   test('header fixo, item ativo acompanha a seção e itens fora do escopo avisam', async ({ page }) => {
@@ -38,5 +38,26 @@ test.describe('14 · navegação do header', () => {
     await market.click()
     await expect(page).toHaveURL(/\/#mercado$/)
     await expect(page.locator('#mercado')).toBeInViewport()
+  })
+
+  test('header e rodapé cabem em 768 px com o nome do usuário', async ({ page }) => {
+    test.skip(isMobile(page), 'Largura de tablet a partir do projeto desktop')
+    await openApp(page, '/')
+    await loginAs(page, USERS.ana, '/nft/emerald-ape-042')
+    await page.setViewportSize({ width: 768, height: 1024 })
+    await expect(page.getByRole('link', { name: USERS.ana.name })).toBeVisible()
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+    expect(overflow).toBeLessThanOrEqual(0)
+    // The newsletter field takes its own row below lg instead of a 4th narrow column.
+    const field = await page.getByLabel('E-mail para a newsletter').boundingBox()
+    expect(field?.width).toBeGreaterThan(200)
+  })
+
+  test('Voltar no detalhe aberto por link direto fica no site', async ({ page }) => {
+    test.skip(!isMobile(page), 'O botão Voltar sobre a arte é do mobile')
+    await openApp(page, '/nft/emerald-ape-042')
+    await page.getByRole('button', { name: 'Voltar' }).first().click()
+    await expect(page).toHaveURL(/\/#mercado$/)
+    await expect(page.locator('#mercado')).toBeVisible()
   })
 })

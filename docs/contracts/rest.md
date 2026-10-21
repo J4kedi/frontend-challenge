@@ -80,7 +80,7 @@ os eventos `nft.updated`.
 | --- | --- | --- |
 | `GET /cart` | — | `cart` |
 | `POST /cart/items` | `{ nftId, editionId, quantity }` | `cart` · `409 OUT_OF_STOCK` · `422 QUANTITY_LIMIT` |
-| `PATCH /cart/items/:lineId` | `{ quantity }` | `cart` |
+| `PATCH /cart/items/:lineId` | `{ quantity }` | `cart` · `409 OUT_OF_STOCK` e `422 QUANTITY_LIMIT` só ao **aumentar**: diminuir sempre é aceito, para o item acima do estoque restante voltar ao que sobrou |
 | `DELETE /cart/items/:lineId` | — | `cart` |
 | `POST /cart/acknowledge` | — | `cart` (aceita os preços atuais) |
 | `PUT /cart/coupon` / `DELETE /cart/coupon` | `{ code }` | `cart` · `422 COUPON_INVALID/COUPON_EXPIRED` |

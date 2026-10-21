@@ -37,7 +37,7 @@ export function SiteFooter() {
   return (
     <footer className="mt-24 hidden md:block">
       <div className="mx-auto max-w-page px-6 xl:px-0">
-        <div className="grid grid-cols-4 gap-0 rounded-t-lg bg-surface px-12 py-8 shadow-overlay">
+        <div className="grid grid-cols-3 gap-0 rounded-t-lg bg-surface px-12 py-8 shadow-overlay lg:grid-cols-4">
           {FEATURES.map((feature) => (
             <div key={feature.title} className="border-r border-primary pr-6 not-first:pl-4">
               <span
@@ -50,7 +50,7 @@ export function SiteFooter() {
               <p className="mt-2 text-body-sm leading-[22px] text-muted-foreground">{feature.text}</p>
             </div>
           ))}
-          <form className="pl-4" onSubmit={subscribe} aria-labelledby="newsletter-title">
+          <form className="col-span-3 mt-8 max-w-md lg:col-span-1 lg:mt-0 lg:max-w-none lg:pl-4" onSubmit={subscribe} aria-labelledby="newsletter-title">
             <h2 id="newsletter-title" className="text-title-sm leading-4 font-bold text-foreground">
               Antecipe-se ao próximo lançamento
             </h2>

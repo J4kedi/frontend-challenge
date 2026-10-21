@@ -40,7 +40,7 @@ export function SiteHeader() {
         </Link>
 
         <nav aria-label="Principal" className="self-stretch">
-          <ul className="flex h-full items-stretch gap-10">
+          <ul className="flex h-full items-stretch gap-6 lg:gap-10">
             <NavItem active={homeActive}>
               <SectionLink href="/" active={homeActive} onActivate={goToSection(undefined)}>
                 Início
@@ -68,7 +68,7 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 lg:gap-6">
           <button
             type="button"
             className="grid size-9 place-items-center rounded-md text-foreground hover:text-accent"
@@ -98,7 +98,7 @@ export function SiteHeader() {
               className="flex h-9 items-center gap-2 rounded-sm border border-primary px-3 text-body-lg font-medium text-accent hover:bg-surface"
             >
               <UserIcon className="size-[18px]" />
-              <span className="max-w-32 truncate">{user.displayName}</span>
+              <span className="max-w-24 truncate lg:max-w-32">{user.displayName}</span>
             </Link>
           ) : (
             <Link

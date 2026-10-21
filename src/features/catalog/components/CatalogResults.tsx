@@ -44,6 +44,8 @@ export function CatalogResults({
   }
 
   if (!data) return <ErrorState error={error} onRetry={onRetry} title="Não foi possível carregar o catálogo" />
+  // e.g. ?page=99 from an old link: there are results, just not on this page.
+  const outOfRange = data.items.length === 0 && data.total > 0
 
   return (
     <div aria-busy={isFetching} className={cn('transition-opacity', isFetching && 'opacity-60')}>
@@ -55,7 +57,19 @@ export function CatalogResults({
           <ErrorState error={error} onRetry={onRetry} title="Não foi possível atualizar o catálogo" />
         </div>
       ) : null}
-      {data.items.length === 0 ? (
+      {outOfRange ? (
+        <div className="flex flex-col items-center gap-3 rounded-lg border border-border-soft bg-surface px-6 py-16 text-center" data-testid="catalog-out-of-range">
+          <p className="text-title-sm font-bold">Esta página não existe</p>
+          <p className="max-w-sm text-body-sm text-muted-foreground">
+            Os resultados vão até a página {data.totalPages}.
+          </p>
+          <Button asChild variant="outline">
+            <Link to="/" hash="mercado" search={(prev) => ({ ...prev, page: data.totalPages === 1 ? undefined : data.totalPages })}>
+              Ir para a página {data.totalPages}
+            </Link>
+          </Button>
+        </div>
+      ) : data.items.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-border-soft bg-surface px-6 py-16 text-center" data-testid="catalog-empty">
           <p className="text-title-sm font-bold">Nenhum NFT encontrado</p>
           <p className="max-w-sm text-body-sm text-muted-foreground">
@@ -74,7 +88,7 @@ export function CatalogResults({
           ))}
         </ul>
       )}
-      <Pagination page={data.page} totalPages={data.totalPages} />
+      {!outOfRange && <Pagination page={data.page} totalPages={data.totalPages} />}
     </div>
   )
 }
