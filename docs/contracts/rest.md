@@ -45,7 +45,7 @@ No cliente, toda falha vira `ApiError` (`src/shared/api/errors.ts`), inclusive
 | `GET /auth/session` | — | `200 session` · `401 SESSION_EXPIRED` |
 | `POST /auth/logout` | — | `204` |
 | `GET /me/profile` | — | `200 user` |
-| `PATCH /me/profile` | `profileBody` | `200 user` · `409 EMAIL_TAKEN/USERNAME_TAKEN` |
+| `PATCH /me/profile` | `profileUpdateBody` (`profileBody` + `password?`: troca de senha opcional, conferida junto) | `200 user` · `409 EMAIL_TAKEN/USERNAME_TAKEN` · `422 fields.currentPassword`; tudo é conferido antes de gravar, então perfil e senha mudam juntos ou nada muda |
 | `PUT /me/avatar` / `DELETE /me/avatar` | `{ dataUrl }` (PNG/JPG/WebP ≤ 1 MB) | `200 user` · `422` |
 | `PUT /me/password` | `passwordBody` | `204` · `422 fields.currentPassword` |
 

@@ -76,6 +76,7 @@ totais do Figma). Nada monetário passa por `Number`.
 
 - **Mutations não repetem sozinhas.** A única exceção é o pedido, que repete com a mesma chave (ver "Pedido").
 - **Respostas obsoletas são descartadas.** A chave é a query inteira, então uma resposta lenta de uma busca antiga cai na entrada dela, nunca na da tela atual. O `signal` do Query chega ao Axios, e o Query aborta o pedido de uma chave sem observadores.
+- **Timeout num timer do JavaScript.** O Axios usa o adapter `fetch`, cujo timeout roda num `setTimeout`, e não no timer nativo do XHR. Assim, o `page.clock` dos testes controla o timeout do pedido como controla os outros timers do app.
 - **Atualização otimista com rollback:** favoritos (`src/features/favorites/queries.ts`). O coração muda antes da resposta; se der erro, volta ao estado anterior, com toast e anúncio. As escritas saem em fila, na ordem dos cliques (`scope` do TanStack Query), e só a última grava a lista no cache. Assim, dois cliques rápidos com rede lenta não chegam invertidos à API.
 - **Isolamento por usuário:** tudo que é privado fica sob `['user', id]`, e o carrinho do visitante sob `['guest', cartId]`. Logout e troca de usuário removem o prefixo inteiro.
 
@@ -175,6 +176,9 @@ a mesma mensagem que o MSW envia no início (`mocksReady`, em
 - Imagens: AVIF e WebP em 3 larguras com `srcset`/`sizes`, `width`/`height` fixos e `preload` + `fetchpriority="high"` do hero.
 - Fonte local (sem ida ao Google Fonts) com `font-display: swap`.
 - Skeletons do tamanho final (CLS 0).
+- Só o layout do viewport atual vai para o DOM onde uma versão escondida teria custo: hero (a arte prioritária do desktop não baixa no celular) e sidebar do catálogo (só a partir de `lg`).
+- zod sem JIT (`z.config({ jitless: true })` em `contracts/common.ts`): o JIT compila um parser por schema na primeira validação, e cada schema daqui valida poucas respostas; compilar custava uma tarefa longa no carregamento.
+- A grade de cards renderiza com `useDeferredValue`: quando o catálogo chega, o React a monta como transição, em fatias, em vez de uma tarefa longa.
 - Medidas e análise em [`docs/quality/lighthouse.md`](docs/quality/lighthouse.md).
 
 ## Decisões de UX
@@ -191,4 +195,3 @@ Os desvios do Figma estão listados, um a um, em [`docs/design/screens.md`](docs
 
 - Um pedido pode misturar NFTs de redes diferentes com uma única taxa da rede escolhida (simplificação da simulação).
 - As baselines visuais são Linux-only, porque a renderização de fontes varia por SO. Em Windows e macOS os asserts de pixel são ignorados, e as baselines são geradas no container oficial do Playwright (`pnpm test:visual:update`).
-- O teste de timeout do pedido usa tempo real (~12 s): o timeout do Axios no XHR é nativo do navegador e não obedece ao `page.clock`.

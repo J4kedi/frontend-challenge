@@ -1,6 +1,6 @@
 # Testes
 
-Última revisão: 2026-10-20
+Última revisão: 2026-10-21
 
 ## Como rodar
 
@@ -18,7 +18,10 @@ pnpm test:visual:update   # regera as baselines visuais
   - latências dos cenários vêm do hash da requisição;
   - eventos são disparados pela API de controle (`/api/__mock/*`) no momento exato do teste.
 - **Sem atalhos:** o REST passa pelos handlers MSW, e os eventos passam pelo `socket.io-client` (a API de controle publica pelo servidor Socket.IO simulado). Os asserts observam a interface: texto, `aria-*`, URL, região `aria-live`. Quando o resultado de uma operação precisa ser conferido, os testes perguntam à própria API simulada (ex.: quantos pedidos existem).
-- **Tempo:** cenários de tempo usam latência controlada por cenário (`slow`, `jitter`, `order-timeout`). O timeout do pedido roda em tempo real (~12 s), porque o timeout de XHR do Axios é nativo do navegador e não obedece ao `page.clock`.
+- **Tempo:** a latência de cada cenário é controlada (`slow`, `jitter`, `order-timeout`). Quando o teste depende de quanto tempo passou, o relógio é do Playwright (`page.clock`) e avança sem espera real. Testes com relógio controlado:
+  - o timeout de 8 s do pedido: o Axios usa o adapter `fetch`, cujo timeout é um `setTimeout`;
+  - a sessão que expira sozinha depois de 30 min;
+  - a aba parada, com o service worker desligado depois de 25 s.
 - **Regressão visual:**
   - baselines só para Linux (a renderização de fonte muda por SO), versionadas em `tests/e2e/__screenshots__`;
   - geradas e conferidas no container `mcr.microsoft.com/playwright:v1.64.1-noble`;
@@ -28,17 +31,17 @@ pnpm test:visual:update   # regera as baselines visuais
 
 | # | Requisito do enunciado (§9) | Spec | Desktop | Mobile |
 | --- | --- | --- | :---: | :---: |
-| 1 | Busca, filtros combinados, ordenação, paginação e restauração pelo histórico (+ respostas fora de ordem, vazio, página além da última) | `01-catalog.spec.ts` | ✅ | ✅ |
+| 1 | Busca, filtros combinados, ordenação, paginação e restauração pelo histórico (+ respostas fora de ordem, vazio, página além da última; filtros digitados à mão na URL, como `?priceMin=1&networks=solana`) | `01-catalog.spec.ts` | ✅ | ✅ |
 | 2 | Acesso direto ao detalhe, edição indisponível, limite de quantidade, recurso inexistente, rota inexistente | `02-detail.spec.ts` | ✅ | ✅ |
-| 3 | Cadastro (conflito e sucesso), validação e erro de login, expiração de sessão, logout e troca de usuário sem vazamento; o login pedido pelo carrinho e pelo "Entrar" do header abre sobre a página atual; sair apaga o rascunho do pagamento | `03-auth.spec.ts` | ✅ | ✅³ |
+| 3 | Cadastro (conflito e sucesso), validação e erro de login, expiração de sessão, logout e troca de usuário sem vazamento; o login pedido pelo carrinho e pelo "Entrar" do header abre sobre a página atual; sair apaga o rascunho do pagamento; a sessão expira sozinha depois de 30 min (relógio controlado) | `03-auth.spec.ts` | ✅ | ✅³ |
 | 4 | Favoritos persistidos, falha de mutation com rollback; visitante entra sem sair do detalhe e o favorito é salvo; dois cliques rápidos com rede lenta terminam no último clique; logado, o favorito funciona enquanto a sessão ainda é confirmada; escritas em fila que falham terminam como o servidor | `04-favorites.spec.ts` | ✅ | ✅ |
 | 5 | Carrinho: quantidades, remoção, cupom expirado, inválido e válido, persistência após refresh e login (merge); quantidade acima do estoque restante reduzida passo a passo; sem rolagem lateral a 320 px; total do carrinho = total do pagamento (rede da carteira principal) | `05-cart.spec.ts` | ✅ | ✅ |
-| 6 | Compra completa, do catálogo ao recibo confirmado, com o login sobre o carrinho; revisão e recibo cabem em 320 px | `06-purchase.spec.ts` | ✅ | ✅ |
-| 7 | Pagamento recusado, clique repetido, timeout com recuperação do mesmo pedido, mesma chave com corpo diferente → 409; nova tentativa depois da recusa cria outro pedido; com pedido pendente, outra compra é recusada (`ORDER_IN_PROGRESS`); a carteira só conecta numa rede do seu tipo de endereço | `07-payment-failures.spec.ts` | ✅ | ✅ |
-| 8 | Perfil (dados, validação, avatar, senha errada não salva nada, senha certa) e carteiras (endereço inválido, principal, secundária) | `08-profile-wallets.spec.ts` | ✅ | ✅ |
+| 6 | Compra completa, do catálogo ao recibo confirmado, com o login sobre o carrinho; revisão e recibo cabem em 320 px; comprar a última unidade não anuncia, para quem comprou, que ela esgotou | `06-purchase.spec.ts` | ✅ | ✅ |
+| 7 | Pagamento recusado, clique repetido, timeout com recuperação do mesmo pedido (relógio controlado, sem esperar os 8 s), mesma chave com corpo diferente → 409; nova tentativa depois da recusa cria outro pedido; com pedido pendente, outra compra é recusada (`ORDER_IN_PROGRESS`); a carteira só conecta numa rede do seu tipo de endereço | `07-payment-failures.spec.ts` | ✅ | ✅ |
+| 8 | Perfil (dados, validação, avatar, senha errada não salva nada, nome de usuário em uso com troca de senha não grava nada (perfil e senha vão juntos), senha certa) e carteiras (endereço inválido, principal, secundária) | `08-profile-wallets.spec.ts` | ✅ | ✅ |
 | 9 | Preço muda via Socket.IO durante o checkout (aviso, total, bloqueio, aceitar, comprar); edição esgota durante o checkout | `09-realtime-checkout.spec.ts` | ✅ | ✅ |
 | 10 | Eventos duplicados e antigos; queda de 3 s com evento perdido e reconciliação REST na volta; pedido pendente + queda do socket + reload sem nova compra; duas abas: preço e logout chegam à outra | `10-realtime-resilience.spec.ts` | ✅ | ✅ |
-| 11 | Pular para o conteúdo, foco preso no diálogo e Esc, foco volta a quem abriu o login e a revisão, erros ligados aos campos, axe WCAG 2.1 AA em 4 telas | `11-accessibility.spec.ts` | ✅ | ✅¹ |
+| 11 | Pular para o conteúdo, foco preso no diálogo e Esc, o login abre no campo de e-mail, foco volta a quem abriu o login e a revisão, erros ligados aos campos; axe (WCAG 2.0 e 2.1, A e AA) em início, detalhe, login, carrinho, perfil, carteiras, favoritos, pagamento com a revisão aberta e recibo | `11-accessibility.spec.ts` | ✅ | ✅¹ |
 | 12 | Skeletons em rede lenta, falha 503 com "Tentar novamente", sem conexão; rota privada sem rede mostra o erro, sem loop de login; aba parada continua nos mocks depois que o navegador desliga o service worker; sem rede, a revisão não abre com valores não conferidos | `12-loading-and-failures.spec.ts` | ✅ | ✅ |
 | — | Regressão visual: início, detalhe, carrinho e pagamento | `13-visual.spec.ts` | ✅ | ✅ |
 | — | Header fixo, item ativo por seção (scroll-spy), itens fora do escopo avisam, Mercado a partir de outra página; header e rodapé em 768 px com usuário logado; "Voltar" num link direto fica no site; item ativo certo ao voltar à home depois de entrar e de comprar; rota 404 parecida não marca Mercado; sem rolagem lateral a 320 px e no perfil a 768 px | `14-navigation.spec.ts` | ✅ | ✅² |

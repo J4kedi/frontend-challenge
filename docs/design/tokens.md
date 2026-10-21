@@ -81,6 +81,7 @@ letter-spacing de 1,4 px em 14 px.
 | `--shadow-card` | `0 4px 12px rgb(20 13 10 / .15)` | Drop shadow r12 y4 #140D0A 15% |
 | `--shadow-raised` | `0 6px 20px rgb(10 6 4 / .45)` | Drop shadow r20 y6 #0A0604 45% |
 | `--shadow-overlay` | `0 0 20px rgb(10 6 4 / .45)` | Drop shadow r20 #0A0604 45% (modais) |
+| `--drop-shadow-tab-bar` | `0 -10px 30px rgb(10 6 4 / .45)` | Drop shadow r30 y-10 #0A0604 45% (Tab Bar; `filter`, segue o recorte) |
 | `--container-page` | 1200 px | largura do conteúdo dos frames de 1440 |
 | `--spacing-header` | 69 px | altura do Header With Divider |
 
