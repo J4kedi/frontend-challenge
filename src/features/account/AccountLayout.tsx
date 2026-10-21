@@ -28,7 +28,7 @@ export function AccountLayout({ title, hideTitle = false, children }: { title: s
   const row = 'flex h-11 shrink-0 items-center gap-3 border-l-4 px-4 text-body-sm whitespace-nowrap'
   return (
     <div className="mx-auto grid max-w-page grid-cols-1 gap-8 px-4 pt-8 md:grid-cols-[220px_minmax(0,1fr)] md:px-6 lg:grid-cols-[310px_minmax(0,1fr)] xl:px-0">
-      <nav aria-label="Meu perfil" className="h-fit min-w-0 rounded-sm bg-surface py-2 md:py-4">
+      <nav aria-label="Seções da conta" className="h-fit min-w-0 rounded-sm bg-surface py-2 md:py-4">
         <p className="px-4 pb-2 text-title-sm font-bold text-foreground max-md:sr-only">Meu perfil</p>
         <ul className="max-md:flex max-md:overflow-x-auto">
           {ITEMS.map((item) => (

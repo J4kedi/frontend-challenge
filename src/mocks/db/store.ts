@@ -44,6 +44,11 @@ window.addEventListener('storage', (event) => {
   state = event.newValue ? (JSON.parse(event.newValue) as MockDb) : null
 })
 
+/** Takes the latest state any tab wrote, before its storage event arrives here. */
+export function refreshDb() {
+  state = read() ?? state
+}
+
 export function persist() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))

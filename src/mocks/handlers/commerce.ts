@@ -1,7 +1,7 @@
 import { delay, http, HttpResponse } from 'msw'
 import { network as networkSchema, type Edition } from '@/contracts/nft'
 import { addCartItemBody, couponBody, createOrderBody, mergeCartBody, updateCartItemBody } from '@/contracts/commerce'
-import { db, nextId, persist, stableHash } from '../db/store'
+import { db, nextId, persist, refreshDb, stableHash } from '../db/store'
 import type { CartRecord, NftRecord, OrderRecord, UserRecord } from '../db/types'
 import { api, authenticate, fail, now, readBody, sameChainFamily, withNetwork } from '../http'
 import { nftUpdated, orderUpdated, publish } from '../realtime/server'
@@ -113,8 +113,21 @@ function scheduleSettlement(order: OrderRecord) {
   const wait = Math.max(0, Date.parse(order.settleAt) - Date.now())
   timers.set(
     order.id,
-    setTimeout(() => settle(order.id), wait),
+    setTimeout(() => settleOnce(order.id), wait),
   )
+}
+
+/**
+ * Every open tab runs the simulated backend and schedules the same settlement.
+ * The lock makes the tabs take turns, and each one re-reads the stored state, so
+ * only the first settles the order (the cart is not reduced twice).
+ */
+function settleOnce(orderId: string) {
+  if (!('locks' in navigator)) return settle(orderId)
+  void navigator.locks.request('kurio-mock-settlement', () => {
+    refreshDb()
+    settle(orderId)
+  })
 }
 
 /** Called at mock start-up: payments still pending after a reload settle on schedule. */

@@ -166,7 +166,7 @@ ignorados. Regere com `pnpm test:visual:update`, que usa Docker.
 
 ## Deploy
 
-Publicado na Vercel: **https://kurio-nft-marketplace-vert.vercel.app**. O deploy sai do commit da `main` marcado com a tag `v1.0.9`, e a suíte E2E roda também contra a URL publicada:
+Publicado na Vercel: **https://kurio-nft-marketplace-vert.vercel.app**. O deploy sai do commit da `main` marcado com a tag `v1.0.10`, e a suíte E2E roda também contra a URL publicada:
 
 ```bash
 E2E_BASE_URL=https://kurio-nft-marketplace-vert.vercel.app pnpm exec playwright test --grep-invert @visual

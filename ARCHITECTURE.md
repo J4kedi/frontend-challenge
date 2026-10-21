@@ -39,7 +39,7 @@ real. Trocar `VITE_ENABLE_MOCKS` para `false` e apontar `VITE_API_URL` e
 | `src/contracts` | schemas zod de REST e eventos, usados pelo cliente **e** pelos mocks | — |
 | `src/shared` | cliente HTTP, erros, query keys, sessão, tempo real, `money.ts`, a11y | depender de uma fatia |
 | `src/components` | layout, primitivos de UI e feedback | buscar dados |
-| `src/mocks` | banco simulado, handlers REST, servidor Socket.IO, cenários e painel | ser importado por componentes (só pelo `main.tsx`, de forma dinâmica) |
+| `src/mocks` | banco simulado, handlers REST, servidor Socket.IO, cenários e painel | ser importado pelo app de forma estática: o `main.tsx` carrega os mocks e o `AppShell` carrega o painel, os dois por `import()` dinâmico e só com mocks ligados |
 | `src/styles` | tokens do Figma (`theme.css`) e o guard de tokens | — |
 
 ## Contratos tipados de ponta a ponta

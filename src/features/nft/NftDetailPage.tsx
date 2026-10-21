@@ -70,7 +70,7 @@ export function NftDetailPage() {
             </h1>
             <Rating nft={nft} compact />
           </div>
-          <div className="mt-3 hidden items-center justify-between gap-4 border-b border-border pb-3 md:flex">
+          <div className="mt-3 hidden flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border pb-3 md:flex">
             <Price nft={nft} edition={edition} />
             <Rating nft={nft} />
           </div>
@@ -196,7 +196,7 @@ function Gallery({ nft }: { nft: NftDetail }) {
 
 function Price({ nft, edition }: { nft: NftDetail; edition: Edition }) {
   return (
-    <p className="flex items-baseline gap-3 text-title-lg font-bold text-accent" data-testid="detail-price">
+    <p className="flex items-baseline gap-3 text-title-lg font-bold whitespace-nowrap text-accent" data-testid="detail-price">
       <span>
         <span className="sr-only">Preço da edição {edition.label}: </span>
         {formatEth(edition.priceEth)}
@@ -225,13 +225,15 @@ function Rating({ nft, compact = false }: { nft: NftDetail; compact?: boolean })
     )
   }
   return (
-    <p className="flex items-center gap-2 text-body-sm text-foreground">
+    <p className="flex items-center gap-2 text-body-sm whitespace-nowrap text-foreground">
       <span className="flex gap-0.5 text-primary" aria-hidden="true">
         {Array.from({ length: 5 }, (_, i) => (
           <StarIcon key={i} className={cn('size-4', i >= Math.round(nft.rating.average) && 'opacity-30')} />
         ))}
       </span>
-      <span aria-hidden="true">{nft.rating.count} avaliações de colecionadores</span>
+      <span aria-hidden="true">
+        {nft.rating.count} avaliações<span className="max-lg:hidden"> de colecionadores</span>
+      </span>
       <span className="sr-only">{label}</span>
     </p>
   )

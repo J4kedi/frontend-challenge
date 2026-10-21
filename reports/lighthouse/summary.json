@@ -1,11 +1,11 @@
 {
   "environment": {
-    "date": "2026-10-21T13:57:18.174Z",
+    "date": "2026-10-21T16:49:53.798Z",
     "lighthouse": "13.5.0",
     "chrome": "Chrome/155.0.0.0",
     "node": "v22.23.3",
     "os": "Linux 6.17.0-1022-azure (x64)",
-    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpu": "AMD EPYC 7763 64-Core Processor",
     "memoryGb": 16,
     "throttling": "Lighthouse defaults: mobile = simulated slow 4G + 4x CPU slowdown; desktop = desktop-config (simulated, 1x CPU)",
     "build": "published demo at https://kurio-nft-marketplace-vert.vercel.app"
@@ -16,14 +16,14 @@
       "profile": "mobile",
       "runs": 3,
       "median": {
-        "performance": 92,
+        "performance": 93,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 2861,
+        "lcpMs": 2803,
         "cls": 0,
-        "tbtMs": 177,
-        "fcpMs": 1923
+        "tbtMs": 154,
+        "fcpMs": 1944
       }
     },
     {
@@ -35,10 +35,10 @@
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 566,
+        "lcpMs": 590,
         "cls": 0,
-        "tbtMs": 3,
-        "fcpMs": 377
+        "tbtMs": 4,
+        "fcpMs": 396
       }
     },
     {
@@ -46,14 +46,14 @@
       "profile": "mobile",
       "runs": 3,
       "median": {
-        "performance": 95,
+        "performance": 94,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 2572,
+        "lcpMs": 2582,
         "cls": 0,
-        "tbtMs": 126,
-        "fcpMs": 1747
+        "tbtMs": 145,
+        "fcpMs": 1757
       }
     },
     {
@@ -65,10 +65,10 @@
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 568,
+        "lcpMs": 581,
         "cls": 0,
         "tbtMs": 0,
-        "fcpMs": 397
+        "fcpMs": 390
       }
     }
   ],
@@ -78,30 +78,30 @@
       "profile": "mobile",
       "run": 1,
       "scores": {
-        "performance": 70,
+        "performance": 74,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 3135,
+      "lcpMs": 3063,
       "cls": 0,
-      "tbtMs": 1013,
-      "fcpMs": 2069
+      "tbtMs": 737,
+      "fcpMs": 1989
     },
     {
       "page": "inicio",
       "profile": "mobile",
       "run": 2,
       "scores": {
-        "performance": 92,
+        "performance": 93,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 2861,
+      "lcpMs": 2803,
       "cls": 0,
-      "tbtMs": 149,
-      "fcpMs": 1923
+      "tbtMs": 154,
+      "fcpMs": 1944
     },
     {
       "page": "inicio",
@@ -113,10 +113,10 @@
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 2616,
+      "lcpMs": 2726,
       "cls": 0,
-      "tbtMs": 177,
-      "fcpMs": 1720
+      "tbtMs": 152,
+      "fcpMs": 1901
     },
     {
       "page": "inicio",
@@ -128,102 +128,102 @@
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 566,
+      "lcpMs": 583,
       "cls": 0,
-      "tbtMs": 3,
-      "fcpMs": 377
-    },
-    {
-      "page": "inicio",
-      "profile": "desktop",
-      "run": 2,
-      "scores": {
-        "performance": 100,
-        "accessibility": 100,
-        "best-practices": 100,
-        "seo": 100
-      },
-      "lcpMs": 599,
-      "cls": 0,
-      "tbtMs": 3,
-      "fcpMs": 419
-    },
-    {
-      "page": "inicio",
-      "profile": "desktop",
-      "run": 3,
-      "scores": {
-        "performance": 100,
-        "accessibility": 100,
-        "best-practices": 100,
-        "seo": 100
-      },
-      "lcpMs": 566,
-      "cls": 0,
-      "tbtMs": 3,
-      "fcpMs": 377
-    },
-    {
-      "page": "detalhe",
-      "profile": "mobile",
-      "run": 1,
-      "scores": {
-        "performance": 95,
-        "accessibility": 100,
-        "best-practices": 100,
-        "seo": 100
-      },
-      "lcpMs": 2577,
-      "cls": 0,
-      "tbtMs": 142,
-      "fcpMs": 1752
-    },
-    {
-      "page": "detalhe",
-      "profile": "mobile",
-      "run": 2,
-      "scores": {
-        "performance": 95,
-        "accessibility": 100,
-        "best-practices": 100,
-        "seo": 100
-      },
-      "lcpMs": 2572,
-      "cls": 0,
-      "tbtMs": 126,
-      "fcpMs": 1747
-    },
-    {
-      "page": "detalhe",
-      "profile": "mobile",
-      "run": 3,
-      "scores": {
-        "performance": 95,
-        "accessibility": 100,
-        "best-practices": 100,
-        "seo": 100
-      },
-      "lcpMs": 2566,
-      "cls": 0,
-      "tbtMs": 112,
-      "fcpMs": 1741
-    },
-    {
-      "page": "detalhe",
-      "profile": "desktop",
-      "run": 1,
-      "scores": {
-        "performance": 100,
-        "accessibility": 100,
-        "best-practices": 100,
-        "seo": 100
-      },
-      "lcpMs": 563,
-      "cls": 0,
-      "tbtMs": 0,
+      "tbtMs": 4,
       "fcpMs": 389
     },
     {
+      "page": "inicio",
+      "profile": "desktop",
+      "run": 2,
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "lcpMs": 618,
+      "cls": 0,
+      "tbtMs": 4,
+      "fcpMs": 447
+    },
+    {
+      "page": "inicio",
+      "profile": "desktop",
+      "run": 3,
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "lcpMs": 590,
+      "cls": 0,
+      "tbtMs": 6,
+      "fcpMs": 396
+    },
+    {
+      "page": "detalhe",
+      "profile": "mobile",
+      "run": 1,
+      "scores": {
+        "performance": 94,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "lcpMs": 2519,
+      "cls": 0,
+      "tbtMs": 188,
+      "fcpMs": 1696
+    },
+    {
+      "page": "detalhe",
+      "profile": "mobile",
+      "run": 2,
+      "scores": {
+        "performance": 95,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "lcpMs": 2582,
+      "cls": 0,
+      "tbtMs": 131,
+      "fcpMs": 1757
+    },
+    {
+      "page": "detalhe",
+      "profile": "mobile",
+      "run": 3,
+      "scores": {
+        "performance": 93,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "lcpMs": 2726,
+      "cls": 0,
+      "tbtMs": 145,
+      "fcpMs": 1956
+    },
+    {
+      "page": "detalhe",
+      "profile": "desktop",
+      "run": 1,
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "lcpMs": 616,
+      "cls": 0,
+      "tbtMs": 0,
+      "fcpMs": 439
+    },
+    {
       "page": "detalhe",
       "profile": "desktop",
       "run": 2,
@@ -233,10 +233,10 @@
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 568,
+      "lcpMs": 581,
       "cls": 0,
       "tbtMs": 0,
-      "fcpMs": 397
+      "fcpMs": 390
     },
     {
       "page": "detalhe",
@@ -248,10 +248,10 @@
         "best-practices": 100,
         "seo": 100
       },
-      "lcpMs": 598,
+      "lcpMs": 579,
       "cls": 0,
       "tbtMs": 0,
-      "fcpMs": 407
+      "fcpMs": 388
     }
   ]
 }

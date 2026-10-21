@@ -123,8 +123,8 @@ export function CouponForm({ quote, variant = 'boxed' }: { quote: Quote | undefi
           aria-describedby={error ? `${id}-coupon-error` : undefined}
           autoComplete="off"
           className={cn(
-            'h-10 min-w-0 flex-1 bg-transparent px-3 text-body-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none',
-            pill ? 'rounded-full focus-visible:ring-2 focus-visible:ring-primary' : 'rounded-l-sm border border-primary focus-visible:border-accent',
+            'h-10 min-w-0 flex-1 bg-transparent px-3 text-body-sm text-foreground placeholder:text-muted-foreground',
+            pill ? 'rounded-full' : 'rounded-l-sm border border-primary focus-visible:border-accent',
           )}
         />
         <Button type="button" onClick={() => void submit()} className={cn('h-10', pill ? 'rounded-full px-5' : 'rounded-l-none')} disabled={apply.isPending} aria-busy={apply.isPending}>
