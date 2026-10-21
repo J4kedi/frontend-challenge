@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { Link, useRouter, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
@@ -12,8 +13,11 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { loginBody, signupBody, type LoginBody, type SignupBody } from '@/contracts/account'
-import { PromoCards } from '@/features/catalog/components/HomeEditorial'
+import { CatalogFilters } from '@/features/catalog/components/CatalogFilters'
+import { CatalogResults } from '@/features/catalog/components/CatalogResults'
 import { HomeHero } from '@/features/catalog/components/HomeHero'
+import { nftListOptions } from '@/features/catalog/queries'
+import { catalogSearch, toListQuery } from '@/features/catalog/search'
 import { config, DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/shared/config'
 import { DESKTOP_QUERY, useMediaQuery } from '@/shared/hooks/use-media-query'
 import { loginPrompt, type LoginPromptRequest } from './login-prompt'
@@ -58,10 +62,7 @@ export function AuthScreen({ mode, redirect, reason }: { mode: Mode; redirect?: 
     const close = () => (router.history.canGoBack() ? router.history.back() : void router.navigate({ to: '/' }))
     return (
       <>
-        <div inert aria-hidden="true" className="pointer-events-none select-none">
-          <HomeHero />
-          <PromoCards />
-        </div>
+        <MarketplaceBackdrop />
         <AuthDialog mode={mode} redirect={redirect} description={copy.intro} onClose={close}>
           {body}
         </AuthDialog>
@@ -90,6 +91,25 @@ export function AuthScreen({ mode, redirect, reason }: { mode: Mode; redirect?: 
         )}
       </p>
     </section>
+  )
+}
+
+const BACKDROP_SEARCH = catalogSearch.parse({})
+const noop = () => {}
+
+/** What the Figma frame shows behind the desktop modal: the marketplace (hero, filters, first page of the catalog), inert. */
+function MarketplaceBackdrop() {
+  const list = useQuery(nftListOptions(toListQuery(BACKDROP_SEARCH)))
+  return (
+    <div inert aria-hidden="true" className="pointer-events-none select-none">
+      <HomeHero />
+      <div className="mx-auto mt-16 grid max-w-page grid-cols-1 gap-12 px-6 lg:grid-cols-[310px_minmax(0,1fr)] xl:px-0">
+        <div className="hidden self-start rounded-lg bg-surface p-5 lg:block">
+          <CatalogFilters facets={list.data?.facets} search={BACKDROP_SEARCH} onChange={noop} />
+        </div>
+        <CatalogResults data={list.data} isPending={list.isPending} isFetching={false} error={list.error} onRetry={noop} onClear={noop} />
+      </div>
+    </div>
   )
 }
 
