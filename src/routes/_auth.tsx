@@ -1,4 +1,5 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useRouter, type ErrorComponentProps } from '@tanstack/react-router'
+import { RouteErrorPage } from '@/components/feedback/StatusPage'
 import { sessionQueryOptions } from '@/features/auth/session'
 import { isApiError } from '@/shared/api/errors'
 import { sessionStore } from '@/shared/session/session-store'
@@ -10,7 +11,10 @@ export const Route = createFileRoute('/_auth')({
     const session = token
       ? await context.queryClient.ensureQueryData(sessionQueryOptions(token)).catch((error: unknown) => {
           if (isApiError(error, 'SESSION_EXPIRED')) return 'expired' as const
-          return null
+          if (isApiError(error) && error.status === 401) return null
+          // Network or server failure: the session may be fine. Sending the collector
+          // to /login would bounce straight back here, since a token is stored.
+          throw error
         })
       : null
     if (!session || session === 'expired') {
@@ -22,4 +26,11 @@ export const Route = createFileRoute('/_auth')({
     return { user: session.user }
   },
   component: Outlet,
+  errorComponent: AuthError,
 })
+
+/** "Tentar novamente" runs the session check again. */
+function AuthError({ error }: ErrorComponentProps) {
+  const router = useRouter()
+  return <RouteErrorPage error={error} reset={() => void router.invalidate()} />
+}
