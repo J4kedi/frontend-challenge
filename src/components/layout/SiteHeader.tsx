@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import type { MouseEvent, ReactNode } from 'react'
 import { toast } from 'sonner'
 import { CartIcon, LogoutIcon, SearchIcon, UserIcon } from '@/components/icons'
+import { promptVisitor } from '@/features/auth/login-prompt'
 import { useSession } from '@/features/auth/session'
 import { useCartCount } from '@/features/cart/queries'
 import { scrollBehavior, useSectionInView } from '@/shared/hooks/use-section-in-view'
@@ -103,6 +104,7 @@ export function SiteHeader() {
             <Link
               to="/login"
               search={{ redirect: pathname === '/login' ? undefined : pathname }}
+              onClick={promptVisitor({})}
               className="flex h-9 items-center gap-1 rounded-sm bg-primary px-2 text-body-lg font-medium text-ink hover:bg-accent"
             >
               <LogoutIcon className="size-5 rotate-180" />

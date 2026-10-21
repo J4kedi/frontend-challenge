@@ -96,7 +96,7 @@ export async function ordersOf(page: Page) {
 export async function goToReview(page: Page, { login = true }: { login?: boolean } = {}) {
   await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
   if (login) {
-    await expect(page).toHaveURL(/\/login/)
+    await expect(page.getByRole('dialog', { name: 'Entrar' })).toBeVisible()
     await submitLogin(page)
   }
   await expect(page).toHaveURL(/\/checkout$/)

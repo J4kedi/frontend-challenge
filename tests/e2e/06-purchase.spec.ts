@@ -8,9 +8,10 @@ test.describe('06 · compra completa', () => {
     await expect(page.getByTestId('cart-line').filter({ visible: true })).toHaveCount(1)
     await expect(page.getByTestId('quote-total')).toHaveText('1.198 ETH')
 
-    // Checkout is private: the visitor logs in and comes back with the cart merged.
+    // Checkout is private: the visitor logs in over the cart and goes on with the cart merged.
     await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
-    await expect(page).toHaveURL(/\/login\?redirect=/)
+    await expect(page.getByRole('dialog', { name: 'Entrar' })).toBeVisible()
+    await expect(page).toHaveURL(/\/cart$/)
     await submitLogin(page)
     await expect(page).toHaveURL(/\/checkout$/)
 

@@ -33,16 +33,31 @@ test.describe('03 · conta e sessão', () => {
     await expect(page.getByRole('alert').filter({ hasText: 'E-mail ou senha incorretos' })).toBeVisible()
   })
 
-  test('fechar o login aberto pelo carrinho volta ao carrinho', async ({ page }) => {
-    test.skip(isMobile(page), 'No mobile o login é tela cheia, sem botão de fechar; o voltar do navegador faz o mesmo caminho')
+  test('o login pedido pelo carrinho abre sobre o carrinho e fecha nele', async ({ page }) => {
     await openApp(page, '/')
     await addToCartFromDetail(page, 'emerald-ape-042')
     await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
-    await expect(page).toHaveURL(/\/login\?redirect=%2Fcheckout/)
-    // Going to the redirect (/checkout, private) would bounce straight back to this login.
-    await page.getByRole('dialog', { name: 'Entrar' }).getByRole('button', { name: 'Fechar' }).click()
+    const dialog = page.getByRole('dialog', { name: 'Entrar' })
+    await expect(dialog).toContainText('Entre para finalizar a compra.')
+    // The /login route would show the home page behind the modal.
     await expect(page).toHaveURL(/\/cart$/)
-    await expect(page.getByRole('dialog')).toBeHidden()
+    await dialog.getByRole('button', { name: 'Fechar' }).click()
+    await expect(dialog).toBeHidden()
+    await expect(page).toHaveURL(/\/cart$/)
+    await expect(page.getByTestId('cart-line').filter({ visible: true })).toHaveCount(1)
+  })
+
+  test('Entrar no header abre o login sobre a página atual e fica nela', async ({ page }) => {
+    test.skip(isMobile(page), 'No mobile não há header; a aba Perfil leva à tela cheia de login')
+    await openApp(page, '/nft/emerald-ape-042')
+    await page.getByRole('link', { name: 'Entrar', exact: true }).click()
+    const dialog = page.getByRole('dialog', { name: 'Entrar' })
+    await expect(dialog).toContainText('Entre para gerenciar sua carteira')
+    await expect(page).toHaveURL(/\/nft\/emerald-ape-042$/)
+    await submitLogin(page)
+    await expect(dialog).toBeHidden()
+    await expect(page).toHaveURL(/\/nft\/emerald-ape-042$/)
+    await expect(page.getByRole('link', { name: USERS.ana.name })).toBeVisible()
   })
 
   test('expiração durante a navegação, logout e troca de usuário sem vazar dados', async ({ page }) => {

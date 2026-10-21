@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Link, useRouter } from '@tanstack/react-router'
+import { Link, useNavigate, useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { ErrorState } from '@/components/feedback/StatusPage'
 import { ArrowLeftIcon, DeleteIcon } from '@/components/icons'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { QuantityStepper } from '@/components/ui/quantity-stepper'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { CartLine, Quote, QuoteLine } from '@/contracts/commerce'
+import { promptVisitor } from '@/features/auth/login-prompt'
 import { NftCard, NftCardSkeleton } from '@/features/catalog/components/NftCard'
 import { NftImage } from '@/features/catalog/components/NftImage'
 import { highlightsOptions } from '@/features/catalog/queries'
@@ -82,13 +83,21 @@ export function CartPage() {
 }
 
 function CheckoutButton({ quote }: { quote: Quote | undefined }) {
+  const navigate = useNavigate()
   const ready = quote?.purchasable === true
   const reason = !quote ? 'Calculando o total…' : !ready ? 'Resolva os avisos do carrinho para continuar.' : null
+  // Visitors sign in over the cart; the cart moves into the account (see signIn) before checkout.
+  const signInFirst = promptVisitor({
+    reason: 'Entre para finalizar a compra. Os itens do carrinho vão junto para a sua conta.',
+    onSignedIn: () => void navigate({ to: '/checkout' }),
+  })
   return (
     <div>
       {ready ? (
         <Button asChild size="lg" className="h-12 w-full max-md:h-15 max-md:rounded-full">
-          <Link to="/checkout">Conectar e finalizar</Link>
+          <Link to="/checkout" onClick={signInFirst}>
+            Conectar e finalizar
+          </Link>
         </Button>
       ) : (
         <Button size="lg" className="h-12 w-full max-md:h-15 max-md:rounded-full" disabled aria-describedby="checkout-blocked">
