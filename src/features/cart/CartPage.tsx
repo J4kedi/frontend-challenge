@@ -233,7 +233,7 @@ function CartCard({ line, status }: { line: CartLine; status: QuoteLine | undefi
         <NftImage artwork={line.artwork} alt="" sizes="96px" className="h-full" />
       </div>
       <div className="min-w-0 flex-1 py-3">
-        <p className="truncate text-body font-bold">{line.name}</p>
+        <p className="text-body font-bold">{line.name}</p>
         <p className="text-caption text-muted-foreground">Edição: {line.editionLabel}</p>
         <LineStatus status={status} />
         <p className="mt-2 text-title-sm font-bold text-accent">{formatEth(multiplyEth(line.unitPriceEth, line.quantity))}</p>

@@ -1,12 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate, useRouter } from '@tanstack/react-router'
 import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 import { useEffect, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { ErrorState } from '@/components/feedback/StatusPage'
 import { FormError, FormField } from '@/components/form/FormField'
+import { ArrowLeftIcon } from '@/components/icons'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -67,11 +68,23 @@ export function CheckoutPage() {
   const { user } = useSession()
   const cart = useCart()
   const wallets = useWallets()
+  const router = useRouter()
 
   return (
     <div className="mx-auto max-w-page px-4 pt-6 md:px-6 md:pt-8 xl:px-0">
       <Breadcrumb items={[{ label: 'Início', to: '/' }, { label: 'Mercado', to: '/', hash: 'mercado' }, { label: 'Pagamento' }]} />
-      <h1 className="mt-2 text-title font-bold md:sr-only">Pagamento com carteira</h1>
+      <div className="mt-2 flex items-center gap-4 md:hidden">
+        <button
+          type="button"
+          onClick={() => (router.history.canGoBack() ? router.history.back() : void router.navigate({ to: '/cart' }))}
+          aria-label="Voltar"
+          className="grid size-9 place-items-center rounded-full bg-surface-raised"
+        >
+          <ArrowLeftIcon className="size-5" />
+        </button>
+        <h1 className="text-title font-bold">Pagamento com carteira</h1>
+      </div>
+      <h1 className="sr-only max-md:hidden">Pagamento com carteira</h1>
       {!user || cart.isPending || wallets.isPending ? (
         <CheckoutSkeleton />
       ) : cart.isError || wallets.isError ? (
