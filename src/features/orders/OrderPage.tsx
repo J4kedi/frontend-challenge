@@ -179,7 +179,7 @@ function ReceiptContent({ order }: { order: Order }) {
               <tr key={line.editionId}>
                 <td className="py-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-16 shrink-0 overflow-hidden rounded-sm">
+                    <div className="hidden w-16 shrink-0 overflow-hidden rounded-sm min-[360px]:block">
                       <NftImage artwork={line.artwork} alt="" sizes="64px" />
                     </div>
                     <div>
