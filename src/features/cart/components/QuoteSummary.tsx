@@ -22,10 +22,12 @@ export function QuoteTotals({ quote, className }: { quote: Quote | undefined; cl
   }
   const row = 'flex items-baseline justify-between gap-4 [&>dd]:shrink-0 [&>dd]:whitespace-nowrap'
   return (
-    <dl className={cn('space-y-3 text-body-lg text-foreground', className)} data-testid="quote-totals">
+    <dl className={cn('space-y-3 text-body text-foreground', className)} data-testid="quote-totals">
       <div className={row}>
         <dt>Subtotal</dt>
-        <dd data-testid="quote-subtotal">{formatEth(quote.subtotalEth)}</dd>
+        <dd className="text-body-lg md:text-title-sm" data-testid="quote-subtotal">
+          {formatEth(quote.subtotalEth)}
+        </dd>
       </div>
       <div className={row}>
         <dt>Desconto do lançamento{quote.coupon?.status === 'applied' && ` (${quote.coupon.code})`}</dt>
@@ -34,13 +36,15 @@ export function QuoteTotals({ quote, className }: { quote: Quote | undefined; cl
       <div className={row}>
         <dt>Taxa de rede</dt>
         <dd className="text-right">
-          <span data-testid="quote-fee">{formatEth(quote.networkFeeEth)}</span>
+          <span className="text-body-lg md:text-title-sm" data-testid="quote-fee">
+            {formatEth(quote.networkFeeEth)}
+          </span>
           <span className="mt-1 block text-caption text-accent">Taxa estimada</span>
         </dd>
       </div>
       <div className={cn(row, 'border-t border-border pt-4 font-bold')}>
-        <dt>Total</dt>
-        <dd className="text-title-lg text-accent" data-testid="quote-total">
+        <dt className="text-body-lg">Total</dt>
+        <dd className="text-title-sm text-accent" data-testid="quote-total">
           {formatEth(quote.totalEth)}
         </dd>
       </div>

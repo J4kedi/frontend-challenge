@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate, useRouter } from '@tanstack/react-router'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { ErrorState } from '@/components/feedback/StatusPage'
 import { ArrowLeftIcon, DeleteIcon } from '@/components/icons'
@@ -14,7 +15,7 @@ import { useSession } from '@/features/auth/session'
 import { promptVisitor } from '@/features/auth/login-prompt'
 import { NftCard, NftCardSkeleton } from '@/features/catalog/components/NftCard'
 import { NftImage } from '@/features/catalog/components/NftImage'
-import { highlightsOptions } from '@/features/catalog/queries'
+import { nftListOptions } from '@/features/catalog/queries'
 import { announce } from '@/shared/a11y/announcer'
 import { isApiError } from '@/shared/api/errors'
 import { cn } from '@/shared/lib/cn'
@@ -164,7 +165,15 @@ const maxFor = (line: CartLine) => Math.max(1, Math.min(line.maxPerOrder, Math.m
 
 function CartTable({ lines, quote }: { lines: CartLine[]; quote: Quote | undefined }) {
   return (
-    <table className="hidden w-full border-separate border-spacing-y-3 text-left md:table">
+    <table className="hidden w-full table-fixed border-separate border-spacing-y-3 text-left md:table">
+      {/* Column widths of the Figma table (311, 138, 137 and 140 of 782 px), as proportions. */}
+      <colgroup>
+        <col className="w-[39.8%]" />
+        <col className="w-[17.6%]" />
+        <col className="w-[17.5%]" />
+        <col className="w-[17.9%]" />
+        <col />
+      </colgroup>
       <thead>
         <tr className="text-body-lg font-bold text-foreground">
           <th scope="col" className="border-b border-border pb-3">
@@ -298,26 +307,45 @@ function CartSkeleton() {
   )
 }
 
+/** Figma "Related Products": five trending NFTs per page, three pages behind the dots. */
+const SHOWCASE_PAGES = 3
+const SHOWCASE_SIZE = 5
+
 function RelatedProducts() {
-  const { data, isPending } = useQuery(highlightsOptions())
+  const [page, setPage] = useState(1)
+  const { data, isPending } = useQuery(nftListOptions({ tab: 'trending', page, pageSize: SHOWCASE_SIZE }))
   return (
     <section aria-labelledby="cart-related" className="mt-20">
       <h2 id="cart-related" className="border-b border-border pb-2 text-title-sm font-bold text-accent">
         Colecionadores também viram
       </h2>
-      <ul className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
+      <ul className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-5">
         {isPending
-          ? Array.from({ length: 4 }, (_, i) => (
+          ? Array.from({ length: SHOWCASE_SIZE }, (_, i) => (
               <li key={i}>
                 <NftCardSkeleton />
               </li>
             ))
-          : data?.related.map((nft) => (
+          : data?.items.map((nft) => (
               <li key={nft.id}>
                 <NftCard nft={nft} />
               </li>
             ))}
       </ul>
+      <div role="group" aria-label="Páginas da vitrine" className="mt-6 flex justify-center gap-1">
+        {Array.from({ length: SHOWCASE_PAGES }, (_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => setPage(i + 1)}
+            aria-label={`Mostrar a página ${i + 1} de ${SHOWCASE_PAGES} da vitrine`}
+            aria-current={page === i + 1 ? 'true' : undefined}
+            className="group grid size-6 place-items-center"
+          >
+            <span aria-hidden="true" className={cn('size-3 rounded-full border border-primary', page === i + 1 ? 'bg-primary' : 'group-hover:bg-primary/40')} />
+          </button>
+        ))}
+      </div>
     </section>
   )
 }
