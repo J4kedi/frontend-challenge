@@ -76,7 +76,9 @@ function applyNftUpdated(queryClient: QueryClient, event: NftUpdatedEvent) {
         `${line.name}: o preço mudou de ${formatEth(line.unitPriceEth)} para ${formatEth(edition.priceEth)}. O resumo do carrinho foi atualizado.`,
       )
     }
-    void queryClient.invalidateQueries({ queryKey: key })
+    // A first load still on its way (no data yet) would be reused by the refetch,
+    // and its answer may predate this change: cancel it, then fetch again.
+    void queryClient.cancelQueries({ queryKey: key }).then(() => queryClient.invalidateQueries({ queryKey: key }))
   }
 }
 

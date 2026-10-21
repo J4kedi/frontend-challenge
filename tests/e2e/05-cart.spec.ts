@@ -1,4 +1,4 @@
-import { addToCartFromDetail, expect, isMobile, loginAs, mockControl, openApp, submitLogin, test, USERS, visibleTestId, waitForMocks } from './support/app'
+import { addToCartFromDetail, expect, isMobile, loginAs, mockControl, openApp, submitLogin, test, USERS, visibleTestId, waitForMocks, waitForRealtime } from './support/app'
 
 test.describe('05 · carrinho', () => {
   test('quantidades, remoção, cupom e persistência após refresh e login', async ({ page }) => {
@@ -52,6 +52,7 @@ test.describe('05 · carrinho', () => {
     await expect(page).toHaveURL(/\/cart$/)
 
     // Stock drops to 1 while the collector holds 3: stepping down must work.
+    await waitForRealtime(page)
     await mockControl(page, '/nfts/emerald-ape-042', { available: 1 })
     const line = visibleTestId(page, 'cart-line')
     await expect(line.getByTestId('line-status')).toHaveText('Só resta 1')

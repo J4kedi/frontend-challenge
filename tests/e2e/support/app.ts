@@ -23,6 +23,15 @@ export async function waitForMocks(page: Page) {
 }
 
 /**
+ * Waits for the realtime socket. An event published before the first connection
+ * reaches the page only with its next REST fetch, so tests that publish one
+ * right after opening a page wait for the connection first.
+ */
+export async function waitForRealtime(page: Page) {
+  await expect(page.locator('html[data-realtime="online"]')).toBeAttached()
+}
+
+/**
  * Calls the mock control API from inside the page: MSW handlers only exist in
  * the browser, so Playwright's `request` fixture cannot reach them.
  */
